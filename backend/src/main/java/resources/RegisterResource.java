@@ -58,26 +58,100 @@ public class RegisterResource {
                     role = "USER";
                     status = "INACTIVE";
                 }
-                user = Entity.newBuilder(userKey)
-                        .set("email", data.email)
-                        .set("name", data.name)
-                        .set("password", DigestUtils.sha512Hex(data.password))
-                        .set("landline", data.landline)
-                        .set("mobile", data.mobile)
-                        .set("address", data.address)
-                        .set("complementary", data.complementary)
-                        .set("city", data.city)
-                        .set("postcode", data.postcode)
-                        .set("workplace", data.workplace)
-                        .set("occupation", data.occupation)
-                        .set("nif", data.nif)
-                        .set("privacy", data.privacy)
-                        .set("role", role)
-                        .set("status", status)
-                        .set("time_creation", Timestamp.now())
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-                txn.add(user);
+                Entity.Builder builder = Entity.newBuilder(userKey);
+                if(true){
+                    builder.set("email", data.email);
+                }
+                if(true){
+                    builder.set("name", data.name);
+                }
+                if(true){
+                    builder.set("password", DigestUtils.sha512Hex(data.password));
+                }
+
+                if(true){
+                    builder.set("landline", data.landline);
+                }else {
+                    builder.set("landline", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("mobile", data.mobile);
+                }else {
+                    builder.set("mobile", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("address", data.address);
+                }else {
+                    builder.set("address", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("complementary", data.complementary);
+                }else {
+                    builder.set("complementary", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("postcode", data.postcode);
+                }else {
+                    builder.set("postcode", "EMPTY");
+                }
+
+                if(true){
+                    builder .set("workplace", data.workplace);
+                }else {
+                    builder.set("workplace", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("occupation", data.occupation);
+                }else {
+                    builder.set("occupation", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("nif", data.nif);
+                }else {
+                    builder.set("nif", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("email", data.email);
+                }else {
+                    builder.set("email", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("privacy", data.privacy);
+                }else {
+                    builder.set("privacy", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("laranja", "toranja");
+                }
+
+                if(true){
+                    builder.set("villager", "gimme emeralds");
+                }
+
+                if(true){
+                    builder.set("role", role);
+                }else {
+                    builder.set("role", "EMPTY");
+                }
+
+                if(true){
+                    builder.set("status", status);
+                }else {
+                    builder.set("status", "EMPTY");
+                }
+                    builder.set("time_creation", Timestamp.now());
+                    builder.set("time_lastupdate", Timestamp.now());
+                Entity entity = builder.build();
+                txn.add(entity);
 
                 LOG.info("User registered " + data.username);
                 txn.commit();

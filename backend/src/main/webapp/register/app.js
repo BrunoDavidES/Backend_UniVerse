@@ -83,7 +83,7 @@ function uploadPFP() {
 
     if(file !== null) {
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/gcs/braided-turbine-379313.appspot.com/" + document.getElementById("username").value, false);
+        xhr.open("POST", "/gcs/universe-202223.appspot.com/" + document.getElementById("username").value, false);
         xhr.setRequestHeader("Content-Type", file.type);
         xhr.send(file);
     }

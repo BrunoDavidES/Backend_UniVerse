@@ -409,7 +409,7 @@ function getToken() {
 }
 
 function downloadPFP() {
-    document.getElementsByClassName("profile_picture")[0].src = "https://storage.googleapis.com/braided-turbine-379313.appspot.com/" + document.getElementById("username").textContent;
+    document.getElementsByClassName("profile_picture")[0].src = "https://storage.googleapis.com/universe-202223.appspot.com/" + document.getElementById("username").textContent;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
