@@ -8,11 +8,12 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import util.UserData;
+import util.ValToken;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -26,6 +27,42 @@ public class RegisterResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     //private static final Datastore datastore = DatastoreOptions.newBuilder().setHost("localhost:8081").setProjectId("id").build().getService();
+
+
+
+    @POST
+    @Path("/new/{kind}/{key}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getReceivedInbox(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("key") String keyName, Map<String, String> attributes) {
+        LOG.fine("Attempt to create new entity");
+
+
+
+        Transaction txn = datastore.newTransaction();
+        Key key = datastore.newKeyFactory().setKind("Role").newKey(keyName);
+
+        try {
+            Entity role = txn.get(key);
+            if(role == null){
+                txn.rollback();
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            Entity.Builder builder = Entity.newBuilder(key);
+            for(Map.Entry<String, String> attribute : attributes.entrySet()) {
+                builder.set(attribute.getKey(), attribute.getValue());
+            }
+            Entity entity = builder.build();
+            txn.put(entity);
+
+            LOG.info("Role Created");
+            txn.commit();
+            return Response.ok().build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
     public RegisterResource() {}
 
     @POST
