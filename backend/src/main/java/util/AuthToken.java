@@ -25,7 +25,7 @@ public class AuthToken {
 
 	public String generateToken(Map<String, String> payload) throws Exception {
 		Builder tokenBuilder = JWT.create()
-				.withIssuer("https://localhost:8080")
+				.withIssuer("https://localcapi:8080")
 				.withClaim("jti", UUID.randomUUID().toString())
 				.withExpiresAt(Instant.now().plusSeconds(6000))
 				.withIssuedAt(Instant.now());

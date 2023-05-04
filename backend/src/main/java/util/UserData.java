@@ -6,18 +6,9 @@ public class UserData {
 	public String name;
 	public String password;
 	public String confirmation;
-	public int landline;
-	public int mobile;
-	public String occupation;
-	public String workplace;
-	public String address;
-	public String complementary;
-	public String city;
-	public String postcode;
-	public String nif;
+
 	public String role;
-	public String status;
-	public String privacy;
+
 	
 	public UserData() { }
 
