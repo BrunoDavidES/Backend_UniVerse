@@ -26,7 +26,6 @@ import util.LoginData;
 @Path("/login")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LoginResource {
-	private static final String MODE_MAINTENANCE = "MAINTENANCE";
 
 	private static final String USER = "USER";
 
@@ -42,7 +41,7 @@ public class LoginResource {
 
 
 	@POST
-	@Path("/v1")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response doLogin(LoginData data) {
@@ -76,17 +75,6 @@ public class LoginResource {
 					return Response.status(Status.FORBIDDEN).entity("User " + data.username + "  is already logged in.").build();
 				}
 
-				Key modeKey = datastore.newKeyFactory().setKind("Mode").newKey("Mode");
-				Entity mode = txn.get(modeKey);
-
-				if (mode.getString("mode").equals(MODE_MAINTENANCE) &&
-						user.getString("role").equals(USER)) {
-					txn.rollback();
-					Log.info("Login attempt while in maintenance mode.");
-					return Response.status(Status.SERVICE_UNAVAILABLE)
-							.entity("Login attempt while in maintenance mode.\nPlease try again later.").build();
-				}
-
 				token = Entity.newBuilder(tokenKey)
 						.set("username", auToken.username)
 						.set("tokenId", auToken.tokenId)
@@ -110,7 +98,7 @@ public class LoginResource {
 		}  finally{
 			if (txn.isActive()) {
 				txn.rollback();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error 500. Something went wrong with your request.").build();
+				//return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error 500. Something went wrong with your request.").build();
 			}
 		}
 	}
