@@ -321,12 +321,12 @@ function validateToken() {
             loadUserInfo(username, userRole);
             document.getElementById("decodedToken").innerHTML = xhr.responseText;
         } else {
-            window.location.href = "/login";
+            //window.location.href = "/login";
         }
     };
     xhr.onerror = function() {
         console.log("UPS");
-        window.location.href = "/login";
+        //window.location.href = "/login";
     };
 }
 

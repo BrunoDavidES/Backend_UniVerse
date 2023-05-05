@@ -79,9 +79,9 @@ public class RegisterResource {
         Transaction txn = datastore.newTransaction();
         try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
-            Key mapKey = datastore.newKeyFactory().setKind("RolesMap").newKey("ROLES MAP"); // MAP ENTITY TO FINISH
+            //Key roleKey = datastore.newKeyFactory().setKind("RolesMap").newKey("ROLES MAP"); // MAP ENTITY TO FINISH
             Entity user = txn.get(userKey);
-            Entity map = txn.get(mapKey); //MAP ENTITY TO FINISH
+            //Entity roleAttributes = txn.get(mapKey); //MAP ENTITY TO FINISH
 
             if( user != null ) {
                 txn.rollback();
@@ -89,26 +89,17 @@ public class RegisterResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("User already exists").build();
             } else {
                 Entity.Builder builder = Entity.newBuilder(userKey);
-                if(true){
-                    builder.set("name", data.name);
-                }
-                if(true){
-                    builder.set("password", DigestUtils.sha512Hex(data.password));
-                }
-                if(true){
-                    builder.set("email", data.email);
-                }else {
-                    builder.set("email", "EMPTY");
-                }
-                if(true){
-                    builder.set("role", data.role);
-                }else {
-                    builder.set("role", "EMPTY");
-                }
-                    builder.set("time_creation", Timestamp.now());
-                    builder.set("time_lastupdate", Timestamp.now());
-                Entity entity = builder.build();
-                txn.add(entity);
+
+                    builder.set("name", data.name)
+                    .set("password", DigestUtils.sha512Hex(data.password))
+                    .set("email", data.email)
+                    .set("role", "SU")
+                    .set("status", "ACTIVE")
+                    .set("time_creation", Timestamp.now())
+                    .set("time_lastupdate", Timestamp.now());
+
+                user = builder.build();
+                txn.add(user);
 
                 LOG.info("User registered " + data.username);
                 txn.commit();

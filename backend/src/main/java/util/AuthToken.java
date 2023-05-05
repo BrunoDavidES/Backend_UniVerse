@@ -1,39 +1,34 @@
 package util;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.time.Instant;
-import java.util.Map;
 import java.util.UUID;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator.Builder;
-import com.auth0.jwt.algorithms.Algorithm;
-
 public class AuthToken {
-	private KeyPairGenerator keyPairGenerator;
-	private KeyPair keyPair;
 
-	public AuthToken () throws NoSuchAlgorithmException {
-		keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-		keyPairGenerator.initialize(2048);
-		keyPair = keyPairGenerator.generateKeyPair();
+	public String username;
+	public String tokenId;
+	public long creationDate;
+	public long expirationDate;
+	public String role;
+
+	public static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2h
+
+	public AuthToken(String username) {
+		this.username = username;
+		this.tokenId = UUID.randomUUID().toString();
+		this.creationDate = System.currentTimeMillis();
+		this.expirationDate = this.creationDate + AuthToken.EXPIRATION_TIME;
+		this.role = null;
 	}
 
-	public String generateToken(Map<String, String> payload) throws Exception {
-		Builder tokenBuilder = JWT.create()
-				.withIssuer("https://localcapi:8080")
-				.withClaim("jti", UUID.randomUUID().toString())
-				.withExpiresAt(Instant.now().plusSeconds(6000))
-				.withIssuedAt(Instant.now());
-
-		payload.entrySet().forEach(action -> tokenBuilder.withClaim(action.getKey(), action.getValue()));
-
-		return tokenBuilder.sign(Algorithm.RSA256(((RSAPublicKey) keyPair.getPublic()), (RSAPrivateKey) keyPair.getPrivate()));
+	public AuthToken(String username, String tokenId, long creationDate, long expirationDate, String role) {
+		this.username = username;
+		this.tokenId = tokenId;
+		this.creationDate = creationDate;
+		this.expirationDate = expirationDate;
+		this.role = role;
 	}
 
-
+	public void setRole(String role) {
+		this.role = role;
+	}
 }

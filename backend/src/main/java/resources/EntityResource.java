@@ -1,9 +1,6 @@
 package resources;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.*;
-import com.google.gson.Gson;
-import util.MessageData;
 import util.ValToken;
 
 import javax.servlet.http.Cookie;
@@ -12,9 +9,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
