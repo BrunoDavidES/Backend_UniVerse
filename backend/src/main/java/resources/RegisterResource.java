@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Path("/register")
@@ -110,6 +111,58 @@ public class RegisterResource {
                 txn.rollback();
             }
         }
+    }
+
+    @POST
+    @Path("/v2")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response registerV2(UserData data) {
+        String[] emails = data.getEmails();
+        for (String email : emails) {
+            String username = email.split("@")[0];
+            LOG.fine("Attempt to register user: " + username);
+
+            /*if (!data.validateRegister()) {
+                LOG.warning("Missing or wrong parameter");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
+            }*/
+
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+                Entity user = txn.get(userKey);
+
+                if (user != null) {
+                    txn.rollback();
+                    LOG.warning("User already exists");
+                    //return Response.status(Response.Status.BAD_REQUEST).entity("User already exists").build();
+                } else {
+                    Entity.Builder builder = Entity.newBuilder(userKey);
+
+                    String password = UUID.randomUUID().toString();
+
+                    builder.set("name", data.name)
+                            .set("password", DigestUtils.sha512Hex(password))
+                            .set("email", data.email)
+                            .set("role", data.role);
+
+                    for (String[] attribute : data.attributes) {
+                        builder.set(attribute[0], attribute[1]);
+                    }
+
+                    user = builder.build();
+                    txn.add(user);
+
+                    LOG.info("User registered " + data.username);
+                    txn.commit();
+                }
+            } finally {
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
+            }
+        }
+        return Response.ok().build();
     }
 
 }

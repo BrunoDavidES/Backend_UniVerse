@@ -1,13 +1,17 @@
 package util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserData {
 	public String username;
+	public String[] multipleEmails;
 	public String email;
 	public String name;
 	public String password;
 	public String confirmation;
-
 	public String role;
+	public String[][] attributes;
 
 	
 	public UserData() { }
@@ -23,6 +27,10 @@ public class UserData {
 			return false;
 		}
 		return password.equals(confirmation);
+	}
+
+	public String[] getEmails() {
+		return multipleEmails;
 	}
 
 	public boolean validateLogin() {
