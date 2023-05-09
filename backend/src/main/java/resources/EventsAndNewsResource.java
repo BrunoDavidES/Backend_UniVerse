@@ -70,11 +70,47 @@ public class EventsAndNewsResource {
     @POST
     @Path("/addNews")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postNews(){
+    public Response postNews(FeedData data){
         /*
          * verificações de role e tokens
          */
-        return Response.ok().build();
+        LOG.fine("Attempt to add news.");
+
+        if( !data.validate() ) {
+            LOG.warning("Missing or wrong parameter");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
+        }
+
+        Transaction txn = datastore.newTransaction();
+
+        try {
+            Key newsKey = datastore.newKeyFactory().setKind("Event").newKey(data.eventname);
+            //Key roleKey = datastore.newKeyFactory().setKind("RolesMap").newKey("ROLES MAP"); // MAP ENTITY TO FINISH
+            Entity news = txn.get(newsKey);
+            //Entity roleAttributes = txn.get(mapKey); //MAP ENTITY TO FINISH
+
+            if( news != null ) {
+                txn.rollback();
+                LOG.warning("News already exists");
+                return Response.status(Response.Status.BAD_REQUEST).entity("News already exists").build();
+            } else {
+                Entity.Builder builder = Entity.newBuilder(newsKey);
+
+                builder.set("name", data.name)
+                        .set("time_creation", Timestamp.now());
+
+                news = builder.build();
+                txn.add(news);
+
+                LOG.info("User registered " + data.eventname);
+                txn.commit();
+                return Response.ok(news).build();
+            }
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
     }
 
     @GET
