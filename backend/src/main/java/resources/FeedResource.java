@@ -3,11 +3,15 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.datastore.v1.CompositeFilter;
 import util.FeedData;
 
+import com.google.gson.Gson;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -98,7 +102,7 @@ public class FeedResource {
                 entry = builder.build();
                 txn.add(entry);
 
-                LOG.info(kind + " registered " + data.eventname);
+                LOG.info(kind + " registered " + data.title + "; id: " + id);
                 txn.commit();
                 return Response.ok(entry).build();
             }
@@ -148,23 +152,48 @@ public class FeedResource {
     }
 
     @GET
-    @Path("/queryEvents")
+    @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEvents(){
+    public Response queryEvents(@QueryParam("kind") String kind, @QueryParam("filters") String[][] filters,
+                                @QueryParam("limit") int limit, @QueryParam("offset") int offset){
         /*
          * verificações de role e tokens
          */
-        return Response.ok().build();
+        LOG.fine("Attempt to query events: ");
+
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
+
+        for (String[] filter: filters){
+            StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(filter[0], filter[1]);
+
+            if(attributeFilter == null)
+                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
+            else
+                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(kind)
+                .setFilter(attributeFilter)
+                .setLimit(limit)
+                .setOffset(offset)
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(list -> {
+            results.add(list);
+        });
+
+        LOG.info("Ides receber um query ó filho!");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!").build();
+
     }
 
-    @GET
-    @Path("/queryNews")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryNews(){
-        /*
-         * verificações de role e tokens
-         */
-        return Response.ok().build();
-    }
 
 }
