@@ -66,7 +66,6 @@ public class LogoutResource {
         }  finally {
             if (txn.isActive()) {
                 txn.rollback();
-                return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error 500. Something went wrong with your request.").build();
             }
         }
     }
