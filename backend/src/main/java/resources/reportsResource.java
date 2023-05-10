@@ -1,12 +1,11 @@
 package resources;
 
-
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
-import com.google.datastore.v1.CompositeFilter;
-import util.FeedData;
-
 import com.google.gson.Gson;
+import util.FeedData;
+import util.ReportData;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -15,9 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-@Path("/feed")
+@Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class FeedResource {
+public class reportsResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     //private static final Datastore datastore = DatastoreOptions.newBuilder().setHost("localhost:8081").setProjectId("id").build().getService();
@@ -26,14 +25,15 @@ public class FeedResource {
     @POST
     @Path("/post")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postFeed(FeedData data, String kind){
+    public Response postReports(ReportData data){
 
         /*
          * verificações de role e tokens
          */
-        LOG.fine("Attempt to post feed.");
 
-        if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
+        LOG.fine("Attempt to post report.");
+
+        if(!data.validate()) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
         }
@@ -41,26 +41,29 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key feedKey;
+            Key reportKey;
             Entity entry;
             String id;
             do {
                 id = UUID.randomUUID().toString();
-                feedKey = datastore.newKeyFactory().setKind(kind).newKey(id);
-                entry = txn.get(feedKey);
+                reportKey = datastore.newKeyFactory().setKind("Report").newKey(id);
+                entry = txn.get(reportKey);
             } while(entry != null);
 
-            Entity.Builder builder = Entity.newBuilder(feedKey);
+            Entity.Builder builder = Entity.newBuilder(reportKey);
 
             builder.set("title", data.title)
+                    .set("reporter", data.reporter)
+                    .set("department", data.department)
+                    .set("status", "UNSEEN")
                     .set("time_creation", Timestamp.now());
 
             entry = builder.build();
             txn.add(entry);
 
-            LOG.info(kind + " registered " + id);
+            LOG.info("Report registered " + id);
             txn.commit();
-            return Response.ok(entry).build();
+            return Response.ok(id).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -68,81 +71,37 @@ public class FeedResource {
         }
     }
 
-    @PATCH
+    @POST
     @Path("/edit/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editFeed(@PathParam("id") String id, FeedData data, String kind){
+    public Response editReport(@PathParam("id") String id){
 
         /*
          * verificações de role e tokens
          */
-        LOG.fine("Attempt to add event.");
-
-        if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
-            LOG.warning("Missing or wrong parameter");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-        }
+        LOG.fine("Attempt to edit report");
 
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
+            Key eventKey = datastore.newKeyFactory().setKind("Report").newKey(id);
             Entity entry = txn.get(eventKey);
 
             if( entry == null ) {
                 txn.rollback();
-                LOG.warning(kind + " does not exist");
-                return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
+                LOG.warning("Report does not exist");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Report does not exist").build();
             } else {
                 Entity.Builder builder = Entity.newBuilder(eventKey);
 
-                builder.set("title", data.title)
-                        .set("time_creation", Timestamp.now());
+                builder.set("time_lastUpdated", Timestamp.now());
 
                 entry = builder.build();
                 txn.add(entry);
 
-                LOG.info(kind + " registered " + data.title + "; id: " + id);
+                LOG.info( "Report registered id: " + id);
                 txn.commit();
-                return Response.ok(entry).build();
-            }
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @DELETE
-    @Path("/delete/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEvent(@PathParam("id") String id, String kind){
-
-        /*
-         * verificações de role e tokens
-         */
-        LOG.fine("Attempt to add event.");
-
-        /*if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
-            LOG.warning("Missing or wrong parameter");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-        }*/
-
-        Transaction txn = datastore.newTransaction();
-
-        try {
-            Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
-            Entity entry = txn.get(eventKey);
-
-            if( entry == null ) {
-                txn.rollback();
-                LOG.warning(kind + " does not exist");
-                return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
-            } else {
-                txn.delete(eventKey);
-                LOG.info(kind + " registered " + id);
-                txn.commit();
-                return Response.ok(entry).build();
+                return Response.ok(id).build();
             }
         } finally {
             if (txn.isActive()) {
@@ -154,12 +113,12 @@ public class FeedResource {
     @GET
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEvents(@QueryParam("kind") String kind, @QueryParam("filters") String[][] filters,
+    public Response queryReports(@QueryParam("filters") String[][] filters,
                                 @QueryParam("limit") int limit, @QueryParam("offset") int offset){
         /*
          * verificações de role e tokens
          */
-        LOG.fine("Attempt to query events.");
+        LOG.fine("Attempt to query reports.");
 
         QueryResults<Entity> queryResults;
 
@@ -175,7 +134,7 @@ public class FeedResource {
         }
 
         Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind(kind)
+                .setKind("Report")
                 .setFilter(attributeFilter)
                 .setLimit(limit)
                 .setOffset(offset)
@@ -192,6 +151,4 @@ public class FeedResource {
         return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!!").build();
 
     }
-
-
 }
