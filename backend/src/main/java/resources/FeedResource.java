@@ -20,9 +20,9 @@ public class FeedResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
-    @Path("/post")
+    @Path("/post/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEntry(FeedData data, String kind){
+    public Response postEntry(@PathParam("kind") String kind, FeedData data){
         LOG.fine("Attempt to post entry to feed.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
@@ -61,9 +61,9 @@ public class FeedResource {
     }
 
     @PATCH
-    @Path("/edit/{id}")
+    @Path("/edit/{kind}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editEntry(@PathParam("id") String id, FeedData data, String kind){
+    public Response editEntry(@PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
         LOG.fine("Attempt to edit feed entry.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
@@ -102,9 +102,8 @@ public class FeedResource {
     }
 
     @DELETE
-    @Path("/delete/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEntry(@PathParam("id") String id, String kind){
+    @Path("/delete/{kind}/{id}")
+    public Response deleteEntry(@PathParam("kind") String kind, @PathParam("id") String id){
         LOG.fine("Attempt to add event.");
 
         if((!kind.equals("News") && !kind.equals("Event"))) {
@@ -136,9 +135,9 @@ public class FeedResource {
     }
 
     @POST
-    @Path("/query")
+    @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntries(@QueryParam("kind") String kind,
+    public Response queryEntries(@PathParam("kind") String kind,
                                 @QueryParam("limit") int limit,
                                 @QueryParam("offset") int offset, String[][] filters){
         LOG.fine("Attempt to query feed " + kind);
