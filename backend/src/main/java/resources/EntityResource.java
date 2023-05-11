@@ -1,7 +1,6 @@
 package resources;
 
 import com.google.cloud.datastore.*;
-import util.ValToken;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import java.util.logging.Logger;
 public class EntityResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-    //private static final Datastore datastore = DatastoreOptions.newBuilder().setHost("localhost:8081").setProjectId("id").build().getService();
 
     public EntityResource() { }
 
@@ -26,24 +24,6 @@ public class EntityResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getReceivedInbox(@Context HttpServletRequest request,@PathParam("kind") String kind,@PathParam("key") String keyName, Map<String, String> attributes) {
         LOG.fine("Attempt to create new entity");
-
-        final ValToken validator = new ValToken();
-        String codedToken = null;
-
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    codedToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        if (codedToken == null) {
-            LOG.warning("Token not found");
-            //return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
-        }
 
             Transaction txn = datastore.newTransaction();
             try {

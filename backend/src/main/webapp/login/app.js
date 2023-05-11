@@ -26,6 +26,18 @@ function login() {
     });
 }
 
+function validateToken() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/rest/token/validate", true);
+    xhr.send();
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            window.location.href = "/profile";
+        }
+    };
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+    validateToken();
     login();
 });

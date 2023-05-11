@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 public class reportsResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-    //private static final Datastore datastore = DatastoreOptions.newBuilder().setHost("localhost:8081").setProjectId("id").build().getService();
-
 
     @POST
     @Path("/post")
