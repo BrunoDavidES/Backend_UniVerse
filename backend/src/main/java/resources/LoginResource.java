@@ -66,7 +66,7 @@ public class LoginResource {
 			String hashedPassword = (String) user.getString("password");
 
 			if (data.isPasswordValid(hashedPassword)) {
-				AuthToken auToken = new AuthToken(data.username);
+				AuthToken auToken = new AuthToken(data.username, user.getString("name"));
 				Entity token = txn.get(tokenKey);
 
 				if (token != null  &&  token.getLong("expirationDate") >= System.currentTimeMillis()  ) {
@@ -77,6 +77,7 @@ public class LoginResource {
 
 				token = Entity.newBuilder(tokenKey)
 						.set("username", auToken.username)
+						.set("name", auToken.name)
 						.set("tokenId", auToken.tokenId)
 						.set("creationDate", auToken.creationDate)
 						.set("expirationDate", auToken.expirationDate)
