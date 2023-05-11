@@ -21,7 +21,7 @@ public class FeedData {
         boolean validity = title != null && img != null && description != null;
 
         if(kind.equals("Event")) {
-            validity = validity && startDate != null && endDate != null && manager != null && location != null;
+            validity = validity && startDate != null && endDate != null && manager != null && location != null && capacity > 0;
         }
         return validity;
     }

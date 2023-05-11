@@ -3,7 +3,6 @@ package resources;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
-import util.FeedData;
 import util.ReportData;
 
 import javax.ws.rs.*;
@@ -24,11 +23,6 @@ public class reportsResource {
     @Path("/post")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postReports(ReportData data){
-
-        /*
-         * verificações de role e tokens
-         */
-
         LOG.fine("Attempt to post report.");
 
         if(!data.validate()) {
@@ -73,10 +67,6 @@ public class reportsResource {
     @Path("/edit/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editReport(@PathParam("id") String id){
-
-        /*
-         * verificações de role e tokens
-         */
         LOG.fine("Attempt to edit report");
 
         Transaction txn = datastore.newTransaction();
@@ -111,11 +101,9 @@ public class reportsResource {
     @GET
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryReports(@QueryParam("filters") String[][] filters,
-                                @QueryParam("limit") int limit, @QueryParam("offset") int offset){
-        /*
-         * verificações de role e tokens
-         */
+    public Response queryReports(@QueryParam("limit") int limit,
+                                 @QueryParam("offset") int offset,
+                                 String[][] filters) {
         LOG.fine("Attempt to query reports.");
 
         QueryResults<Entity> queryResults;

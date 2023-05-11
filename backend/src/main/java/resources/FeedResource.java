@@ -1,9 +1,7 @@
 package resources;
 
-
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
-import com.google.datastore.v1.CompositeFilter;
 import util.FeedData;
 
 import com.google.gson.Gson;
@@ -24,12 +22,8 @@ public class FeedResource {
     @POST
     @Path("/post")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postFeed(FeedData data, String kind){
-
-        /*
-         * verificações de role e tokens
-         */
-        LOG.fine("Attempt to post feed.");
+    public Response postEntry(FeedData data, String kind){
+        LOG.fine("Attempt to post entry to feed.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
@@ -56,7 +50,7 @@ public class FeedResource {
             entry = builder.build();
             txn.add(entry);
 
-            LOG.info(kind + " registered " + id);
+            LOG.info(kind + " posted " + data.title + "; id: " + id);
             txn.commit();
             return Response.ok(entry).build();
         } finally {
@@ -69,12 +63,8 @@ public class FeedResource {
     @PATCH
     @Path("/edit/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editFeed(@PathParam("id") String id, FeedData data, String kind){
-
-        /*
-         * verificações de role e tokens
-         */
-        LOG.fine("Attempt to add event.");
+    public Response editEntry(@PathParam("id") String id, FeedData data, String kind){
+        LOG.fine("Attempt to edit feed entry.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
@@ -89,8 +79,8 @@ public class FeedResource {
 
             if( entry == null ) {
                 txn.rollback();
-                LOG.warning(kind + " does not exist");
-                return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
+                LOG.warning(kind + " does not exist " + id);
+                return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
             } else {
                 Entity.Builder builder = Entity.newBuilder(eventKey);
 
@@ -100,7 +90,7 @@ public class FeedResource {
                 entry = builder.build();
                 txn.add(entry);
 
-                LOG.info(kind + " registered " + data.title + "; id: " + id);
+                LOG.info(kind + " edited " + data.title + "; id: " + id);
                 txn.commit();
                 return Response.ok(entry).build();
             }
@@ -114,17 +104,13 @@ public class FeedResource {
     @DELETE
     @Path("/delete/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteEvent(@PathParam("id") String id, String kind){
-
-        /*
-         * verificações de role e tokens
-         */
+    public Response deleteEntry(@PathParam("id") String id, String kind){
         LOG.fine("Attempt to add event.");
 
-        /*if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
+        if((!kind.equals("News") && !kind.equals("Event"))) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-        }*/
+        }
 
         Transaction txn = datastore.newTransaction();
 
@@ -138,7 +124,7 @@ public class FeedResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
             } else {
                 txn.delete(eventKey);
-                LOG.info(kind + " registered " + id);
+                LOG.info(kind + " deleted " + id);
                 txn.commit();
                 return Response.ok(entry).build();
             }
@@ -152,12 +138,10 @@ public class FeedResource {
     @GET
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEvents(@QueryParam("kind") String kind, @QueryParam("filters") String[][] filters,
-                                @QueryParam("limit") int limit, @QueryParam("offset") int offset){
-        /*
-         * verificações de role e tokens
-         */
-        LOG.fine("Attempt to query events.");
+    public Response queryEntries(@QueryParam("kind") String kind,
+                                @QueryParam("limit") int limit,
+                                @QueryParam("offset") int offset, String[][] filters){
+        LOG.fine("Attempt to query feed " + kind);
 
         QueryResults<Entity> queryResults;
 
