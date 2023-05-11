@@ -27,7 +27,6 @@ function register() {
             xhr.send(JSON.stringify(userData));
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    uploadPFP();
                     alert("SUCCESS");
                     window.location = "..";
                 } else {
