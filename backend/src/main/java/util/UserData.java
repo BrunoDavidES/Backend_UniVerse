@@ -16,6 +16,14 @@ public class UserData {
 	
 	public UserData() { }
 
+	public UserData(String username, String password, String confirmation, String email, String name) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.confirmation = confirmation;
+		this.name = name;
+	}
+
 	public boolean validateRegister() {
 		if (username == null || email == null || name == null || password == null || confirmation == null) {
 			return false;
