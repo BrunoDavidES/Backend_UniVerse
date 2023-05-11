@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -139,15 +140,15 @@ public class FeedResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@PathParam("kind") String kind,
                                 @QueryParam("limit") int limit,
-                                @QueryParam("offset") int offset, String[][] filters){
+                                @QueryParam("offset") int offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
 
-        for (String[] filter: filters){
-            StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(filter[0], filter[1]);
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
             if(attributeFilter == null)
                 attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
