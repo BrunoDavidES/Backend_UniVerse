@@ -135,7 +135,7 @@ public class FeedResource {
         }
     }
 
-    @GET
+    @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@QueryParam("kind") String kind,

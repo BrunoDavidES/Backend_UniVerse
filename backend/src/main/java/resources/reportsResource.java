@@ -98,12 +98,11 @@ public class reportsResource {
         }
     }
 
-    @GET
+    @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryReports(@QueryParam("limit") int limit,
-                                 @QueryParam("offset") int offset,
-                                 String[][] filters) {
+                                 @QueryParam("offset") int offset, String[][] filters) {
         LOG.fine("Attempt to query reports.");
 
         QueryResults<Entity> queryResults;
