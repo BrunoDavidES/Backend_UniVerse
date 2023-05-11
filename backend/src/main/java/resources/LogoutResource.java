@@ -30,7 +30,7 @@ public class LogoutResource {
     }
 
     @POST
-    @Path("/")
+    @Path("/v1")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response doLogout(LogoutData data) {

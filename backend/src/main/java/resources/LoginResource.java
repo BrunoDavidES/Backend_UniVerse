@@ -41,7 +41,7 @@ public class LoginResource {
 
 
 	@POST
-	@Path("/")
+	@Path("/v1")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response doLogin(LoginData data) {
