@@ -83,13 +83,12 @@ public class FeedResource {
                 LOG.warning(kind + " does not exist " + id);
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
             } else {
-                Entity.Builder builder = Entity.newBuilder(eventKey);
+                Entity newEntry = Entity.newBuilder(entry)
+                        .set("title", data.title)
+                        .set("time_creation", Timestamp.now())
+                        .build();
 
-                builder.set("title", data.title)
-                        .set("time_creation", Timestamp.now());
-
-                entry = builder.build();
-                txn.add(entry);
+                txn.update(newEntry);
 
                 LOG.info(kind + " edited " + data.title + "; id: " + id);
                 txn.commit();
@@ -171,7 +170,7 @@ public class FeedResource {
 
         LOG.info("Ides receber um query ó filho!");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!!").build();
+        return Response.ok(g.toJson(results)).build();
 
     }
 
