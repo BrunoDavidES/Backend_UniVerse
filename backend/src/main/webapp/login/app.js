@@ -17,7 +17,6 @@ function login() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
                     alert("SUCCESS");
-                    window.location = "/profile";
                 } else {
                     alert("FAIL");
                 }
@@ -26,18 +25,6 @@ function login() {
     });
 }
 
-function validateToken() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/rest/token/validate", true);
-    xhr.send();
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            window.location.href = "/profile";
-        }
-    };
-}
-
 document.addEventListener("DOMContentLoaded", function() {
-    validateToken();
     login();
 });
