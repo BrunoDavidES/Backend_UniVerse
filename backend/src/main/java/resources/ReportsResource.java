@@ -64,7 +64,7 @@ public class ReportsResource {
         }
     }
 
-    @PATCH
+    @POST
     @Path("/edit/{id}")
     public Response editReport(@PathParam("id") String id){
         LOG.fine("Attempt to edit report");
@@ -80,11 +80,12 @@ public class ReportsResource {
                 LOG.warning("Report does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Report does not exist").build();
             } else {
-                Entity newEntry = Entity.newBuilder(entry)
-                                .set("time_lastUpdated", Timestamp.now())
-                                .build();
+                Entity.Builder builder = Entity.newBuilder(eventKey);
 
-                txn.update(newEntry);
+                builder.set("time_lastUpdated", Timestamp.now());
+
+                entry = builder.build();
+                txn.add(entry);
 
                 LOG.info( "Report registered id: " + id);
                 txn.commit();
@@ -133,7 +134,7 @@ public class ReportsResource {
 
         LOG.info("Ides receber um query ó filho!");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
+        return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!!").build();
 
     }
 }
