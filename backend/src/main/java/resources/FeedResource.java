@@ -5,7 +5,12 @@ import com.google.cloud.datastore.*;
 import util.FeedData;
 
 import com.google.gson.Gson;
+import util.ValToken;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -23,8 +28,21 @@ public class FeedResource {
     @POST
     @Path("/post/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEntry(@PathParam("kind") String kind, FeedData data){
+    public Response postEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, FeedData data){
         LOG.fine("Attempt to post entry to feed.");
+
+        final ValToken validator = new ValToken();
+        String codedToken = null;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    codedToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
