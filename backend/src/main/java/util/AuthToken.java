@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
 
+
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -27,13 +29,14 @@ public class AuthToken {
 		Builder tokenBuilder = JWT.create()
 				.withIssuer("https://localhost:8080")
 				.withClaim("jti", UUID.randomUUID().toString())
-				.withExpiresAt(Instant.now().plusSeconds(6000))
+				.withExpiresAt(Instant.now().plusSeconds(300))
 				.withIssuedAt(Instant.now());
 
 		payload.entrySet().forEach(action -> tokenBuilder.withClaim(action.getKey(), action.getValue()));
 
 		return tokenBuilder.sign(Algorithm.RSA256(((RSAPublicKey) keyPair.getPublic()), (RSAPrivateKey) keyPair.getPrivate()));
 	}
+
 
 
 }
