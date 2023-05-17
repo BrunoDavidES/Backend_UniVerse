@@ -1,5 +1,6 @@
 package resources;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import util.FeedData;
@@ -13,6 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,38 +46,49 @@ public class FeedResource {
             }
         }
 
+        if (codedToken == null) {
+            LOG.warning("Token not found");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+        }
+
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
         }
 
-        Transaction txn = datastore.newTransaction();
-
         try {
-            Key feedKey;
-            Entity entry;
-            String id;
-            do {
-                id = UUID.randomUUID().toString();
-                feedKey = datastore.newKeyFactory().setKind(kind).newKey(id);
-                entry = txn.get(feedKey);
-            } while(entry != null);
+            DecodedJWT token = validator.validateToken(codedToken);
+            String role = token.getClaim("role").asString();
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key feedKey;
+                Entity entry;
+                String id;
+                do {
+                    id = UUID.randomUUID().toString();
+                    feedKey = datastore.newKeyFactory().setKind(kind).newKey(id);
+                    entry = txn.get(feedKey);
+                } while (entry != null);
 
-            Entity.Builder builder = Entity.newBuilder(feedKey);
+                Entity.Builder builder = Entity.newBuilder(feedKey);
 
-            builder.set("title", data.title)
-                    .set("time_creation", Timestamp.now());
+                builder.set("title", data.title)
+                        .set("time_creation", Timestamp.now());
 
-            entry = builder.build();
-            txn.add(entry);
+                entry = builder.build();
+                txn.add(entry);
 
-            LOG.info(kind + " posted " + data.title + "; id: " + id);
-            txn.commit();
-            return Response.ok(entry).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
+                LOG.info(kind + " posted " + data.title + "; id: " + id);
+                txn.commit();
+                return Response.ok(entry).build();
+            } finally {
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
             }
+        } catch (InvalidParameterException e) {
+            LOG.warning("Token is invalid: " + e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity("Token is invalid").build();
         }
     }
 
