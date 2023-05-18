@@ -2,11 +2,18 @@ package resources;
 
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
+import util.AuthToken;
 import util.UserData;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Path("/login")
@@ -20,7 +27,7 @@ public class LoginResource {
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response login(UserData data) {
+	public Response login(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
 		LOG.fine("Attempt to login user: " + data.username);
 
 		if(!data.validateLogin() ) {
@@ -40,6 +47,9 @@ public class LoginResource {
 			} else {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 					LOG.info("User logged in: " + data.username);
+
+					loginToken(response, data.username, user.getString("role"));
+
 					txn.commit();
 					return Response.ok(user).build();
 				} else {
@@ -52,6 +62,25 @@ public class LoginResource {
 			if (txn.isActive()) {
 				txn.rollback();
 			}
+		}
+	}
+
+	private void loginToken(HttpServletResponse response, String username, String role) {
+		try {
+			AuthToken generator = new AuthToken();
+
+			Map<String, String> claims = new HashMap<>();
+
+			claims.put("user", username);
+			claims.put("role", role);
+
+			String token = generator.generateToken(claims);
+			Cookie cookie = new Cookie("token", token);
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(600);
+			response.addCookie(cookie);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
