@@ -51,6 +51,7 @@ public class FeedResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
         }
 
+
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
