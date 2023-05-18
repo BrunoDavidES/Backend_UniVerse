@@ -1,11 +1,15 @@
 package resources;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 import util.ReportData;
+import util.ValToken;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -23,8 +27,10 @@ public class ReportsResource {
     @POST
     @Path("/post")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postReports(ReportData data){
+    public Response postReports(@Context HttpServletRequest request,  ReportData data){
         LOG.fine("Attempt to post report.");
+
+
 
         if(!data.validate()) {
             LOG.warning("Missing or wrong parameter");
@@ -34,6 +40,15 @@ public class ReportsResource {
         Transaction txn = datastore.newTransaction();
 
         try {
+
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
             Key reportKey;
             Entity entry;
             String id;
@@ -66,12 +81,21 @@ public class ReportsResource {
 
     @POST
     @Path("/edit/{id}")
-    public Response editReport(@PathParam("id") String id){
+    public Response editReport(@Context HttpServletRequest request, @PathParam("id") String id){
         LOG.fine("Attempt to edit report");
 
         Transaction txn = datastore.newTransaction();
 
         try {
+
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
             Key eventKey = datastore.newKeyFactory().setKind("Report").newKey(id);
             Entity entry = txn.get(eventKey);
 
@@ -101,9 +125,17 @@ public class ReportsResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryReports(@QueryParam("limit") int limit,
+    public Response queryReports(@Context HttpServletRequest request, @QueryParam("limit") int limit,
                                  @QueryParam("offset") int offset, Map<String, String> filters) {
         LOG.fine("Attempt to query reports.");
+
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning("Token not found");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+        }
 
         QueryResults<Entity> queryResults;
 

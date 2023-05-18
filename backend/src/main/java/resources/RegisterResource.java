@@ -1,5 +1,6 @@
 package resources;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 
@@ -8,8 +9,12 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import util.UserData;
+import util.ValToken;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
@@ -25,7 +30,7 @@ public class RegisterResource {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(UserData data) {
+    public Response register(@Context HttpServletRequest request, UserData data) {
         LOG.fine("Attempt to register user: " + data.username);
 
         if( !data.validateRegister() ) {
@@ -35,6 +40,15 @@ public class RegisterResource {
 
         Transaction txn = datastore.newTransaction();
         try {
+
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
             Entity user = txn.get(userKey);
 
@@ -149,5 +163,6 @@ public class RegisterResource {
         }
         return Response.ok().build();
     }*/
+
 
 }

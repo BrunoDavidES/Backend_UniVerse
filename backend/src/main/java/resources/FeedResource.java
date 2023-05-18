@@ -27,29 +27,14 @@ public class FeedResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
+
     @POST
     @Path("/post/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, FeedData data){
         LOG.fine("Attempt to post entry to feed.");
 
-        final ValToken validator = new ValToken();
-        String codedToken = null;
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    codedToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        if (codedToken == null) {
-            LOG.warning("Token not found");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
-        }
 
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
@@ -58,8 +43,17 @@ public class FeedResource {
         }
 
         try {
-            DecodedJWT token = validator.validateToken(codedToken);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
             String role = token.getClaim("role").asString();
+
+
             Transaction txn = datastore.newTransaction();
             try {
                 Key feedKey;
@@ -96,7 +90,7 @@ public class FeedResource {
     @PATCH
     @Path("/edit/{kind}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editEntry(@PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
+    public Response editEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
         LOG.fine("Attempt to edit feed entry.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
@@ -107,6 +101,15 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
+
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
@@ -135,7 +138,7 @@ public class FeedResource {
 
     @DELETE
     @Path("/delete/{kind}/{id}")
-    public Response deleteEntry(@PathParam("kind") String kind, @PathParam("id") String id){
+    public Response deleteEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id){
         LOG.fine("Attempt to add event.");
 
         if((!kind.equals("News") && !kind.equals("Event"))) {
@@ -146,6 +149,14 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
+
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
@@ -169,10 +180,18 @@ public class FeedResource {
     @POST
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntries(@PathParam("kind") String kind,
+    public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
                                 @QueryParam("limit") int limit,
                                 @QueryParam("offset") int offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
+
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning("Token not found");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+        }
 
         QueryResults<Entity> queryResults;
 
