@@ -48,7 +48,7 @@ public class LoginResource {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 					LOG.info("User logged in: " + data.username);
 
-					loginToken(response, data.username, user.getString("role"));
+					loginToken(response, data.username, data.name, user.getString("role"));
 
 					txn.commit();
 					return Response.ok(user).build();
@@ -65,12 +65,13 @@ public class LoginResource {
 		}
 	}
 
-	private void loginToken(HttpServletResponse response, String username, String role) {
+	private void loginToken(HttpServletResponse response, String name, String username, String role) {
 		try {
 			AuthToken generator = new AuthToken();
 			Map<String, String> claims = new HashMap<>();
 
 			claims.put("user", username);
+			claims.put("name", name);
 			claims.put("role", role);
 
 			String token = generator.generateToken(claims);
