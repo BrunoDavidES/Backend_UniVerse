@@ -3,7 +3,6 @@ package util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.algorithms.Algorithm;
-import resources.LoginResource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -17,12 +16,10 @@ import java.util.logging.Logger;
 
 public class AuthToken {
 
-	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+	private static final Logger LOG = Logger.getLogger(AuthToken.class.getName());
 
 	private KeyPairGenerator keyPairGenerator;
 	private KeyPair keyPair;
-
-	private static final Logger LOG = Logger.getLogger(AuthToken.class.getName());
 
 	public AuthToken () throws NoSuchAlgorithmException {
 		keyPairGenerator = KeyPairGenerator.getInstance("RSA");
