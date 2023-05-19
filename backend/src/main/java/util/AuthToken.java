@@ -2,18 +2,16 @@ package util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -44,39 +42,21 @@ public class AuthToken {
 		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
 
-		String publicKeyJwt = convertToJWK(publicKey);
-		String privateKeyJwt = convertToJWK(privateKey);
+		String token = tokenBuilder.sign(Algorithm.RSA256((publicKey), privateKey));
 
-		LOG.info("Public Key (JWT format):\n" + publicKeyJwt);
-		LOG.info("Private Key (JWT format):\n" + privateKeyJwt);
-		return tokenBuilder.sign(Algorithm.RSA256(((RSAPublicKey) keyPair.getPublic()), (RSAPrivateKey) keyPair.getPrivate()));
+		if(verifyToken(token)) {
+			LOG.info(publicKey.toString());
+		}
+		return token;
 	}
 
-	private String convertToJWK(RSAPublicKey publicKey) throws Exception {
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-		X509EncodedKeySpec publicKeySpec = keyFactory.getKeySpec(publicKey, X509EncodedKeySpec.class);
-		byte[] publicKeyBytes = publicKeySpec.getEncoded();
-		String publicKeyBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString(publicKeyBytes);
+	private boolean verifyToken(String token) throws Exception {
+		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
-		return "{\n" +
-				"  \"kty\": \"RSA\",\n" +
-				"  \"e\": \"" + Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()) + "\",\n" +
-				"  \"n\": \"" + publicKeyBase64 + "\"\n" +
-				"}";
-	}
+		JWTVerifier verifier = JWT.require(Algorithm.RSA256(publicKey)).build();
+		DecodedJWT decodedJWT = verifier.verify(token);
 
-	private String convertToJWK(RSAPrivateKey privateKey) throws Exception {
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-		RSAPrivateKeySpec rsaPrivateKeySpec = keyFactory.getKeySpec(privateKey, RSAPrivateKeySpec.class);
-
-		String modulus = Base64.getUrlEncoder().withoutPadding().encodeToString(rsaPrivateKeySpec.getModulus().toByteArray());
-		String privateExponent = Base64.getUrlEncoder().withoutPadding().encodeToString(rsaPrivateKeySpec.getPrivateExponent().toByteArray());
-
-		return "{\n" +
-				"  \"kty\": \"RSA\",\n" +
-				"  \"d\": \"" + privateExponent + "\",\n" +
-				"  \"n\": \"" + modulus + "\"\n" +
-				"}";
+		return true;
 	}
 
 }
