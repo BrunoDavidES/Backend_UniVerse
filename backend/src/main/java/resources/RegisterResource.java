@@ -40,15 +40,6 @@ public class RegisterResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
-            }
-
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
             Entity user = txn.get(userKey);
 
