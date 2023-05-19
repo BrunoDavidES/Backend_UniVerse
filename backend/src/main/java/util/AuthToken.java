@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.security.KeyPair;
@@ -50,13 +51,17 @@ public class AuthToken {
 		return token;
 	}
 
-	private boolean verifyToken(String token) throws Exception {
+	private boolean verifyToken(String token) throws JWTVerificationException {
 		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
-		JWTVerifier verifier = JWT.require(Algorithm.RSA256(publicKey)).build();
-		DecodedJWT decodedJWT = verifier.verify(token);
-
-		return true;
+		try {
+			JWTVerifier verifier = JWT.require(Algorithm.RSA256(publicKey)).build();
+			DecodedJWT decodedJWT = verifier.verify(token);
+			return true; // Verification successful
+		} catch (JWTVerificationException e) {
+			return false; // Verification failed
+		}
 	}
+
 
 }
