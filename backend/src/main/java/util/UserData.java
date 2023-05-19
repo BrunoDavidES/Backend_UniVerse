@@ -20,10 +20,10 @@ public class UserData {
 		if (username == null || email == null || name == null || password == null || confirmation == null) {
 			return false;
 		}
-		if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$")) {
+		if (!email.matches("^[A-Za-z0-9._%+-]+@campus\\.fct\\.unl\\.pt$")) {
 			return false;
 		}
-		if (!password.matches("(?=.*[0-9])(?=.*[A-Z]).{6,}")) {
+		if (!password.matches("(?=.*[0-9])(?=.*[A-Z]).{6,64}")) {
 			return false;
 		}
 		return password.equals(confirmation);
