@@ -68,7 +68,6 @@ public class LoginResource {
 	private void loginToken(HttpServletResponse response, String username, String role) {
 		try {
 			AuthToken generator = new AuthToken();
-
 			Map<String, String> claims = new HashMap<>();
 
 			claims.put("user", username);

@@ -62,6 +62,8 @@ public class RegisterResource {
                         .set("email", data.email)
                         .set("name", data.name)
                         .set("password", DigestUtils.sha512Hex(data.password))
+                        .set("role", data.role)
+                        .set("status", "ACTIVE")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
