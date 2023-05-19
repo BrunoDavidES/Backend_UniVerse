@@ -16,6 +16,9 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 public class AuthToken {
+
+	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+
 	private KeyPairGenerator keyPairGenerator;
 	private KeyPair keyPair;
 
@@ -35,6 +38,7 @@ public class AuthToken {
 				.withIssuedAt(Instant.now());
 
 		payload.entrySet().forEach(action -> tokenBuilder.withClaim(action.getKey(), action.getValue()));
+		
 
 		LOG.info("Public Key: " + keyPair.getPublic() + " / Private Key: " + keyPair.getPrivate());
 		return tokenBuilder.sign(Algorithm.RSA256(((RSAPublicKey) keyPair.getPublic()), (RSAPrivateKey) keyPair.getPrivate()));
