@@ -13,17 +13,22 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 
 @Path("/logout")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LogoutResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(LogoutResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public LogoutResource() { }
+    public LogoutResource() {
+        scheduler.scheduleAtFixedRate(this::removeExpiredTokens, 0, 1, TimeUnit.HOURS);
+    }
 
     @POST
     @Path("/")
@@ -52,6 +57,25 @@ public class LogoutResource {
                 txn.rollback();
             }
         }
+    }
+
+    private void removeExpiredTokens() {
+        LOG.fine("Checking for expired tokens.");
+
+        Timestamp now = Timestamp.now();
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("Token_Blacklist")
+                .setFilter(StructuredQuery.PropertyFilter.le("expiration", now))
+                .build();
+
+        QueryResults<Entity> results = datastore.run(query);
+        while (results.hasNext()) {
+            Entity tokenEntity = results.next();
+            Key tokenKey = tokenEntity.getKey();
+            datastore.delete(tokenKey);
+        }
+
+        LOG.fine("Expired tokens removed.");
     }
 
 
