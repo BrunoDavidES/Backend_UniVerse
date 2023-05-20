@@ -51,7 +51,7 @@ public class ModifyUser {
             }
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
             Entity user = txn.get(userKey);
-
+            data.fillGaps(user);
             if( user == null ) {
                 txn.rollback();
                 LOG.warning("User or password incorrect");
@@ -62,7 +62,7 @@ public class ModifyUser {
                     Entity newUser = Entity.newBuilder(user)
                             .set("name", data.name)
                             .set("email", data.email)
-                            .set("status", "ACTIVE")
+                            .set("status", data.status)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 
