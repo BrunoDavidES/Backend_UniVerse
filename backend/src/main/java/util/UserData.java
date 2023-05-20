@@ -1,5 +1,7 @@
 package util;
 
+import com.google.cloud.datastore.Entity;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +13,7 @@ public class UserData {
 	public String password;
 	public String confirmation;
 	public String role;
-	public String[][] attributes;
+	public String status;
 
 	
 	public UserData() { }
@@ -28,18 +30,29 @@ public class UserData {
 		}
 		return password.equals(confirmation);
 	}
+	public boolean validateModify() {
+		if(this.email != null)
+			if (!email.matches("^[A-Za-z0-9._%+-]+@([\\w-]+\\.fct\\.unl\\.pt$)")) {
+				return false;
+			}
+		return username != null && password != null;
+	}
 
 	public String[] getEmails() {
 		return multipleEmails;
 	}
 
 	public boolean validateLogin() {
-		if (username == null || password == null) {
-			return false;
-		}
-		return true;
+		return username != null && password != null;
 	}
-
+	public void fillGaps(Entity targetUser) {
+		if(this.name == null)
+			this.name = targetUser.getString("name");
+		if(this.email == null)
+			this.email = targetUser.getString("email");
+		if(this.status == null)
+			this.status = targetUser.getString("status");
+	}
 
 
 }
