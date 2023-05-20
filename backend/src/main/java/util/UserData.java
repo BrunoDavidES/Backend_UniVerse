@@ -28,16 +28,20 @@ public class UserData {
 		}
 		return password.equals(confirmation);
 	}
+	public boolean validateModify() {
+		if(this.email != null)
+			if (!email.matches("^[A-Za-z0-9._%+-]+@([\\w-]+\\.fct\\.unl\\.pt$)")) {
+				return false;
+			}
+		return username != null && password != null;
+	}
 
 	public String[] getEmails() {
 		return multipleEmails;
 	}
 
 	public boolean validateLogin() {
-		if (username == null || password == null) {
-			return false;
-		}
-		return true;
+		return username != null && password != null;
 	}
 
 
