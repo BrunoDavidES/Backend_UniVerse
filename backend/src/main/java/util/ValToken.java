@@ -3,25 +3,49 @@ package util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.cloud.Timestamp;
+import com.google.cloud.datastore.*;
+import org.apache.commons.codec.digest.DigestUtils;
+import resources.LoginResource;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.security.InvalidParameterException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 public class ValToken{
-
+    private static final Logger LOG = Logger.getLogger(ValToken.class.getName());
     private static final List<String> allowedIssuers = Collections.singletonList("https://universe-fct.oa.r.appspot.com/");
 
-    public DecodedJWT validateToken(String token) {
-        try {
-            DecodedJWT decoded = JWT.decode(token);
+    private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
+    public DecodedJWT validateToken(String token) {
+        DecodedJWT decoded = JWT.decode(token);
+        Transaction txn = datastore.newTransaction();
+        try {
+            Key tokenKey = datastore.newKeyFactory().setKind("Token_Blacklist").newKey(decoded.getId());
+            Entity blToken = txn.get(tokenKey);
+
+            if (blToken != null) {
+                txn.rollback();
+                LOG.warning("Token invalid.");
+                throw new InvalidParameterException("Token validation failed");
+            }
+        } finally{
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+
+        try {
             if(!allowedIssuers.contains(decoded.getIssuer())) {
                 throw new InvalidParameterException(String.format("Unknown Issuer %s", decoded.getIssuer()));
             }
@@ -61,6 +85,25 @@ public class ValToken{
         }
 
         return this.validateToken(codedToken);
+    }
+
+    public DecodedJWT invalidateToken(HttpServletRequest request, HttpServletResponse response){
+        String token = null;
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                    cookie.setValue(null);
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+
+        assert token != null;
+        return JWT.decode(token);
     }
 
 }
