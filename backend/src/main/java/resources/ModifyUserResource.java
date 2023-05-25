@@ -5,24 +5,16 @@ import com.google.cloud.datastore.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import util.*;
 
-import com.google.gson.Gson;
-
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class ModifyUser {
+public class ModifyUserResource {
     private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -155,10 +147,12 @@ public class ModifyUser {
                 txn.rollback();
                 LOG.warning("One of the users does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
-            } else if( !data.validatePermission(user.getString("role"), target.getString("role"))) {
-                LOG.warning("Wrong permissions.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
-            }else {
+            } else
+                if( !data.validatePermission(user.getString("role"), target.getString("role"))) {
+                    txn.rollback();
+                    LOG.warning("Wrong permissions.");
+                    return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
+            } else {
                     Entity newUser = Entity.newBuilder(target)
                             .set("role", data.newRole)
                             .set("time_lastupdate", Timestamp.now())

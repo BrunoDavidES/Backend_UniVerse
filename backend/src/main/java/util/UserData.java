@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserData {
+	private static final String ALUNO = "A";
+	private static final String FUNCIONÁRIO = "F";
+	private static final String DOCENTE = "D";
+	private static final String BACK_OFFICE = "BO";
+
 	public String username;
 	public String[] multipleEmails;
 	public String email;
@@ -22,6 +27,11 @@ public class UserData {
 		if (username == null || email == null || name == null || password == null || confirmation == null) {
 			return false;
 		}
+
+		if (!username.matches(".{3,64}")){
+			return false;
+		}
+
 		if (!email.matches("^[A-Za-z0-9._%+-]+@([\\w-]+\\.fct\\.unl\\.pt$)")) {
 			return false;
 		}
@@ -57,8 +67,11 @@ public class UserData {
 
 	public String getRole() {
 		if(this.email.contains("@campus.fct.unl.pt")) //ver se email é só @fct.unl.pt, e como ver se é proff ou funcionário
-			return "aluno";
-		else
-			return "docente";
+			return ALUNO;
+
+		if (this.email.contains("@fct.unl.pt"))
+			return DOCENTE;
+
+		return null;
 	}
 }
