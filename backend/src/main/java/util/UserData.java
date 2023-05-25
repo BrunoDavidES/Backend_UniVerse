@@ -55,4 +55,10 @@ public class UserData {
 	}
 
 
+	public String getRole() {
+		if(this.email.contains("@campus.fct.unl.pt")) //ver se email é só @fct.unl.pt, e como ver se é proff ou funcionário
+			return "aluno";
+		else
+			return "docente";
+	}
 }
