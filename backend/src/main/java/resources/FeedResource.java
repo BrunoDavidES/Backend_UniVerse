@@ -88,9 +88,9 @@ public class FeedResource {
     }
 
     @PATCH
-    @Path("/edit/{kind}/{id}")
+    @Path("/edit/{username}/{kind}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
+    public Response editEntry(@Context HttpServletRequest request, @PathParam("username") String username, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
         LOG.fine("Attempt to edit feed entry.");
 
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
@@ -117,7 +117,11 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist " + id);
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
-            } else {
+            } else if(!entry.getList("manager").contains(username) || !token.getClaim("user").toString().equals(username)) {
+                txn.rollback();
+                LOG.warning("Wrong manager.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
+            }else {
                 Entity newEntry = Entity.newBuilder(entry)
                         .set("title", data.title)
                         .set("time_creation", Timestamp.now())
@@ -137,8 +141,8 @@ public class FeedResource {
     }
 
     @DELETE
-    @Path("/delete/{kind}/{id}")
-    public Response deleteEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id){
+    @Path("/delete/{username}/{kind}/{id}")
+    public Response deleteEntry(@Context HttpServletRequest request, @PathParam("username") String username, @PathParam("kind") String kind, @PathParam("id") String id){
         LOG.fine("Attempt to add event.");
 
         if((!kind.equals("News") && !kind.equals("Event"))) {
@@ -164,7 +168,11 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
-            } else {
+            } else if(!entry.getList("manager").contains(username) || !token.getClaim("user").toString().equals(username)) {
+                txn.rollback();
+                LOG.warning("Wrong manager.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
+            }else {
                 txn.delete(eventKey);
                 LOG.info(kind + " deleted " + id);
                 txn.commit();
