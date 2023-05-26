@@ -53,6 +53,12 @@ public class FeedResource {
 
             String role = token.getClaim("role").asString();
 
+            // Para já, só docentes é q fazem eventos
+            // No futuro, pôr presidente da AE e possivelmente dos Nucleos
+            if (kind.equals("Event") && !role.equals("D")){
+                LOG.warning("No permission to create an event.");
+                return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
+            }
 
             Transaction txn = datastore.newTransaction();
             try {

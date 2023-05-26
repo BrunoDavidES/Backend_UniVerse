@@ -17,7 +17,6 @@ public class UserData {
 	public String name;
 	public String password;
 	public String confirmation;
-	public String role;
 	public String status;
 
 	
