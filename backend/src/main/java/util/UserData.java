@@ -7,9 +7,7 @@ import java.util.Map;
 
 public class UserData {
 	private static final String ALUNO = "A";
-	private static final String FUNCIONÁRIO = "F";
-	private static final String DOCENTE = "D";
-	private static final String BACK_OFFICE = "BO";
+	private static final String UNCHECKED = "EMPTY";
 
 	public String username;
 	public String[] multipleEmails;
@@ -69,7 +67,7 @@ public class UserData {
 			return ALUNO;
 
 		if (this.email.contains("@fct.unl.pt"))
-			return DOCENTE;
+			return UNCHECKED;
 
 		return null;
 	}
