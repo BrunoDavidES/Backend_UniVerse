@@ -27,6 +27,7 @@ public class NucleusData {
 
     public NucleusData(){}
 
+
     public boolean validateRegister() {
         if (name == null || acronym == null || creatorEmail == null || nucleusEmail == null || president == null) {
             return false;
