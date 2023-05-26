@@ -21,9 +21,9 @@ public class ModifyUserResource {
 
 
     @POST
-    @Path("/atributes")
+    @Path("/attributes")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyAtributes(@Context HttpServletRequest request, UserData data){
+    public Response modifyAttributes(@Context HttpServletRequest request, UserData data){
         LOG.fine("Attempt to modify user.");
 
         if( !data.validateModify()) {
