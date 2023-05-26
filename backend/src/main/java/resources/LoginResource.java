@@ -32,7 +32,7 @@ public class LoginResource {
 
 		if(!data.validateLogin() ) {
 			LOG.warning("Missing parameter");
-			return Response.status(Response.Status.BAD_REQUEST).entity("Missing parameter.").build();
+			return Response.status(Response.Status.BAD_REQUEST).entity("Missing parameter").build();
 		}
 
 		Transaction txn = datastore.newTransaction();
@@ -42,7 +42,7 @@ public class LoginResource {
 
 			if( user == null ) {
 				txn.rollback();
-				LOG.warning("User or password incorrect");
+				LOG.warning("User does not exist.");
 				return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
 			} else {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
@@ -54,7 +54,7 @@ public class LoginResource {
 					return Response.ok(user).build();
 				} else {
 					txn.rollback();
-					LOG.warning("User or password incorrect");
+					LOG.warning("Password incorrect.");
 					return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
 				}
 			}
