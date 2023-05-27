@@ -149,7 +149,7 @@ public class FeedResource {
     @DELETE
     @Path("/delete/{username}/{kind}/{id}")
     public Response deleteEntry(@Context HttpServletRequest request, @PathParam("username") String username, @PathParam("kind") String kind, @PathParam("id") String id){
-        LOG.fine("Attempt to add event.");
+        LOG.fine("Attempt to delete event.");
 
         if((!kind.equals("News") && !kind.equals("Event"))) {
             LOG.warning("Missing or wrong parameter");
