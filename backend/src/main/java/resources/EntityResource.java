@@ -22,9 +22,9 @@ public class EntityResource {
     public EntityResource() { }
 
     @POST
-    @Path("/new/{username}/{kind}/{key}")
+    @Path("/new/{kind}/{key}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getReceivedInbox(@Context HttpServletRequest request, @PathParam("username") String username,@PathParam("kind") String kind,@PathParam("key") String keyName, Map<String, String> attributes) {
+    public Response getReceivedInbox(@Context HttpServletRequest request, @PathParam("kind") String kind,@PathParam("key") String keyName, Map<String, String> attributes) {
         LOG.fine("Attempt to create new entity");
 
             Transaction txn = datastore.newTransaction();
@@ -36,7 +36,7 @@ public class EntityResource {
                     LOG.warning("Token not found");
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
                 }
-                Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+                Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
                 Entity user = txn.get(userKey);
                 if(!user.getString("role").equals("BO")){
                     txn.rollback();
