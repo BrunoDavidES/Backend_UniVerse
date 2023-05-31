@@ -40,7 +40,7 @@ public class ModifyUserResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
             Entity user = txn.get(userKey);
             data.fillGaps(user);
             if( user == null ) {
@@ -56,7 +56,7 @@ public class ModifyUserResource {
                             .build();
 
                     txn.update(newUser);
-                    LOG.info(data.username + " edited.");
+                    LOG.info(token.getClaim("user").toString() + " edited.");
                     txn.commit();
                     return Response.ok(user).build();
                 } else {
@@ -92,7 +92,7 @@ public class ModifyUserResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
             Entity user = txn.get(userKey);
 
             if( user == null ) {
@@ -108,7 +108,7 @@ public class ModifyUserResource {
                             .build();
 
                     txn.update(newUser);
-                    LOG.info(data.username + " pwd edited.");
+                    LOG.info(token.getClaim("user").toString() + " pwd edited.");
                     txn.commit();
                     return Response.ok(user).build();
                 } else {
@@ -128,7 +128,7 @@ public class ModifyUserResource {
     @Path("/role")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response modifyRole(@Context HttpServletRequest request, ModifyRoleData data){
-        LOG.fine("Attempt from " + data.modifier + " to modify role of: " + data.target + " to " + data.newRole + ".");
+        LOG.fine("Attempt to modify role of: " + data.target + " to " + data.newRole + ".");
         Transaction txn = datastore.newTransaction();
         try {
             final ValToken validator = new ValToken();
@@ -138,7 +138,7 @@ public class ModifyUserResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.modifier);
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
             Key targetKey = datastore.newKeyFactory().setKind("User").newKey(data.target);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
@@ -148,7 +148,7 @@ public class ModifyUserResource {
                 LOG.warning("One of the users does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
             } else
-                if( !data.validatePermission(user.getString("role"), target.getString("role"))) {
+                if( !data.validatePermission(token.getClaim("role").toString(), target.getString("role"))) {
                     txn.rollback();
                     LOG.warning("Wrong permissions.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();

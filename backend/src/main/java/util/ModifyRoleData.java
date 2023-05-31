@@ -2,8 +2,6 @@ package util;
 
 public class ModifyRoleData {
 
-    public String modifier;
-
     public String target;
 
     public String newRole;

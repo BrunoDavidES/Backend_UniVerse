@@ -36,9 +36,11 @@ public class EntityResource {
                     LOG.warning("Token not found");
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
                 }
+                /*
                 Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
                 Entity user = txn.get(userKey);
-                if(!user.getString("role").equals("BO")){
+                */
+                if(!token.getClaim("role").toString().equals("BO")){
                     txn.rollback();
                     LOG.warning("Nice try but your not a capi person");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
