@@ -35,6 +35,7 @@ public class DepartmentData {
 public boolean validateList(){
         return this.members == null || this.members.isEmpty();
 }
+
     public boolean validateModify() {
         if(this.email != null)
             if (!email.matches("^[A-Za-z0-9._%+-]+@@(fct\\.unl\\.pt)$")) {
