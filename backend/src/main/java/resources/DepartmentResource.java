@@ -132,6 +132,14 @@ public class DepartmentResource {
             }
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(data.id);
             Entity department = txn.get(departmentKey);
+
+            if( department == null ) {
+                txn.rollback();
+                LOG.warning("Department does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
+            }
+
+            data.fillGaps(department);
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
             Entity president = txn.get(presidentKey);
             if(!token.getClaim("role").toString().equals("BO")){
@@ -158,26 +166,23 @@ public class DepartmentResource {
                 txn.rollback();
                 LOG.warning("President doesn't exists.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("President doesn't exists.").build();
-            }else if( department == null ) {
-                txn.rollback();
-                LOG.warning("Department does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
-            }
-            data.fillGaps(department);
-                    Entity newDepartment = Entity.newBuilder(department)
-                            .set("email", data.email)
-                            .set("name", data.name)
-                            .set("president", data.president)
-                            .set("phone_number", data.phoneNumber)
-                            .set("address", data.address)
-                            .set("fax", data.fax)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
+            }else {
 
-                    txn.update(newDepartment);
-                    LOG.info(data.id + " edited.");
-                    txn.commit();
-                    return Response.ok(newDepartment).build();
+                Entity newDepartment = Entity.newBuilder(department)
+                        .set("email", data.email)
+                        .set("name", data.name)
+                        .set("president", data.president)
+                        .set("phone_number", data.phoneNumber)
+                        .set("address", data.address)
+                        .set("fax", data.fax)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(newDepartment);
+                LOG.info(data.id + " edited.");
+                txn.commit();
+                return Response.ok(newDepartment).build();
+            }
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -259,7 +264,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!token.getClaim("role").toString().equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -316,15 +321,10 @@ public class DepartmentResource {
 
 
     @POST
-    @Path("/delete/members/{id}")
+    @Path("/delete/members/{username}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
+    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("username") String username,@PathParam("id") String id, List<String> members) {
         LOG.fine("Attempt to add members to the department.");
-
-        if(data.validateList()){
-            LOG.warning("List is empty.");
-            return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
-        }
 
         Transaction txn = datastore.newTransaction();
         try {
@@ -338,7 +338,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!token.getClaim("role").toString().equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -365,7 +365,7 @@ public class DepartmentResource {
             }
 
             String list = department.getString("members_list");
-            for(String valuesOfMember : data.members) {
+            for(String valuesOfMember : members) {
                 String[] attributes = valuesOfMember.split("-");
 
                 Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
@@ -377,84 +377,6 @@ public class DepartmentResource {
                 }
                 list = list.replace("|"+valuesOfMember, "");
             }
-            Entity newDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-
-            txn.update(newDepartment);
-            LOG.info("Members removed.");
-            txn.commit();
-            return Response.ok(newDepartment).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @POST
-    @Path("/edit/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response editMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
-        LOG.fine("Attempt to add members to the department.");
-        if(data.validateList()){
-            LOG.warning("List is empty.");
-            return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
-            }
-
-            Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
-            Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                txn.rollback();
-                LOG.warning("Nice try but your not a capi person");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-                        "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-                        "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-                        "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-                        "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-                        "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-                        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀").build();
-            }else if( department == null ) {
-                txn.rollback();
-                LOG.warning("Department does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
-            }
-
-            String list = department.getString("members_list");
-            for(String valuesOfMember : data.members) {
-                String[] attribute = valuesOfMember.split("-");
-
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attribute[1]);
-                Entity memberEntity = txn.get(memberKey);
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning("Member doesn't exists.");
-                    return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
-                }
-                list = list.replace("|"+valuesOfMember, "|"+attribute[0]+"-"+attribute[1]);
-            }
-
             Entity newDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())

@@ -1,5 +1,7 @@
 package util;
 
+import com.google.cloud.datastore.Entity;
+
 import java.util.List;
 
 public class NucleusData {
@@ -8,20 +10,27 @@ public class NucleusData {
 
     public String acronym;
 
-    public String creatorEmail;
+    public String president;
 
     public String nucleusEmail;
 
     // Modify
-    public String president;
 
-    public String modifierEmail;
+    public String newName;
 
     public List<String> members;
 
     public String website;
 
-    public List<String> socials;
+    public String instagram;
+
+    public String twitter;
+
+    public String facebook;
+
+    public String youtube;
+
+    public String linkedIn;
 
     public String description;
 
@@ -29,18 +38,28 @@ public class NucleusData {
 
 
     public boolean validateRegister() {
-        if (name == null || acronym == null || creatorEmail == null || nucleusEmail == null || president == null) {
+        if (name == null || acronym == null || president == null || nucleusEmail == null) {
             return false;
         }
-        if (!nucleusEmail.matches("^[A-Za-z0-9._%+-]+@(ae+\\.fct\\.unl\\.pt$)")) {
-            return false;
-        }
-        return creatorEmail.matches("^[A-Za-z0-9._%+-]+@(campus+\\.fct\\.unl\\.pt$)");
+        return nucleusEmail.matches("^[A-Za-z0-9._%+-]+@(ae+\\.fct\\.unl\\.pt$)");
     }
 
-    public boolean validateModify() {
-        if(this.modifierEmail != null)
-            return this.modifierEmail.matches("^[A-Za-z0-9._%+-]+@(campus\\.fct\\.unl\\.pt$)");
-        return false;
+    public boolean validateModify(){
+        return name != null;
     }
+
+    public void fillGaps(Entity nucleus){
+        if (newName == null) newName = nucleus.getString("name");
+        if (acronym == null) acronym = nucleus.getString("acronym");
+        if (president == null) president = nucleus.getString("president");
+        if (nucleusEmail == null) nucleusEmail = nucleus.getString("nucleusEmail");
+        if (website == null) website = nucleus.getString("website");
+        if (instagram == null) instagram = nucleus.getString("instagram");
+        if (twitter == null) twitter = nucleus.getString("twitter");
+        if (facebook == null) facebook = nucleus.getString("facebook");
+        if (youtube == null) youtube = nucleus.getString("youtube");
+        if (linkedIn == null) linkedIn = nucleus.getString("linkedIn");
+        if (description == null) description = nucleus.getString("description");
+    }
+
 }
