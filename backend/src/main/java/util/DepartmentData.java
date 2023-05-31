@@ -22,7 +22,7 @@ public class DepartmentData {
     public DepartmentData() { }
 
     public boolean validateRegister() {
-        if (id == null || email == null || name == null || president == null || address == null || phoneNumber != null) {
+        if (id == null || email == null || name == null || president == null || address == null || phoneNumber == null) {
             return false;
         }
 

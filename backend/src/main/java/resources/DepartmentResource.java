@@ -30,9 +30,9 @@ public class DepartmentResource {
 
 
     @POST
-    @Path("/register/{username}")
+    @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerDepartment(@Context HttpServletRequest request, @PathParam("username") String username, DepartmentData data) {
+    public Response registerDepartment(@Context HttpServletRequest request, DepartmentData data) {
         LOG.fine("Attempt to register user: " + data.id);
 
         if( !data.validateRegister() ) {
@@ -49,9 +49,7 @@ public class DepartmentResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-            Entity user = txn.get(userKey);
-            if(!user.getString("role").equals("BO")){
+            if(!token.getClaim("role").toString().equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -113,9 +111,9 @@ public class DepartmentResource {
 
 
     @POST
-    @Path("/modify/{username}")
+    @Path("/modify")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyDepartment(@Context HttpServletRequest request, @PathParam("username") String username, DepartmentData data){
+    public Response modifyDepartment(@Context HttpServletRequest request, DepartmentData data){
         LOG.fine("Attempt to modify department.");
 
         if( !data.validateModify()) {
@@ -135,11 +133,9 @@ public class DepartmentResource {
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(data.id);
             Entity department = txn.get(departmentKey);
             data.fillGaps(department);
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-            Entity user = txn.get(userKey);
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
             Entity president = txn.get(presidentKey);
-            if(!user.getString("role").equals("BO")){
+            if(!token.getClaim("role").toString().equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -191,8 +187,8 @@ public class DepartmentResource {
     }
 
     @DELETE
-    @Path("/delete/{username}/{id}")
-    public Response deleteDepartment(@Context HttpServletRequest request, @PathParam("username") String username, @PathParam("id") String id){
+    @Path("/delete/{id}")
+    public Response deleteDepartment(@Context HttpServletRequest request, @PathParam("id") String id){
         LOG.fine("Attempt to delete department.");
 
         Transaction txn = datastore.newTransaction();
@@ -208,10 +204,8 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-            Entity user = txn.get(userKey);
 
-            if(!user.getString("role").equals("BO")){
+            if(!token.getClaim("role").toString().equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -249,9 +243,9 @@ public class DepartmentResource {
     }
 
     @POST
-    @Path("/add/members/{username}/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //mapa feito tipo (papel do membro, username do membro) exemplo: (coordenador, m.dias)
-    public Response getMembers(@Context HttpServletRequest request, @PathParam("username") String username,@PathParam("id") String id, Map<String, String> members) {
+    @Path("/add/members/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "papel-username"
+    public Response getMembers(@Context HttpServletRequest request, @PathParam("id") String id, List<String> members) {
         LOG.fine("Attempt to add members to the department.");
 
         Transaction txn = datastore.newTransaction();
@@ -266,9 +260,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-            Entity user = txn.get(userKey);
-            if(!user.getString("role").equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!token.getClaim("role").toString().equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -293,19 +285,19 @@ public class DepartmentResource {
                 LOG.warning("Department does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
-            Key listsKey = datastore.newKeyFactory().setKind("List").newKey(id);
-            Entity.Builder builder = Entity.newBuilder(listsKey);
-            for(Map.Entry<String, String> attribute : members.entrySet()) {
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attribute.getValue());
+            String list = null;
+            for(String valuesOfMember : members) {
+                String[] attributes = valuesOfMember.split("-");
+
+                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
                 Entity memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                builder.set(attribute.getKey(), attribute.getValue());
+                list.concat("|"+valuesOfMember);
             }
-            Entity list = builder.build();
             //txn.add(list);
             Entity newDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
@@ -342,9 +334,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
-            Entity user = txn.get(userKey);
-            if(!user.getString("role").equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!token.getClaim("role").toString().equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
