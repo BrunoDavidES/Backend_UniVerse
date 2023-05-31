@@ -285,7 +285,7 @@ public class DepartmentResource {
                 LOG.warning("Department does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
-            String list = null;
+            String list = "";
             for(String valuesOfMember : members) {
                 String[] attributes = valuesOfMember.split("-");
 
@@ -296,7 +296,7 @@ public class DepartmentResource {
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                list.concat("|"+valuesOfMember);
+                list = list.concat("|"+valuesOfMember);
             }
             //txn.add(list);
             Entity newDepartment = Entity.newBuilder(department)
@@ -315,11 +315,11 @@ public class DepartmentResource {
     }
     }
 
-/*                               //FALTA VER MANEIRA MAIS EFICIENTE DE TRATAR DE MEMBROS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     @POST
     @Path("/delete/members/{username}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("username") String username,@PathParam("id") String id, Map<String, String> members) {
+    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("username") String username,@PathParam("id") String id, List<String> members) {
         LOG.fine("Attempt to add members to the department.");
 
         Transaction txn = datastore.newTransaction();
@@ -360,19 +360,19 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
 
-            Key listsKey = datastore.newKeyFactory().setKind("List").newKey(id);
-            Entity.Builder builder = Entity.newBuilder(listsKey);
-            for(Map.Entry<String, String> attribute : members.entrySet()) {
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attribute.getValue());
+            String list = department.getString("members_list");
+            for(String valuesOfMember : members) {
+                String[] attributes = valuesOfMember.split("-");
+
+                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
                 Entity memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                builder.set(attribute.getKey(), attribute.getValue());
+                list = list.replace("|"+valuesOfMember, "");
             }
-            Entity list = builder.build();
             Entity newDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
@@ -388,5 +388,4 @@ public class DepartmentResource {
             }
         }
     }
-    */
 }
