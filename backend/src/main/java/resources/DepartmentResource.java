@@ -132,6 +132,13 @@ public class DepartmentResource {
             }
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(data.id);
             Entity department = txn.get(departmentKey);
+
+            if( department == null ) {
+                txn.rollback();
+                LOG.warning("Department does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
+            }
+
             data.fillGaps(department);
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
             Entity president = txn.get(presidentKey);
@@ -159,26 +166,23 @@ public class DepartmentResource {
                 txn.rollback();
                 LOG.warning("President doesn't exists.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("President doesn't exists.").build();
-            }else if( department == null ) {
-                txn.rollback();
-                LOG.warning("Department does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
+            }else {
+
+                Entity newDepartment = Entity.newBuilder(department)
+                        .set("email", data.email)
+                        .set("name", data.name)
+                        .set("president", data.president)
+                        .set("phone_number", data.phoneNumber)
+                        .set("address", data.address)
+                        .set("fax", data.fax)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(newDepartment);
+                LOG.info(data.id + " edited.");
+                txn.commit();
+                return Response.ok(newDepartment).build();
             }
-
-                    Entity newDepartment = Entity.newBuilder(department)
-                            .set("email", data.email)
-                            .set("name", data.name)
-                            .set("president", data.president)
-                            .set("phone_number", data.phoneNumber)
-                            .set("address", data.address)
-                            .set("fax", data.fax)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
-
-                    txn.update(newDepartment);
-                    LOG.info(data.id + " edited.");
-                    txn.commit();
-                    return Response.ok(newDepartment).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
