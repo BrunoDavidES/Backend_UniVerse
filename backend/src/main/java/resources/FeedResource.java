@@ -15,10 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Path("/feed")
@@ -81,7 +78,7 @@ public class FeedResource {
 
                 LOG.info(kind + " posted " + data.title + "; id: " + id);
                 txn.commit();
-                return Response.ok(entry).build();
+                return Response.ok(id).build();
             } finally {
                 if (txn.isActive()) {
                     txn.rollback();
@@ -198,19 +195,22 @@ public class FeedResource {
                                 @QueryParam("limit") int limit,
                                 @QueryParam("offset") int offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
+        if(kind.equals("Event")) {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning("Token not found");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            }
         }
 
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
