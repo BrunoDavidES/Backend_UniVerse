@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -31,11 +32,12 @@ public class AuthToken {
 	}
 
 	public String generateToken(Map<String, String> payload) throws Exception {
+
 		Builder tokenBuilder = JWT.create()
 				.withIssuer("https://universe-fct.oa.r.appspot.com/")
 				.withClaim("jti", UUID.randomUUID().toString())
-				.withExpiresAt(Instant.now().plusSeconds(6000)) //2 fase implementar refresh
-				.withIssuedAt(Instant.now());
+				.withIssuedAt(Instant.now())
+				.withExpiresAt(Instant.now().plus(2, ChronoUnit.HOURS)); //2 fase implementar refresh
 
 		payload.entrySet().forEach(action -> tokenBuilder.withClaim(action.getKey(), action.getValue()));
 

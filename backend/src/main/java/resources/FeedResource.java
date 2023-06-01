@@ -71,6 +71,7 @@ public class FeedResource {
                 Entity.Builder builder = Entity.newBuilder(feedKey);
 
                 builder.set("title", data.title)
+                        .set("id", id)
                         .set("time_creation", Timestamp.now());
 
                 entry = builder.build();
