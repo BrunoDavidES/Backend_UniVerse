@@ -11,7 +11,7 @@
     <packaging>war</packaging>
 
     <name>ADCAvIndv</name>
-    <description>ADC 2023 Individual Project</description>
+    <description>ADC 2023 Project</description>
 
     <properties>
         <appengine.maven.plugin.version>2.4.0</appengine.maven.plugin.version>
