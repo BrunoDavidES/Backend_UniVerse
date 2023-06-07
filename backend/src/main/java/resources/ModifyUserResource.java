@@ -156,7 +156,7 @@ public class ModifyUserResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
             } else {
                     Entity newUser = Entity.newBuilder(target)
-                            .set("roles", data.newRole)
+                            .set("role", data.newRole)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 

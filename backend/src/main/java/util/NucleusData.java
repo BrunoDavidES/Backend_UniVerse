@@ -8,7 +8,8 @@ public class NucleusData {
     // Create
     public String name;
 
-    public String acronym;
+    // Aronym ex: ninf
+    public String id;
 
     public String president;
 
@@ -38,7 +39,7 @@ public class NucleusData {
 
 
     public boolean validateRegister() {
-        if (name == null || acronym == null || president == null || nucleusEmail == null) {
+        if (name == null || id == null || president == null || nucleusEmail == null) {
             return false;
         }
         return nucleusEmail.matches("^[A-Za-z0-9._%+-]+@(ae+\\.fct\\.unl\\.pt$)");
@@ -50,7 +51,7 @@ public class NucleusData {
 
     public void fillGaps(Entity nucleus){
         if (newName == null) newName = nucleus.getString("name");
-        if (acronym == null) acronym = nucleus.getString("acronym");
+        if (id == null) id = nucleus.getString("id");
         if (president == null) president = nucleus.getString("president");
         if (nucleusEmail == null) nucleusEmail = nucleus.getString("nucleusEmail");
         if (website == null) website = nucleus.getString("website");
@@ -60,6 +61,10 @@ public class NucleusData {
         if (youtube == null) youtube = nucleus.getString("youtube");
         if (linkedIn == null) linkedIn = nucleus.getString("linkedIn");
         if (description == null) description = nucleus.getString("description");
+    }
+
+    public boolean validateList(){
+        return this.members == null || this.members.isEmpty();
     }
 
 }

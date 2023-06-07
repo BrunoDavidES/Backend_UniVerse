@@ -9,8 +9,6 @@ public class FeedData {
 
     public String author;
 
-    public String date;
-
     // Event only attributes
     public String startDate;
 

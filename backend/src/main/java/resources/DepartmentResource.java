@@ -168,7 +168,7 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("President doesn't exists.").build();
             }else {
 
-                Entity newDepartment = Entity.newBuilder(department)
+                Entity updatedDepartment = Entity.newBuilder(department)
                         .set("email", data.email)
                         .set("name", data.name)
                         .set("president", data.president)
@@ -178,10 +178,10 @@ public class DepartmentResource {
                         .set("time_lastupdate", Timestamp.now())
                         .build();
 
-                txn.update(newDepartment);
+                txn.update(updatedDepartment);
                 LOG.info(data.id + " edited.");
                 txn.commit();
-                return Response.ok(newDepartment).build();
+                return Response.ok(updatedDepartment).build();
             }
         } finally {
             if (txn.isActive()) {
@@ -289,7 +289,7 @@ public class DepartmentResource {
                 LOG.warning("Department does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
-            String list = "";
+            String list = department.getString("members_list");
 
             //Criar metodo getProfile
 
@@ -305,23 +305,25 @@ public class DepartmentResource {
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                list = list.concat("|"+valuesOfMember);
+                if (!list.contains(attributes[1])) {
+                    list = list.concat("|" + valuesOfMember);
+                }
             }
             //txn.add(list);
-            Entity newDepartment = Entity.newBuilder(department)
+            Entity updatedDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
-            txn.update(newDepartment);
+            txn.update(updatedDepartment);
             LOG.info("Members added.");
             txn.commit();
-            return Response.ok(newDepartment).build();
+            return Response.ok(updatedDepartment).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
             }
-    }
+        }
     }
 
 
@@ -387,15 +389,15 @@ public class DepartmentResource {
                 }
                 list = list.replace("|"+valuesOfMember, "");
             }
-            Entity newDepartment = Entity.newBuilder(department)
+            Entity updatedDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
-            txn.update(newDepartment);
+            txn.update(updatedDepartment);
             LOG.info("Members removed.");
             txn.commit();
-            return Response.ok(newDepartment).build();
+            return Response.ok(updatedDepartment).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -465,15 +467,15 @@ public class DepartmentResource {
                 list = list.replace("|"+valuesOfMember, "|"+attribute[0]+"-"+attribute[1]);
             }
 
-            Entity newDepartment = Entity.newBuilder(department)
+            Entity updatedDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
-            txn.update(newDepartment);
+            txn.update(updatedDepartment);
             LOG.info("Members removed.");
             txn.commit();
-            return Response.ok(newDepartment).build();
+            return Response.ok(updatedDepartment).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
