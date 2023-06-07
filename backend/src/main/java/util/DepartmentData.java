@@ -8,7 +8,7 @@ import java.util.Map;
 public class DepartmentData {
 
 
-    public String id;
+    public String id;  //acronimo do departamento, exemplo MIEI
     public List<String> members;
     public String email;
     public String name;

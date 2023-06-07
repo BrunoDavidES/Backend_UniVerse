@@ -290,11 +290,8 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
             String list = department.getString("members_list");
+            String userPersonalList;
 
-            //Criar metodo getProfile
-
-            //Adicionar papel-departamento ao user no datastore
-            //Criar lista para estas coisas
             for(String valuesOfMember : data.members) {
                 String[] attributes = valuesOfMember.split("-");
 
@@ -306,10 +303,17 @@ public class DepartmentResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
                 if (!list.contains(attributes[1])) {
+                    userPersonalList = memberEntity.getString("job_list");
+                    userPersonalList = userPersonalList.concat("|" + department.getString("id") + "-" + attributes[0]);
+                    Entity newUser = Entity.newBuilder(memberEntity)
+                            .set("job_list", userPersonalList)
+                            .set("time_lastupdate", Timestamp.now())
+                            .build();
+
+                    txn.update(newUser);
                     list = list.concat("|" + valuesOfMember);
                 }
             }
-            //txn.add(list);
             Entity updatedDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
@@ -377,6 +381,8 @@ public class DepartmentResource {
             }
 
             String list = department.getString("members_list");
+            String userPersonalList;
+
             for(String valuesOfMember : data.members) {
                 String[] attributes = valuesOfMember.split("-");
 
@@ -387,6 +393,14 @@ public class DepartmentResource {
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
+                userPersonalList = memberEntity.getString("job_list");
+                userPersonalList = userPersonalList.replace("|" + department.getString("id") + "-" + attributes[0], "");
+                Entity newUser = Entity.newBuilder(memberEntity)
+                        .set("job_list", userPersonalList)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(newUser);
                 list = list.replace("|"+valuesOfMember, "");
             }
             Entity updatedDepartment = Entity.newBuilder(department)
@@ -454,6 +468,9 @@ public class DepartmentResource {
             }
 
             String list = department.getString("members_list");
+            String userPersonalList;
+            String[] jobs;
+            String targetJob;
             for(String valuesOfMember : data.members) {
                 String[] attribute = valuesOfMember.split("-");
 
@@ -464,7 +481,25 @@ public class DepartmentResource {
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                list = list.replace("|"+valuesOfMember, "|"+attribute[0]+"-"+attribute[1]);
+                userPersonalList = memberEntity.getString("job_list");
+                jobs = userPersonalList.split("|");
+                targetJob = null;
+                for (String job: jobs) {
+                    if (job.contains(department.getString("id"))) {
+                        targetJob = job.split("-")[1];
+                        break;
+                    }
+                }
+
+                list = list.replace("|"+ targetJob +"-"+attribute[1], "|"+attribute[0]+"-"+attribute[1]);
+
+                userPersonalList = userPersonalList.replace(department.getString("id") + "-" + targetJob, department.getString("id") + "-" + attribute[0]);
+                Entity newUser = Entity.newBuilder(memberEntity)
+                        .set("job_list", userPersonalList)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(newUser);
             }
 
             Entity updatedDepartment = Entity.newBuilder(department)
