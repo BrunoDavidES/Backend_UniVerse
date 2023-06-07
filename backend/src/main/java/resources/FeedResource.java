@@ -31,9 +31,6 @@ public class FeedResource {
     public Response postEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, FeedData data){
         LOG.fine("Attempt to post entry to feed.");
 
-
-
-
         if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
@@ -69,15 +66,33 @@ public class FeedResource {
                 } while (entry != null);
 
                 Entity.Builder builder = Entity.newBuilder(feedKey);
+                if (kind.equals("Event")) { //construtor de eventos
 
-                builder.set("title", data.title)
-                        .set("id", id)
-                        .set("validated_backoffice", "false")
-                        .set("time_creation", Timestamp.now());
+                    builder.set("id", id)
+                            .set("title", data.title)
+                            .set("author", data.author)
+                            .set("startDate", data.startDate)
+                            .set("endDate", data.endDate)
+                            .set("location", data.location)
+                            .set("department", data.department)
+                            .set("isPublic", data.isPublic)
+                            .set("capacity", data.capacity)
+                            .set("isItPaid", data.isItPaid)
+                            .set("validated_backoffice", "false")
+                            .set("time_creation", Timestamp.now());
 
+                }else { //construtor de news
+
+                    builder.set("id", id)
+                            .set("title", data.title)
+                            .set("author", data.author)
+                            .set("validated_backoffice", "false")
+                            .set("time_creation", Timestamp.now());
+
+                }
                 entry = builder.build();
-                txn.add(entry);
 
+                txn.add(entry);
                 LOG.info(kind + " posted " + data.title + "; id: " + id);
                 txn.commit();
                 return Response.ok(id).build();
@@ -122,17 +137,36 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist " + id);
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
-            } else if(!entry.getList("manager").contains(token.getClaim("user").toString())){
+            } else if(!entry.getString("author").equals(token.getClaim("user").toString())){
                 txn.rollback();
                 LOG.warning("Wrong manager.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
             }else {
-                Entity newEntry = Entity.newBuilder(entry)
-                        .set("title", data.title)
-                        .set("time_creation", Timestamp.now())
-                        .build();
+                Entity.Builder newEntry = Entity.newBuilder(entry);
+                if (kind.equals("Event")) { //construtor de eventos
 
-                txn.update(newEntry);
+                    newEntry.set("id", id)
+                            .set("title", data.title)
+                            .set("author", data.author)
+                            .set("startDate", data.startDate)
+                            .set("endDate", data.endDate)
+                            .set("location", data.location)
+                            .set("department", data.department)
+                            .set("isPublic", data.isPublic)
+                            .set("capacity", data.capacity)
+                            .set("isItPaid", data.isItPaid)
+                            .set("time_lastupdated", Timestamp.now());
+
+                }else { //construtor de news
+
+                    newEntry.set("id", id)
+                            .set("title", data.title)
+                            .set("author", data.author)
+                            .set("time_lastupdated", Timestamp.now());
+
+                }
+                Entity updatedEntryEntry = newEntry.build();
+                txn.update(updatedEntryEntry);
 
                 LOG.info(kind + " edited " + data.title + "; id: " + id);
                 txn.commit();
