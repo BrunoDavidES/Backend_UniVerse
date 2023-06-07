@@ -335,7 +335,7 @@ public class DepartmentResource {
     @Path("/delete/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
-        LOG.fine("Attempt to add members to the department.");
+        LOG.fine("Attempt to remove members from the department.");
 
         if(data.validateList()){
             LOG.warning("List is empty.");
@@ -423,7 +423,7 @@ public class DepartmentResource {
     @Path("/edit/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
-        LOG.fine("Attempt to add members to the department.");
+        LOG.fine("Attempt to edit members of the department.");
         if(data.validateList()){
             LOG.warning("List is empty.");
             return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
@@ -491,7 +491,7 @@ public class DepartmentResource {
                     }
                 }
 
-                list = list.replace("|"+ targetJob +"-"+attribute[1], "|"+attribute[0]+"-"+attribute[1]);
+                list = list.replace(targetJob +"-"+attribute[1], attribute[0]+"-"+attribute[1]);
 
                 userPersonalList = userPersonalList.replace(department.getString("id") + "-" + targetJob, department.getString("id") + "-" + attribute[0]);
                 Entity newUser = Entity.newBuilder(memberEntity)
@@ -508,7 +508,7 @@ public class DepartmentResource {
                     .build();
 
             txn.update(updatedDepartment);
-            LOG.info("Members removed.");
+            LOG.info("Members edited.");
             txn.commit();
             return Response.ok(updatedDepartment).build();
         } finally {
