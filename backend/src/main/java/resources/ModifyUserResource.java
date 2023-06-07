@@ -143,6 +143,8 @@ public class ModifyUserResource {
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
 
+            //Falta criar token novo e apagar o antigo
+
             if(user == null || target == null) {
                 txn.rollback();
                 LOG.warning("One of the users does not exist.");
@@ -154,7 +156,7 @@ public class ModifyUserResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
             } else {
                     Entity newUser = Entity.newBuilder(target)
-                            .set("role", data.newRole)
+                            .set("roles", data.newRole)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 

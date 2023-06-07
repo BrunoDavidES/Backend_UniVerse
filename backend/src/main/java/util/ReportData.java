@@ -4,9 +4,10 @@ import java.util.List;
 
 public class ReportData {
     public String title;
-    public String department;
+
+    public String location;
 
     public boolean validate() {
-        return title != null  && department!= null;
+        return title != null  && location!= null;
     }
 }

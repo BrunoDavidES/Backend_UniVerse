@@ -43,7 +43,7 @@ public class LoginResource {
 			if( user == null ) {
 				txn.rollback();
 				LOG.warning("User does not exist.");
-				return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+				return Response.status(Response.Status.UNAUTHORIZED).entity("User or password incorrect").build();
 			} else {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 					LOG.info("User logged in: " + data.username);
@@ -55,7 +55,7 @@ public class LoginResource {
 				} else {
 					txn.rollback();
 					LOG.warning("Password incorrect.");
-					return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+					return Response.status(Response.Status.UNAUTHORIZED).entity("User or password incorrect").build();
 				}
 			}
 		} finally {

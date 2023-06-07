@@ -72,6 +72,7 @@ public class FeedResource {
 
                 builder.set("title", data.title)
                         .set("id", id)
+                        .set("validated_backoffice", "false")
                         .set("time_creation", Timestamp.now());
 
                 entry = builder.build();
@@ -135,7 +136,7 @@ public class FeedResource {
 
                 LOG.info(kind + " edited " + data.title + "; id: " + id);
                 txn.commit();
-                return Response.ok(entry).build();
+                return Response.ok().build();
             }
         } finally {
             if (txn.isActive()) {
@@ -196,6 +197,8 @@ public class FeedResource {
                                 @QueryParam("limit") int limit,
                                 @QueryParam("offset") int offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
+
+        //Verificar, caso for evento privado, se o token é valido
         if(kind.equals("Event")) {
             final ValToken validator = new ValToken();
             DecodedJWT token = validator.checkToken(request);
@@ -205,6 +208,7 @@ public class FeedResource {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
         }
+
 
         QueryResults<Entity> queryResults;
 

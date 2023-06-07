@@ -7,12 +7,25 @@ public class FeedData {
     // News and Event attributes
     public String title;
 
+    public String author;
+
+    public String date;
+
     // Event only attributes
     public String startDate;
+
     public String endDate;
+
     public List<String> manager;
+
     public String location;
+
+    public String department;
+
+    public String isPublic;
+
     public int capacity;
+
     public boolean isItPaid;
 
     public boolean validate(String kind) {

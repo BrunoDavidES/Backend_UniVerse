@@ -249,7 +249,7 @@ public class DepartmentResource {
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "papel-username"
-    public Response getMembers(@Context HttpServletRequest request, @PathParam("id") String id, List<String> members) {
+    public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to add members to the department.");
 
         Transaction txn = datastore.newTransaction();
@@ -290,7 +290,12 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist.").build();
             }
             String list = "";
-            for(String valuesOfMember : members) {
+
+            //Criar metodo getProfile
+
+            //Adicionar papel-departamento ao user no datastore
+            //Criar lista para estas coisas
+            for(String valuesOfMember : data.members) {
                 String[] attributes = valuesOfMember.split("-");
 
                 Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);

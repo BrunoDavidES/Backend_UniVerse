@@ -62,7 +62,7 @@ public class ReportsResource {
 
             builder.set("title", data.title)
                     .set("reporter", token.getClaim("user").toString())
-                    .set("department", data.department)
+                    .set("location", data.location)
                     .set("status", "UNSEEN")
                     .set("time_creation", Timestamp.now());
 
