@@ -21,7 +21,7 @@ public class UserData {
 	public UserData() { }
 
 	public boolean validateRegister() {
-		if (username == null || email == null || name == null || password == null || confirmation == null) {
+		if (email == null || name == null || password == null || confirmation == null) {
 			return false;
 		}
 
@@ -35,6 +35,7 @@ public class UserData {
 		if (!password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,64}")) {
 			return false;
 		}
+		this.username = email.split("@")[0];
 		return password.equals(confirmation);
 	}
 	public boolean validateModify() {
