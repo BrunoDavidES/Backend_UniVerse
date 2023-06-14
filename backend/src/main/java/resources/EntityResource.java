@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 @Path("/entity")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class EntityResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(EntityResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public EntityResource() { }

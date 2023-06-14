@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ModifyUserResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
 
