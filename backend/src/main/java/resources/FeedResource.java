@@ -49,7 +49,7 @@ public class FeedResource {
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
-            if (kind.equals("Event") && !role.equals("D")){
+            if (kind.equals("Event") && !role.equals("D") && !role.equals("BO")){
                 LOG.warning("No permission to create an event.");
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
@@ -228,8 +228,8 @@ public class FeedResource {
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
-                                @QueryParam("limit") int limit,
-                                @QueryParam("offset") int offset, Map<String, String> filters){
+                                @QueryParam("limit") String limit,
+                                @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
         //Verificar, caso for evento privado, se o token é valido
@@ -262,8 +262,8 @@ public class FeedResource {
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
-                .setLimit(limit)
-                .setOffset(offset)
+                .setLimit(Integer.parseInt(limit))
+                .setOffset(Integer.parseInt(offset))
                 .build();
 
         queryResults = datastore.run(query);
