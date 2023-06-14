@@ -1,38 +1,69 @@
 package util;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator.Builder;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class AuthToken {
 
-	public String username;
-	public String tokenId;
+	private static final Logger LOG = Logger.getLogger(AuthToken.class.getName());
 
-	public String name;
-	public long creationDate;
-	public long expirationDate;
-	public String role;
+	private KeyPairGenerator keyPairGenerator;
+	private KeyPair keyPair;
 
-	public static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2h
-
-	public AuthToken(String username, String name) {
-		this.username = username;
-		this.name = name;
-		this.tokenId = UUID.randomUUID().toString();
-		this.creationDate = System.currentTimeMillis();
-		this.expirationDate = this.creationDate + AuthToken.EXPIRATION_TIME;
-		this.role = null;
+	public AuthToken () throws NoSuchAlgorithmException {
+		keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+		keyPairGenerator.initialize(2048);
+		keyPair = keyPairGenerator.generateKeyPair();
 	}
 
-	public AuthToken(String username, String name, String tokenId, long creationDate, long expirationDate, String role) {
-		this.username = username;
-		this.name = name;
-		this.tokenId = tokenId;
-		this.creationDate = creationDate;
-		this.expirationDate = expirationDate;
-		this.role = role;
+	public String generateToken(Map<String, String> payload) throws Exception {
+
+		Builder tokenBuilder = JWT.create()
+				.withIssuer("https://universe-fct.oa.r.appspot.com/")
+				.withClaim("jti", UUID.randomUUID().toString())
+				.withIssuedAt(Instant.now())
+				.withExpiresAt(Instant.now().plus(2, ChronoUnit.HOURS)); //2 fase implementar refresh
+
+		payload.entrySet().forEach(action -> tokenBuilder.withClaim(action.getKey(), action.getValue()));
+
+
+		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+
+		String token = tokenBuilder.sign(Algorithm.RSA256((publicKey), privateKey));
+
+		if(verifyToken(token)) {
+			LOG.info(publicKey.toString());
+		}
+		return token;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	private boolean verifyToken(String token) throws JWTVerificationException {
+		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+
+		try {
+			JWTVerifier verifier = JWT.require(Algorithm.RSA256(publicKey)).build();
+			DecodedJWT decodedJWT = verifier.verify(token);
+			return true; // Verification successful
+		} catch (JWTVerificationException e) {
+			return false; // Verification failed
+		}
 	}
+
+
 }

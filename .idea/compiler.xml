@@ -9,8 +9,5 @@
         <module name="ADCAvIndv" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ADCAvIndv" target="11" />
-    </bytecodeTargetLevel>
   </component>
 </project>

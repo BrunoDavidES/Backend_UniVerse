@@ -1,0 +1,13 @@
+resources\ReportsResource.class
+resources\EntityResource.class
+util\FeedData.class
+util\UserData.class
+util\ReportData.class
+resources\FeedResource.class
+resources\LogoutResource.class
+resources\LoginResource.class
+resources\RegisterResource.class
+util\AuthToken.class
+util\ValToken.class
+filters\AdditionalResponseHeadersFilter.class
+servlets\MediaResourceServlet.class

@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>groupId</groupId>
-    <artifactId>ADCAvIndv</artifactId>
+    <artifactId>ADCProject</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <packaging>war</packaging>
 
     <name>ADCAvIndv</name>
-    <description>ADC 2023 Individual Project</description>
+    <description>ADC 2023 Project</description>
 
     <properties>
         <appengine.maven.plugin.version>2.4.0</appengine.maven.plugin.version>
