@@ -138,6 +138,10 @@ public class FeedResource {
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
+            String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
+            String name = String.valueOf(token.getClaim("name")).replaceAll("\"", "");
+            String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+
             if( entry == null ) {
                 txn.rollback();
                 LOG.warning(kind + " does not exist " + id);
@@ -148,13 +152,11 @@ public class FeedResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
             }
 
-            if(!entry.getString("authorUsername").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
+            if( !(entry.getString("authorUsername").equals(username) || role.equals("BO")) ){
                 txn.rollback();
-                LOG.warning("Wrong manager.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
+                LOG.warning("Permission denied");
+                return Response.status(Response.Status.FORBIDDEN).entity("Permission denied").build();
             }else {
-                String name = String.valueOf(token.getClaim("name")).replaceAll("\"", "");
-                String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
 
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals("Event")) { //construtor de eventos
@@ -216,14 +218,17 @@ public class FeedResource {
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
+            String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
+            String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+
             if( entry == null ) {
                 txn.rollback();
                 LOG.warning(kind + " does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
-            } else if(!entry.getList("manager").contains(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
+            } else if( !(entry.getString("authorUsername").equals(username) || role.equals("BO")) ) {
                 txn.rollback();
-                LOG.warning("Wrong manager.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
+                LOG.warning("Permission denied");
+                return Response.status(Response.Status.FORBIDDEN).entity("Permission denied").build();
             }else {
                 txn.delete(eventKey);
                 LOG.info(kind + " deleted " + id);
