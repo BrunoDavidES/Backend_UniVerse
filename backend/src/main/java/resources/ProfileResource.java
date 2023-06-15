@@ -46,14 +46,14 @@ public class ProfileResource {
             LOG.warning("Token not found");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
         }
-
+        //String.valueOf(token.getClaim("user")).replaceAll("\"", "")
         String requester = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(requester);
         Entity user = datastore.get(userKey);
 
         if( user == null ) {
             LOG.warning("User does not exist");
-            return Response.status(Response.Status.BAD_REQUEST).entity("User does not xist").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("User does not exist "  + requester).build();
         }
 
         // Vai ter de mudar quando se souber os atributos a devolver em cada caso
@@ -67,15 +67,16 @@ public class ProfileResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
             }
         }
-
+        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         ProfileData data = new ProfileData();
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
-        data.name = username;
+        data.username = username;
+        data.name = user.getString("name");
         data.role = user.getString("role");
-        data.roles = user.getString("job_list");
+        data.jobs = user.getString("job_list");
 
         LOG.fine("Profile successfully gotten");
-        return Response.ok(g.toJson(data)).entity("Profile successfully gotten").build();
+        return Response.ok(g.toJson(data)).build();
     }
 
 

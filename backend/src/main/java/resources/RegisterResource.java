@@ -55,6 +55,7 @@ public class RegisterResource {
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("role", data.getRole())
                         .set("status", "ACTIVE")
+                        .set("job_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
