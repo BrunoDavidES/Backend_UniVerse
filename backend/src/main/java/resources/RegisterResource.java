@@ -31,7 +31,7 @@ public class RegisterResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(@Context HttpServletRequest request, UserData data) {
-        LOG.fine("Attempt to register user: " + data.username);
+        LOG.fine("Attempt to register user: " + data.email);
 
         if( !data.validateRegister() ) {
             LOG.warning("Missing or wrong parameter");

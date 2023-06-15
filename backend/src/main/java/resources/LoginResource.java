@@ -28,7 +28,7 @@ public class LoginResource {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
-		LOG.fine("Attempt to login user: " + data.username);
+		LOG.fine("Attempt to login user: " + data.email);
 
 		if(!data.validateLogin() ) {
 			LOG.warning("Missing parameter");

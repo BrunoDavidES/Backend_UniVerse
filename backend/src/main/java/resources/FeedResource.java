@@ -86,7 +86,7 @@ public class FeedResource {
                     builder.set("id", id)
                             .set("title", data.title)
                             .set("author", data.author)
-                            .set("validated_backoffice", "false")
+                            .set("validated_backoffice", "true")
                             .set("time_creation", Timestamp.now());
 
                 }
