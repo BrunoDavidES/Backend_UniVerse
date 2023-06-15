@@ -7,9 +7,7 @@ import util.ProfileData;
 import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,14 +18,17 @@ import java.util.logging.Logger;
 @Path("/profile")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ProfileResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(ProfileResource.class.getName());
 
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public Gson g = new Gson();
 
     // Talvez adicionar LinkedIn
+
+    @GET
     @Path("/{username}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response getProfile(@Context HttpServletRequest request, @PathParam("username") String username, ProfileData data){
         LOG.fine("Attempt to get profile by " + username);
 
@@ -73,5 +74,9 @@ public class ProfileResource {
 
         LOG.fine("Profile successfully gotten");
         return Response.ok(g.toJson(data)).entity("Profile successfully gotten").build();
-      }
+    }
+
+
+
 }
+
