@@ -48,7 +48,7 @@ public class LoginResource {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 					LOG.info("User logged in: " + data.username);
 
-					loginToken(response, data.name, data.username, user.getString("role"));
+					loginToken(response, user.getString("name"), data.username, user.getString("role"));
 
 					txn.commit();
 					return Response.ok(user).build();
