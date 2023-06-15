@@ -25,10 +25,6 @@ public class UserData {
 			return false;
 		}
 
-		if (!username.matches(".{3,64}")){
-			return false;
-		}
-
 		if (!email.matches("^[A-Za-z0-9._%+-]+@(fct\\.unl\\.pt|campus\\.fct\\.unl\\.pt)$")) {
 			return false;
 		}
