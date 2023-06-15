@@ -139,7 +139,6 @@ public class FeedResource {
             Entity entry = txn.get(eventKey);
 
             String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
-            String name = String.valueOf(token.getClaim("name")).replaceAll("\"", "");
             String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
 
             if( entry == null ) {
@@ -160,10 +159,7 @@ public class FeedResource {
 
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals("Event")) { //construtor de eventos
-                    newEntry.set("id", id)
-                            .set("title", data.title)
-                            .set("authorName", name)
-                            .set("authorUsername", username)
+                    newEntry.set("title", data.title)
                             .set("startDate", data.startDate)
                             .set("endDate", data.endDate)
                             .set("location", data.location)
@@ -173,10 +169,7 @@ public class FeedResource {
                             .set("isItPaid", data.isItPaid)
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
-                    newEntry.set("id", id)
-                            .set("title", data.title)
-                            .set("authorName", name)
-                            .set("authorUsername", username)
+                    newEntry.set("title", data.title)
                             .set("time_lastupdated", Timestamp.now());
 
                 }
