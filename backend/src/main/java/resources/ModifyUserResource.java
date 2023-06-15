@@ -140,7 +140,7 @@ public class ModifyUserResource {
                 LOG.warning("One of the users does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
             } else
-                if( !data.validatePermission(token.getClaim("role").toString(), target.getString("role"))) {
+                if( !data.validatePermission(String.valueOf(token.getClaim("role")).replaceAll("\"", ""), target.getString("role"))) {
                     txn.rollback();
                     LOG.warning("Wrong permissions.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
