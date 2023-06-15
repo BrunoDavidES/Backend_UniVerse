@@ -45,7 +45,7 @@ public class FeedResource {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
 
-            String role = token.getClaim("role").asString();
+            String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
@@ -137,7 +137,7 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist " + id);
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
-            } else if(!entry.getString("author").equals(token.getClaim("user").toString())){
+            } else if(!entry.getString("author").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning("Wrong manager.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
@@ -207,7 +207,7 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
-            } else if(!entry.getList("manager").contains(token.getClaim("user").toString())) {
+            } else if(!entry.getList("manager").contains(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Wrong manager.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();

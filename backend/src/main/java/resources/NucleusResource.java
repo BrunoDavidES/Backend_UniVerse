@@ -60,9 +60,9 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus already exists").build();
             }
 
-            String creatorUsername = String.valueOf(token.getClaim("user"));
+            String creatorUsername = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
 
-            String creatorRole = String.valueOf(token.getClaim("role"));
+            String creatorRole = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
 
 
             if (!creatorRole.equals("BO")) {
@@ -149,8 +149,8 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus does not exist.").build();
             }
 
-            String modifierUsername = String.valueOf(token.getClaim("user"));
-            String modifierRole = String.valueOf(token.getClaim("role"));
+            String modifierUsername = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+            String modifierRole = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
 
             if (!modifierRole.equals("BO")) {
                 if (modifierRole.equals("A")) {
@@ -223,7 +223,7 @@ public class NucleusResource {
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
-            if(!token.getClaim("role").toString().equals("BO")){
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -284,7 +284,7 @@ public class NucleusResource {
                 LOG.warning("Nucleus does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus does not exist.").build();
             }
-            else if(!token.getClaim("role").toString().equals("BO") && !nucleus.getString("president").equals(token.getClaim("user").toString())){
+            else if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !nucleus.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -365,7 +365,7 @@ public class NucleusResource {
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
-            if (!token.getClaim("role").toString().equals("BO") && !nucleus.getString("president").equals(token.getClaim("user").toString())) {
+            if (!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !nucleus.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +

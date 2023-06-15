@@ -103,7 +103,7 @@ public class ReportsResource {
                 txn.rollback();
                 LOG.warning("Report does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Report does not exist").build();
-            } else if(!entry.getString("reporter").equals(token.getClaim("user").toString())) {
+            } else if(!entry.getString("reporter").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Wrong author");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong author.").build();
@@ -140,7 +140,7 @@ public class ReportsResource {
             LOG.warning("Token not found");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
         }
-        Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+        Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
         if(!user.getString("role").equals("BO")){
             LOG.warning("Nice try but your not a capi person");

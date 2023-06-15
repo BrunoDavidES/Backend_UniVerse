@@ -49,7 +49,7 @@ public class DepartmentResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            if(!token.getClaim("role").toString().equals("BO")){
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -209,7 +209,7 @@ public class DepartmentResource {
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
 
-            if(!token.getClaim("role").toString().equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -264,7 +264,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !department.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -354,7 +354,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !department.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -441,7 +441,7 @@ public class DepartmentResource {
 
             Key departmentKey = datastore.newKeyFactory().setKind("Department").newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!token.getClaim("role").toString().equals("BO") && !department.getString("president").equals(token.getClaim("user").toString())){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !department.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +

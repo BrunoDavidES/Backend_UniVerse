@@ -82,7 +82,7 @@ public class ModifyUserResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
 
             if( user == null ) {
@@ -128,7 +128,7 @@ public class ModifyUserResource {
                 LOG.warning("Token not found");
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
             Key targetKey = datastore.newKeyFactory().setKind("User").newKey(data.target);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
