@@ -46,6 +46,9 @@ public class FeedResource {
             }
 
             String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
+            String name = String.valueOf(token.getClaim("name")).replaceAll("\"", "");
+            String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
@@ -70,7 +73,8 @@ public class FeedResource {
 
                     builder.set("id", id)
                             .set("title", data.title)
-                            .set("author", data.author)
+                            .set("authorName", name)
+                            .set("authorUsername", username)
                             .set("startDate", data.startDate)
                             .set("endDate", data.endDate)
                             .set("location", data.location)
@@ -85,7 +89,8 @@ public class FeedResource {
 
                     builder.set("id", id)
                             .set("title", data.title)
-                            .set("author", data.author)
+                            .set("authorName", name)
+                            .set("authorUsername", username)
                             .set("validated_backoffice", "true")
                             .set("time_creation", Timestamp.now());
 
@@ -143,16 +148,20 @@ public class FeedResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
             }
 
-            if(!entry.getString("author").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
+            if(!entry.getString("authorUsername").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning("Wrong manager.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
             }else {
+                String name = String.valueOf(token.getClaim("name")).replaceAll("\"", "");
+                String username = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals("Event")) { //construtor de eventos
                     newEntry.set("id", id)
                             .set("title", data.title)
-                            .set("author", data.author)
+                            .set("authorName", name)
+                            .set("authorUsername", username)
                             .set("startDate", data.startDate)
                             .set("endDate", data.endDate)
                             .set("location", data.location)
@@ -164,7 +173,8 @@ public class FeedResource {
                 }else { //construtor de news
                     newEntry.set("id", id)
                             .set("title", data.title)
-                            .set("author", data.author)
+                            .set("authorName", name)
+                            .set("authorUsername", username)
                             .set("time_lastupdated", Timestamp.now());
 
                 }
