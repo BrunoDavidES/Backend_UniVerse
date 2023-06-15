@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public RegisterResource() { }

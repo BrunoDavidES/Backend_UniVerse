@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ReportsResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(ReportsResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
