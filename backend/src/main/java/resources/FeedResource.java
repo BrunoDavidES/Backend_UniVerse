@@ -113,7 +113,7 @@ public class FeedResource {
     public Response editEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
         LOG.fine("Attempt to edit feed entry.");
 
-        if((!kind.equals("News") && !kind.equals("Event")) || !data.validate(kind)) {
+        if(!kind.equals("News") && !kind.equals("Event")) {
             LOG.warning("Missing or wrong parameter");
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
         }
@@ -137,14 +137,19 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist " + id);
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist " + id).build();
-            } else if(!entry.getString("author").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
+            } else if (!data.validateEdit(entry, kind)) {
+                txn.rollback();
+                LOG.warning("Invalid request for editEntry");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
+            }
+
+            if(!entry.getString("author").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning("Wrong manager.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong manager.").build();
             }else {
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals("Event")) { //construtor de eventos
-
                     newEntry.set("id", id)
                             .set("title", data.title)
                             .set("author", data.author)
@@ -156,9 +161,7 @@ public class FeedResource {
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
                             .set("time_lastupdated", Timestamp.now());
-
                 }else { //construtor de news
-
                     newEntry.set("id", id)
                             .set("title", data.title)
                             .set("author", data.author)

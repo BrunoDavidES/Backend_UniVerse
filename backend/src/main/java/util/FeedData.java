@@ -1,6 +1,6 @@
 package util;
 
-import java.util.List;
+import com.google.cloud.datastore.*;
 
 public class FeedData {
 
@@ -45,6 +45,55 @@ public class FeedData {
         }
 
         return true;
+    }
+
+    public boolean validateEdit(Entity entry, String kind){
+        if (title == null){
+            title = entry.getString("title");
+        }
+        else if (title.equals("")) return false;
+
+        if (author == null){
+            author = entry.getString("author");
+        }
+        else if (author.equals("")) return false;
+
+        if (kind.equals("News"))
+            return true;
+
+        //Decidir formato das datas
+        if (startDate == null){
+            startDate = entry.getString("startDate");
+        }
+        else if (startDate.equals("")) return false;
+
+        if (endDate == null){
+            endDate = entry.getString("endDate");
+        }
+        else if (endDate.equals("")) return false;
+
+        //Decidir formato da localização, se é só o nome ou coordenadads, ou ambos
+        if (location == null){
+            location = entry.getString("location");
+        }
+        else if (location.equals("")) return false;
+
+        if (department == null){
+            department = entry.getString("department");
+        }
+        else if (department.equals("")) return false;
+
+        if (isPublic == null){
+            isPublic = entry.getString("isPublic");
+        } else if (!isPublic.equals("PRIVATE") && !isPublic.equals("PUBLIC")) return false;
+
+        if (capacity < 2)
+            return false;
+
+        if (isItPaid == null){
+            isItPaid = entry.getString("isItPaid");
+        }
+        return isItPaid.equals("NOT_PAID") || isItPaid.equals("PAID");
     }
 
 }
