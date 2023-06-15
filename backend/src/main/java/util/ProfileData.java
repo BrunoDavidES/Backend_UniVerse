@@ -8,4 +8,5 @@ public class ProfileData {
     public String role;
 
     public String roles;
+    public ProfileData(){}
 }

@@ -29,7 +29,7 @@ public class ProfileResource {
     @GET
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getProfile(@Context HttpServletRequest request, @PathParam("username") String username, ProfileData data){
+    public Response getProfile(@Context HttpServletRequest request, @PathParam("username") String username){
         LOG.fine("Attempt to get profile by " + username);
 
         if(username == null){
@@ -47,7 +47,7 @@ public class ProfileResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
         }
 
-        String requester = token.getClaim("user").toString();
+        String requester = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(requester);
         Entity user = datastore.get(userKey);
 
@@ -67,6 +67,8 @@ public class ProfileResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
             }
         }
+
+        ProfileData data = new ProfileData();
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         data.name = username;
         data.role = user.getString("role");
