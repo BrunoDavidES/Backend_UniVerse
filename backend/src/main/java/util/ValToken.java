@@ -40,6 +40,8 @@ public class ValToken{
                 LOG.warning("Token invalid.");
                 throw new InvalidParameterException("Token validation failed");
             }
+            txn.commit();
+
         } catch (Exception e){
             return null;
         } finally{
