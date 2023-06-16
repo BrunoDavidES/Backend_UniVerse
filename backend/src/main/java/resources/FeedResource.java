@@ -42,7 +42,7 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             String role = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
@@ -131,7 +131,7 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
 
@@ -205,7 +205,7 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
@@ -250,7 +250,7 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
         }
 
