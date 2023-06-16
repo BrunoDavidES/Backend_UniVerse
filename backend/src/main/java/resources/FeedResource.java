@@ -250,9 +250,12 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
+                if(filters == null)
+                    filters = new HashMap<>(1);
                 filters.put("isPublic","yes");
             }
         }
+        
 
 
 
