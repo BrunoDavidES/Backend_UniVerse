@@ -12,10 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Path("/reports")
@@ -61,7 +58,8 @@ public class ReportsResource {
             Entity.Builder builder = Entity.newBuilder(reportKey);
 
             builder.set("title", data.title)
-                    .set("reporter", token.getClaim("user").toString())
+                    .set("id", id)
+                    .set("reporter", String.valueOf(token.getClaim("user")).replaceAll("\"", ""))
                     .set("location", data.location)
                     .set("status", "UNSEEN")
                     .set("time_creation", Timestamp.now());
@@ -108,12 +106,12 @@ public class ReportsResource {
                 LOG.warning("Wrong author");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong author.").build();
             }else {
-                Entity.Builder builder = Entity.newBuilder(eventKey);
+                Entity.Builder builder = Entity.newBuilder(entry);
 
                 builder.set("time_lastUpdated", Timestamp.now());
 
-                entry = builder.build();
-                txn.add(entry);
+                Entity newEntry = builder.build();
+                txn.update(newEntry);
 
                 LOG.info( "Report registered id: " + id);
                 txn.commit();
@@ -166,6 +164,9 @@ public class ReportsResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
@@ -192,7 +193,7 @@ public class ReportsResource {
 
         LOG.info("Ides receber um query ó filho!");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!!").build();
+        return Response.ok(g.toJson(results)).build();
 
     }
 }
