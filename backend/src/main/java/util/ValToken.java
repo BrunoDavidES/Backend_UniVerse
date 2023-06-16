@@ -26,31 +26,29 @@ public class ValToken{
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public DecodedJWT validateToken(String token) {
-        if (token == null)
-            return null;
+        try{
+            if (token == null)
+                return null;
 
-        DecodedJWT decoded = JWT.decode(token);
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key tokenKey = datastore.newKeyFactory().setKind("Token_Blacklist").newKey(decoded.getId());
-            Entity blToken = txn.get(tokenKey);
+            DecodedJWT decoded = JWT.decode(token);
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key tokenKey = datastore.newKeyFactory().setKind("Token_Blacklist").newKey(decoded.getId());
+                Entity blToken = txn.get(tokenKey);
 
-            if (blToken != null) {
-                txn.rollback();
-                LOG.warning("Token invalid.");
-                throw new InvalidParameterException("Token validation failed");
+                if (blToken != null) {
+                    txn.rollback();
+                    LOG.warning("Token invalid.");
+                    throw new InvalidParameterException("Token validation failed");
+                }
+                txn.commit();
+
+            } finally{
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
             }
-            txn.commit();
 
-        } catch (Exception e){
-            return null;
-        } finally{
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-
-        try {
             if(!allowedIssuers.contains(decoded.getIssuer())) {
                 throw new InvalidParameterException(String.format("Unknown Issuer %s", decoded.getIssuer()));
             }
