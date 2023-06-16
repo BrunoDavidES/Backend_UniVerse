@@ -27,7 +27,7 @@ public class ValToken{
 
     public DecodedJWT validateToken(String token) {
         if (token == null)
-            throw new InvalidParameterException("Token is null");
+            return null;
 
         DecodedJWT decoded = JWT.decode(token);
         Transaction txn = datastore.newTransaction();
@@ -40,6 +40,8 @@ public class ValToken{
                 LOG.warning("Token invalid.");
                 throw new InvalidParameterException("Token validation failed");
             }
+        } catch (Exception e){
+            return null;
         } finally{
             if (txn.isActive()) {
                 txn.rollback();
