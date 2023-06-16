@@ -250,7 +250,7 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-            filters.put("isPublic","yes");
+                filters.put("isPublic","yes");
             }
         }
 
