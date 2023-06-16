@@ -250,10 +250,9 @@ public class FeedResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+                filters.put("isPublic", "yes");
             }
         }
-
 
         QueryResults<Entity> queryResults;
 
