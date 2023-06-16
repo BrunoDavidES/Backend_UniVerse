@@ -7,9 +7,7 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
-import org.apache.commons.codec.digest.DigestUtils;
 import util.NucleusData;
-import util.UserData;
 import util.ValToken;
 
 
@@ -48,7 +46,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
@@ -137,7 +135,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.name);
@@ -217,7 +215,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
@@ -273,7 +271,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
@@ -360,7 +358,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);

@@ -44,7 +44,7 @@ public class ProfileResource {
 
         if (token == null) {
             LOG.warning("Token not found");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
         }
         //String.valueOf(token.getClaim("user")).replaceAll("\"", "")
         String requester = String.valueOf(token.getClaim("user")).replaceAll("\"", "");

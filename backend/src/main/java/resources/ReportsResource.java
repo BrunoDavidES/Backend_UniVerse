@@ -46,7 +46,7 @@ public class ReportsResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key reportKey;
@@ -93,7 +93,7 @@ public class ReportsResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key eventKey = datastore.newKeyFactory().setKind("Report").newKey(id);
@@ -138,7 +138,7 @@ public class ReportsResource {
 
         if (token == null) {
             LOG.warning("Token not found");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
         }
         Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);

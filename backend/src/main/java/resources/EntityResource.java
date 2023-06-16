@@ -34,7 +34,7 @@ public class EntityResource {
 
                 if (token == null) {
                     LOG.warning("Token not found");
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                    return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
                 }
                 /*
                 Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
