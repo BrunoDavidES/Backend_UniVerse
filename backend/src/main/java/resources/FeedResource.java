@@ -255,6 +255,7 @@ public class FeedResource {
         }
 
 
+
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
