@@ -82,12 +82,14 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department already exists").build();
             } else {
                 department = Entity.newBuilder(departmentKey)
+                        .set("id", data.id)
                         .set("email", data.email)
                         .set("name", data.name)
                         .set("president", data.president)
                         .set("phone_number", data.phoneNumber)
                         .set("address", data.address)
                         .set("fax", data.fax)
+                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -137,7 +139,7 @@ public class DepartmentResource {
             data.fillGaps(department);
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
             Entity president = txn.get(presidentKey);
-            if(!token.getClaim("role").toString().equals("BO")){
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
