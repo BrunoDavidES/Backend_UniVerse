@@ -249,9 +249,7 @@ public class FeedResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
-                LOG.info("Token not found");
-                if(filters == null)
-                    filters = new HashMap<>(1);
+                LOG.warning("Token not found");
                 filters.put("isPublic","yes");
             }
         }
