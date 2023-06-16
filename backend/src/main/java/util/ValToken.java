@@ -69,7 +69,7 @@ public class ValToken{
             */
             return decoded;
         } catch (Exception e) {
-            throw new InvalidParameterException("Token validation failed: " + e.getMessage());
+            return null;
         }
     }
     public DecodedJWT checkToken(HttpServletRequest request){

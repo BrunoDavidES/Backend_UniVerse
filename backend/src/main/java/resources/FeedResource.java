@@ -245,15 +245,14 @@ public class FeedResource {
 
         //Verificar, caso for evento privado, se o token é valido
         if(kind.equals("Event")) {
-            try {
-                final ValToken validator = new ValToken();
-                validator.checkToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
-            } catch(Exception e){
+            if (token == null) {
                 LOG.info("Token not found");
                 if (filters == null)
                     filters = new HashMap<>(1);
-                filters.put("isPublic", "PUBLIC");
+                filters.put("isPublic", "yes");
             }
         }
         
