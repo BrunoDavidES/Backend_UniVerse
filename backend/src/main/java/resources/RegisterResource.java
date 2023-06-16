@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public RegisterResource() { }
@@ -31,7 +31,7 @@ public class RegisterResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(@Context HttpServletRequest request, UserData data) {
-        LOG.fine("Attempt to register user: " + data.username);
+        LOG.fine("Attempt to register user: " + data.email);
 
         if( !data.validateRegister() ) {
             LOG.warning("Missing or wrong parameter");
@@ -55,6 +55,7 @@ public class RegisterResource {
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("role", data.getRole())
                         .set("status", "ACTIVE")
+                        .set("job_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();

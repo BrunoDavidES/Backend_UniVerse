@@ -26,24 +26,29 @@ public class ValToken{
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public DecodedJWT validateToken(String token) {
-        DecodedJWT decoded = JWT.decode(token);
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key tokenKey = datastore.newKeyFactory().setKind("Token_Blacklist").newKey(decoded.getId());
-            Entity blToken = txn.get(tokenKey);
+        try{
+            if (token == null)
+                return null;
 
-            if (blToken != null) {
-                txn.rollback();
-                LOG.warning("Token invalid.");
-                throw new InvalidParameterException("Token validation failed");
-            }
-        } finally{
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
+            DecodedJWT decoded = JWT.decode(token);
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key tokenKey = datastore.newKeyFactory().setKind("Token_Blacklist").newKey(decoded.getId());
+                Entity blToken = txn.get(tokenKey);
 
-        try {
+                if (blToken != null) {
+                    txn.rollback();
+                    LOG.warning("Token invalid.");
+                    throw new InvalidParameterException("Token validation failed");
+                }
+                txn.commit();
+
+            } finally{
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
+            }
+
             if(!allowedIssuers.contains(decoded.getIssuer())) {
                 throw new InvalidParameterException(String.format("Unknown Issuer %s", decoded.getIssuer()));
             }
@@ -66,7 +71,7 @@ public class ValToken{
             */
             return decoded;
         } catch (Exception e) {
-            throw new InvalidParameterException("Token validation failed: " + e.getMessage());
+            return null;
         }
     }
     public DecodedJWT checkToken(HttpServletRequest request){

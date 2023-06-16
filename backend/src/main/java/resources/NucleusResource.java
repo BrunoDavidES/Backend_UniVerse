@@ -7,9 +7,7 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
-import org.apache.commons.codec.digest.DigestUtils;
 import util.NucleusData;
-import util.UserData;
 import util.ValToken;
 
 
@@ -48,7 +46,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key presidentKey = datastore.newKeyFactory().setKind("User").newKey(data.president);
@@ -60,9 +58,9 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus already exists").build();
             }
 
-            String creatorUsername = String.valueOf(token.getClaim("user"));
+            String creatorUsername = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
 
-            String creatorRole = String.valueOf(token.getClaim("role"));
+            String creatorRole = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
 
 
             if (!creatorRole.equals("BO")) {
@@ -137,7 +135,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.name);
@@ -149,8 +147,8 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus does not exist.").build();
             }
 
-            String modifierUsername = String.valueOf(token.getClaim("user"));
-            String modifierRole = String.valueOf(token.getClaim("role"));
+            String modifierUsername = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
+            String modifierRole = String.valueOf(token.getClaim("role")).replaceAll("\"", "");
 
             if (!modifierRole.equals("BO")) {
                 if (modifierRole.equals("A")) {
@@ -217,13 +215,13 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
-            if(!token.getClaim("role").toString().equals("BO")){
+            if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -273,7 +271,7 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
@@ -284,7 +282,7 @@ public class NucleusResource {
                 LOG.warning("Nucleus does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus does not exist.").build();
             }
-            else if(!token.getClaim("role").toString().equals("BO") && !nucleus.getString("president").equals(token.getClaim("user").toString())){
+            else if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !nucleus.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
@@ -360,12 +358,12 @@ public class NucleusResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
-            if (!token.getClaim("role").toString().equals("BO") && !nucleus.getString("president").equals(token.getClaim("user").toString())) {
+            if (!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO") && !nucleus.getString("president").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Nice try but your not a capi person");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +

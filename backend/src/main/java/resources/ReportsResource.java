@@ -12,16 +12,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ReportsResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(ReportsResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
@@ -46,7 +43,7 @@ public class ReportsResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key reportKey;
@@ -61,7 +58,8 @@ public class ReportsResource {
             Entity.Builder builder = Entity.newBuilder(reportKey);
 
             builder.set("title", data.title)
-                    .set("reporter", token.getClaim("user").toString())
+                    .set("id", id)
+                    .set("reporter", String.valueOf(token.getClaim("user")).replaceAll("\"", ""))
                     .set("location", data.location)
                     .set("status", "UNSEEN")
                     .set("time_creation", Timestamp.now());
@@ -93,7 +91,7 @@ public class ReportsResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
             Key eventKey = datastore.newKeyFactory().setKind("Report").newKey(id);
@@ -103,17 +101,17 @@ public class ReportsResource {
                 txn.rollback();
                 LOG.warning("Report does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Report does not exist").build();
-            } else if(!entry.getString("reporter").equals(token.getClaim("user").toString())) {
+            } else if(!entry.getString("reporter").equals(String.valueOf(token.getClaim("user")).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Wrong author");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong author.").build();
             }else {
-                Entity.Builder builder = Entity.newBuilder(eventKey);
+                Entity.Builder builder = Entity.newBuilder(entry);
 
                 builder.set("time_lastUpdated", Timestamp.now());
 
-                entry = builder.build();
-                txn.add(entry);
+                Entity newEntry = builder.build();
+                txn.update(newEntry);
 
                 LOG.info( "Report registered id: " + id);
                 txn.commit();
@@ -138,9 +136,9 @@ public class ReportsResource {
 
         if (token == null) {
             LOG.warning("Token not found");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
         }
-        Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+        Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
         if(!user.getString("role").equals("BO")){
             LOG.warning("Nice try but your not a capi person");
@@ -166,6 +164,9 @@ public class ReportsResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
@@ -192,7 +193,7 @@ public class ReportsResource {
 
         LOG.info("Ides receber um query ó filho!");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).entity("Vos recebestes ganda query results maninho!!!").build();
+        return Response.ok(g.toJson(results)).build();
 
     }
 }

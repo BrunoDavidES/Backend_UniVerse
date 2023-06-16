@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ModifyUserResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
 
@@ -23,13 +23,8 @@ public class ModifyUserResource {
     @POST
     @Path("/attributes")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyAttributes(@Context HttpServletRequest request, UserData data){
+    public Response modifyAttributes(@Context HttpServletRequest request, ModifyAttributesData data){
         LOG.fine("Attempt to modify user.");
-
-        if( !data.validateModify()) {
-            LOG.warning("Missing or wrong parameter");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-        }
 
         Transaction txn = datastore.newTransaction();
         try {
@@ -38,17 +33,16 @@ public class ModifyUserResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             data.fillGaps(user);
             if( user == null ) {
                 txn.rollback();
                 LOG.warning("User or password incorrect");
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim("user").toString()).build();
             } else {
-                if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
                     Entity newUser = Entity.newBuilder(user)
                             .set("name", data.name)
                             .set("status", data.status)
@@ -59,11 +53,7 @@ public class ModifyUserResource {
                     LOG.info(token.getClaim("user").toString() + " edited.");
                     txn.commit();
                     return Response.ok(user).build();
-                } else {
-                    txn.rollback();
-                    LOG.warning("User or password incorrect");
-                    return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
-                }
+
             }
         } finally {
             if (txn.isActive()) {
@@ -90,9 +80,9 @@ public class ModifyUserResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
 
             if( user == null ) {
@@ -136,9 +126,9 @@ public class ModifyUserResource {
 
             if (token == null) {
                 LOG.warning("Token not found");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Token not found").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
             Key targetKey = datastore.newKeyFactory().setKind("User").newKey(data.target);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
@@ -150,7 +140,7 @@ public class ModifyUserResource {
                 LOG.warning("One of the users does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
             } else
-                if( !data.validatePermission(token.getClaim("role").toString(), target.getString("role"))) {
+                if( !data.validatePermission(String.valueOf(token.getClaim("role")).replaceAll("\"", ""), target.getString("role"))) {
                     txn.rollback();
                     LOG.warning("Wrong permissions.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();

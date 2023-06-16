@@ -28,7 +28,7 @@ public class LoginResource {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
-		LOG.fine("Attempt to login user: " + data.username);
+		LOG.fine("Attempt to login user: " + data.email);
 
 		if(!data.validateLogin() ) {
 			LOG.warning("Missing parameter");
@@ -48,7 +48,7 @@ public class LoginResource {
 				if(user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 					LOG.info("User logged in: " + data.username);
 
-					loginToken(response, data.username, data.name, user.getString("role"));
+					loginToken(response, user.getString("name"), data.username, user.getString("role"));
 
 					txn.commit();
 					return Response.ok(user).build();
