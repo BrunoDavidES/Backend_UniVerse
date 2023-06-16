@@ -26,6 +26,8 @@ public class ValToken{
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public DecodedJWT validateToken(String token) {
+        if (token == null)
+            return null;
         DecodedJWT decoded = JWT.decode(token);
         Transaction txn = datastore.newTransaction();
         try {
