@@ -231,6 +231,33 @@ public class DepartmentResource {
                 LOG.warning("Department does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist").build();
             } else {
+                String list = department.getString("members_list");
+                String userPersonalList;
+                String[] attributes;
+                Key memberKey;
+                Entity memberEntity;
+                Entity newUser;
+                for(String valuesOfMember : list.split("#")) {
+                    if(!valuesOfMember.equals("")) {
+                        attributes = valuesOfMember.split("-");
+
+                        memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
+                        memberEntity = txn.get(memberKey);
+                        if (memberEntity == null) {
+                            txn.rollback();
+                            LOG.warning("Member doesn't exists.");
+                            return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
+                        }
+                        userPersonalList = memberEntity.getString("job_list");
+                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                        newUser = Entity.newBuilder(memberEntity)
+                                .set("job_list", userPersonalList)
+                                .set("time_lastupdate", Timestamp.now())
+                                .build();
+
+                        txn.update(newUser);
+                    }
+                }
                 txn.delete(departmentKey);
                 LOG.info("Department deleted.");
                 txn.commit();
