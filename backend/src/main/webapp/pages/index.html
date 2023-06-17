@@ -25,10 +25,9 @@
                 <label style="color:rgb(34,34,34); margin-left: -12px;" for="password">Password</label>
                 <input type="password" name="password" id="password" placeholder="Enter Password" required>
                 <i class="far fa-eye" id="togglePassword" style="margin-left: -35px; cursor: pointer;"></i>
-                <br><br>
+                <br><br><br><br>
+                <button class="button button2"  type="submit" value="Login">Sign in</button>
             </form>
-            <br><br>
-            <button class="button button2" onclick="window.location.href = '/login.html'">Sign in</button>
         </div>
         <div class="bottomRight">
             <p style="color:rgb(34,34,34);">@CapiCrew2023&emsp;&emsp;</p>
@@ -51,7 +50,7 @@
 
 			var xhr = new XMLHttpRequest();
 
-            xhr.open("POST", "/rest/login", true);
+            xhr.open("POST", "/rest/login/", true);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(postLogin));
 
