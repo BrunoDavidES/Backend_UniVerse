@@ -45,7 +45,6 @@ public class RegisterResource {
                     .setEmailVerified(false)
                     .setPassword(BCrypt.withDefaults().hashToString(12, data.password.toCharArray()))
                     .setDisplayName(data.name)
-                    .setPhotoUrl("TODO")
                     .setDisabled(true)
             );
 
