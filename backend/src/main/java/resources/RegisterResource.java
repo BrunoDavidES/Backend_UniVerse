@@ -25,18 +25,7 @@ import java.util.logging.Logger;
 public class RegisterResource {
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
 
-    public RegisterResource() {
-        try {
-            FileInputStream serviceAccount =
-                    new FileInputStream("backend/serviceAccountKey.json");
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-            FirebaseApp.initializeApp(options);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public RegisterResource() {}
 
     @POST
     @Path("/")
