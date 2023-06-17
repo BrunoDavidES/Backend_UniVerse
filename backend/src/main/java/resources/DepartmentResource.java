@@ -281,7 +281,7 @@ public class DepartmentResource {
     public Response queryDepartment(@Context HttpServletRequest request,
                                @QueryParam("limit") String limit,
                                @QueryParam("offset") String offset, Map<String, String> filters){
-        LOG.fine("Attempt to query users.");
+        LOG.fine("Attempt to query departments.");
 
         //Verificar, caso for evento privado, se o token é valido
         final ValToken validator = new ValToken();
