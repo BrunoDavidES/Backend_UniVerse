@@ -123,8 +123,9 @@ public class ProfileResource {
         if( filters == null){
             filters = new HashMap<>(1);
         }
+        StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
-            StructuredQuery.PropertyFilter propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
             if(attributeFilter == null)
                 attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
