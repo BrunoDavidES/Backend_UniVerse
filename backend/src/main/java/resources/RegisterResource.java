@@ -1,6 +1,9 @@
 package resources;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.Timestamp;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
@@ -11,6 +14,8 @@ import util.UserData;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -18,10 +23,20 @@ import java.util.logging.Logger;
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
-    private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
-    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
 
-    public RegisterResource() { }
+    public RegisterResource() {
+        try {
+            FileInputStream serviceAccount =
+                    new FileInputStream("backend/serviceAccountKey.json");
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+            FirebaseApp.initializeApp(options);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @POST
     @Path("/")
@@ -35,7 +50,7 @@ public class RegisterResource {
         }
 
         try {
-            UserRecord user = firebaseAuth.createUser( new CreateRequest()
+            UserRecord userRecord = FirebaseAuth.getInstance().createUser( new CreateRequest()
                     .setUid(data.username)
                     .setEmail(data.email)
                     .setEmailVerified(false)
@@ -50,10 +65,10 @@ public class RegisterResource {
             customClaims.put("time_creation", Timestamp.now());
             customClaims.put("time_lastupdate", Timestamp.now());
 
-            firebaseAuth.setCustomUserClaims(user.getUid(), customClaims);
+            FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), customClaims);
 
-            LOG.info("User registered: " + user.getUid());
-            return Response.ok(user).build();
+            LOG.info("User registered: " + userRecord.getUid());
+            return Response.ok(userRecord).build();
         } catch (FirebaseAuthException e) {
             LOG.warning("User registration failed: " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity("User registration failed: " + e.getMessage()).build();
