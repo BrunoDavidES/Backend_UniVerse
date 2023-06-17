@@ -16,6 +16,7 @@ public class UserData {
 	public String password;
 	public String confirmation;
 	public String status;
+	public String token;
 
 
 	public UserData() { }
