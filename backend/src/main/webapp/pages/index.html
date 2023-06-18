@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
-    <title>Sign In</title>
+    <title>Iniciar Sessão</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
 </head>
@@ -26,7 +26,7 @@
                 <input type="password" name="password" id="password" placeholder="Enter Password" required>
                 <i class="far fa-eye" id="togglePassword" style="margin-left: -35px; cursor: pointer;"></i>
                 <br><br><br><br>
-                <button class="button button2"  type="submit" value="Login">Sign in</button>
+                <button class="button button2"  type="submit" value="Login">Entrar</button>
             </form>
         </div>
         <div class="bottomRight">
@@ -50,7 +50,7 @@
 
 			var xhr = new XMLHttpRequest();
 
-            xhr.open("POST", "/rest/login/", true);
+            xhr.open("POST", "/rest/login", true);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify(postLogin));
 

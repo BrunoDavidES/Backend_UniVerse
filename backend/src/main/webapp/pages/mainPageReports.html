@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title> Reports FCT NOVA</title>
+    <link rel="stylesheet" href="styleMainPage.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body onload="loadLoggedUser()">
+<div class="sidebar">
+    <div class="logo-details">
+        <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
+        <span class="logo_name">UniVerse</span>
+    </div>
+    <ul class="nav-links">
+        <li>
+            <button onclick="window.location.href = '/pages/mainPage.html'">
+                <a href="#">
+                    <i class='bx bx-grid-alt' ></i>
+                    <span class="links_name">Home</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageNews.html'">
+                <a href="#news">
+                    <i class='bx bx-message'></i>
+                    <span class="links_name">Noticias</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageNewsEvents.html'">
+                <a href="#events">
+                    <i class='bx bx-list-ul' ></i>
+                    <span class="links_name">Eventos</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageNewsUsers.html'">
+                <a href="#users">
+                    <i class='bx bx-user' ></i>
+                    <span class="links_name">Users</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageStats.html'">
+                <a href="#stats">
+                    <i class='bx bx-pie-chart-alt-2' ></i>
+                    <span class="links_name">Estatísticas</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageReports.html'">
+                <a href="#reports" class="active">
+                    <i class='bx bx-book-alt' ></i>
+                    <span class="links_name">Reportes</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageFav.html'">
+                <a href="#fav">
+                    <i class='bx bx-heart' ></i>
+                    <span class="links_name">Favoritos</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/pages/mainPageSettings.html'">
+                <a href="#settings">
+                    <i class='bx bx-cog' ></i>
+                    <span class="links_name">Definições</span>
+                </a>
+            </button>
+        </li>
+        <li class="log_out">
+            <button onclick="openPopup()">
+                <a href="#logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="links_name">Log out</span>
+                </a>
+            </button>
+        </li>
+    </ul>
+</div>
+<section class="home-section">
+    <nav>
+        <div class="sidebar-button">
+            <i class='bx bx-menu sidebarBtn'></i>
+            <span class="home">Reports</span>
+        </div>
+        <h1> Back Office da FCT NOVA</h1>
+        <div class="profile-details" id="auxLogged">
+            <img src="images/profile.jpg" alt="">
+            <span class="admin_name" id="name"></span>
+        </div>
+    </nav>
+
+    <div class="home-content">
+        <div class="popup" id="popup" style="">
+            <h3>Está prestes a fazer logout</h3>
+            <p>Tem a certeza?</p>
+            <button type="button">Sim</button> &ensp;
+            <button type="button" onclick="closePopup()">Não</button>
+        </div>
+    </div>
+</section>
+
+<script>
+  let popup = document.getElementById("popup");
+
+  function openPopup(){
+    popup.classList.add("open-popup");
+  }
+
+  function closePopup(){
+    popup.classList.remove("open-popup");
+  }
+</script>
+
+<script>
+  let sidebar = document.querySelector(".sidebar");
+  let sidebarBtn = document.querySelector(".sidebarBtn");
+  sidebarBtn.onclick = function() {
+    sidebar.classList.toggle("active");
+    if(sidebar.classList.contains("active")){
+      sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+    }else
+      sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+   }
+</script>
+
+<script>
+  function loadLoggedUser() {
+    var xmlhttp = new XMLHttpRequest();
+	var user = localStorage.getItem("userLogged");
+
+	var postLogged = {
+		"username": user
+	}
+
+	var json = JSON.stringify(postLogged);
+
+	xmlhttp.onreadystatechange = function() {
+	  if (xmlhttp.readyState == 4) {
+	    if (xmlhttp.status == 200) {
+			var userLogged = JSON.parse(this.responseText);
+
+			document.getElementById("name").innerHTML = userLogged.name;
+
+			xmlhttp.open("POST", document.location.origin + "/rest/profile/", true);
+			xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+			xmlhttp.send(json);
+		}
+	  }
+	}
+
+	function goToLogin(){
+	  if(localStorage.getItem("userLogged") === ""){
+	    window.location.href = "/index.html";
+      }
+	}
+</script>
+
+<script>
+  function logout(){
+	var xmlhttp = new XMLHttpRequest();
+
+    var user = document.getElementById("user").innerHTML;
+
+    var postLogout = {
+      "username": user
+    }
+
+    var json = JSON.stringify(postLogout);
+
+    xmlhttp.onreadystatechange = function() {
+      if(xmlhttp.readyState == 4) {
+	    if(xmlhttp.status == 200) {
+		  localStorage.setItem("userLogged", "");
+		  window.location.href = "/pages/login.html";
+		}
+		else{
+		  xmlhttp.responseText;
+		}
+      }
+    }
+
+	xmlhttp.open("POST", document.location.origin + "/rest/logout/", true);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	xmlhttp.send(json);
+  }
+</script>
+
+</body>
+</html>
