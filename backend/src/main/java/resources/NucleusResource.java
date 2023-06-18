@@ -7,6 +7,8 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
+import com.google.gson.Gson;
+import util.DepartmentData;
 import util.NucleusData;
 import util.ValToken;
 
@@ -16,6 +18,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Path("/nucleus")
@@ -100,6 +106,7 @@ public class NucleusResource {
                         .set("name", data.name)
                         .set("id", data.id)
                         .set("president", data.president)
+                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -246,6 +253,33 @@ public class NucleusResource {
                 LOG.warning("Nucleus does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus does not exist").build();
             } else {
+                String list = nucleus.getString("members_list");
+                String userPersonalList;
+                Key memberKey;
+                Entity memberEntity;
+                Entity newUser;
+                for(String member : list.split("#")) {
+                    if(!member.equals("")) {
+
+                        memberKey = datastore.newKeyFactory().setKind("User").newKey(member);
+                        memberEntity = txn.get(memberKey);
+                        if (memberEntity == null) {
+                            txn.rollback();
+                            LOG.warning("Member doesn't exists.");
+                            return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
+                        }
+                        userPersonalList = memberEntity.getString("job_list");
+                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                        newUser = Entity.newBuilder(memberEntity)
+                                .set("job_list", userPersonalList)
+                                .set("time_lastupdate", Timestamp.now())
+                                .build();
+
+                        txn.update(newUser);
+                    }
+                }
+
+
                 txn.delete(nucleusKey);
                 LOG.info("Nucleus deleted.");
                 txn.commit();
@@ -256,6 +290,58 @@ public class NucleusResource {
                 txn.rollback();
             }
         }
+    }
+
+    @POST
+    @Path("/query")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryNucleus(@Context HttpServletRequest request,
+                                    @QueryParam("limit") String limit,
+                                    @QueryParam("offset") String offset, Map<String, String> filters){
+        LOG.fine("Attempt to query nucleus.");
+
+        //Verificar, caso for evento privado, se o token é valido
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning("Token not found");
+            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+        }
+
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
+        StructuredQuery.PropertyFilter propFilter;
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+
+            if(attributeFilter == null)
+                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
+            else
+                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("Nucleus")
+                .setFilter(attributeFilter)
+                .setLimit(Integer.parseInt(limit))
+                .setOffset(Integer.parseInt(offset))
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(results::add);
+
+        LOG.info("Ides receber um query ó filho!");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(results)).build();
+
     }
 
     @POST
@@ -305,21 +391,30 @@ public class NucleusResource {
             }
 
             String list = nucleus.getString("members_list");;
-            //Criar metodo getProfile
-            //Adicionar papel-departamento ao user no datastore
-            //Criar lista para estas coisas
+            String userPersonalList;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
 
             for(String member : data.members) {
 
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(member);
-                Entity memberEntity = txn.get(memberKey);
+                memberKey = datastore.newKeyFactory().setKind("User").newKey(member);
+                memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
                 if (!list.contains(member)){
-                    list = list.concat("|"+member);
+                    userPersonalList = memberEntity.getString("job_list");
+                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "-" + "member");
+                    newUser = Entity.newBuilder(memberEntity)
+                            .set("job_list", userPersonalList)
+                            .set("time_lastupdate", Timestamp.now())
+                            .build();
+
+                    txn.update(newUser);
+                    list = list.concat("#" + member);
                 }
             }
 
@@ -390,17 +485,27 @@ public class NucleusResource {
             }
 
             String list = nucleus.getString("members_list");
-            for (String valuesOfMember : data.members) {
-                String[] attributes = valuesOfMember.split("-");
-
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
-                Entity memberEntity = txn.get(memberKey);
-                if (memberEntity == null) {
+            String userPersonalList;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
+            for(String member : data.members) {
+                memberKey = datastore.newKeyFactory().setKind("User").newKey(member);
+                memberEntity = txn.get(memberKey);
+                if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
-                list = list.replace("|" + valuesOfMember, "");
+                userPersonalList = memberEntity.getString("job_list");
+                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                newUser = Entity.newBuilder(memberEntity)
+                        .set("job_list", userPersonalList)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(newUser);
+                list = list.replace("#"+member, "");
             }
             Entity updatedNucleus = Entity.newBuilder(nucleus)
                     .set("members_list", list)
@@ -417,6 +522,5 @@ public class NucleusResource {
             }
         }
     }
-
 
 }

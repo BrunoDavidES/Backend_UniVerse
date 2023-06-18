@@ -204,6 +204,7 @@
         left: 60px;
       }
       .sidebar.active ~ .home-section{
+        /* width: calc(100% - 220px); */
         overflow: hidden;
         left: 220px;
       }

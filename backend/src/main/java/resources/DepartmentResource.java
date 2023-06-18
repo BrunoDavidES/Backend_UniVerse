@@ -6,6 +6,7 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
+import com.google.gson.Gson;
 import util.DepartmentData;
 import util.ValToken;
 
@@ -14,6 +15,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Path("/department")
@@ -231,6 +236,33 @@ public class DepartmentResource {
                 LOG.warning("Department does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Department does not exist").build();
             } else {
+                String list = department.getString("members_list");
+                String userPersonalList;
+                String[] attributes;
+                Key memberKey;
+                Entity memberEntity;
+                Entity newUser;
+                for(String valuesOfMember : list.split("#")) {
+                    if(!valuesOfMember.equals("")) {
+                        attributes = valuesOfMember.split("-");
+
+                        memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
+                        memberEntity = txn.get(memberKey);
+                        if (memberEntity == null) {
+                            txn.rollback();
+                            LOG.warning("Member doesn't exists.");
+                            return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
+                        }
+                        userPersonalList = memberEntity.getString("job_list");
+                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                        newUser = Entity.newBuilder(memberEntity)
+                                .set("job_list", userPersonalList)
+                                .set("time_lastupdate", Timestamp.now())
+                                .build();
+
+                        txn.update(newUser);
+                    }
+                }
                 txn.delete(departmentKey);
                 LOG.info("Department deleted.");
                 txn.commit();
@@ -244,8 +276,79 @@ public class DepartmentResource {
     }
 
     @POST
+    @Path("/query")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryDepartment(@Context HttpServletRequest request,
+                               @QueryParam("limit") String limit,
+                               @QueryParam("offset") String offset, Map<String, String> filters){
+        LOG.fine("Attempt to query departments.");
+
+        //Verificar, caso for evento privado, se o token é valido
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning("Token not found");
+            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+        }
+        if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            LOG.warning("Nice try but your not a capi person");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+                    "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+                    "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+                    "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+                    "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+                    "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀").build();
+        }
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
+        StructuredQuery.PropertyFilter propFilter;
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+
+            if(attributeFilter == null)
+                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
+            else
+                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("Department")
+                .setFilter(attributeFilter)
+                .setLimit(Integer.parseInt(limit))
+                .setOffset(Integer.parseInt(offset))
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(results::add);
+
+        LOG.info("Ides receber um query ó filho!");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(results)).build();
+
+    }
+
+    @POST
     @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
     public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to add members to the department.");
 
@@ -288,12 +391,15 @@ public class DepartmentResource {
             }
             String list = department.getString("members_list");
             String userPersonalList;
-
+            String[] attributes;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
             for(String valuesOfMember : data.members) {
-                String[] attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("-");
 
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
-                Entity memberEntity = txn.get(memberKey);
+                memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
+                memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
@@ -301,14 +407,14 @@ public class DepartmentResource {
                 }
                 if (!list.contains(attributes[1])) {
                     userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("|" + department.getString("id") + "-" + attributes[0]);
-                    Entity newUser = Entity.newBuilder(memberEntity)
+                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "-" + attributes[0]);
+                    newUser = Entity.newBuilder(memberEntity)
                             .set("job_list", userPersonalList)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 
                     txn.update(newUser);
-                    list = list.concat("|" + valuesOfMember);
+                    list = list.concat("#" + valuesOfMember);
                 }
             }
             Entity updatedDepartment = Entity.newBuilder(department)
@@ -379,26 +485,29 @@ public class DepartmentResource {
 
             String list = department.getString("members_list");
             String userPersonalList;
-
+            String[] attributes;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
             for(String valuesOfMember : data.members) {
-                String[] attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("-");
 
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
-                Entity memberEntity = txn.get(memberKey);
+                memberKey = datastore.newKeyFactory().setKind("User").newKey(attributes[1]);
+                memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("|" + department.getString("id") + "-" + attributes[0], "");
-                Entity newUser = Entity.newBuilder(memberEntity)
+                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())
                         .build();
 
                 txn.update(newUser);
-                list = list.replace("|"+valuesOfMember, "");
+                list = list.replace("#"+valuesOfMember, "");
             }
             Entity updatedDepartment = Entity.newBuilder(department)
                     .set("members_list", list)
@@ -468,18 +577,22 @@ public class DepartmentResource {
             String userPersonalList;
             String[] jobs;
             String targetJob;
+            String[] attribute;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
             for(String valuesOfMember : data.members) {
-                String[] attribute = valuesOfMember.split("-");
+                attribute = valuesOfMember.split("-");
 
-                Key memberKey = datastore.newKeyFactory().setKind("User").newKey(attribute[1]);
-                Entity memberEntity = txn.get(memberKey);
+                memberKey = datastore.newKeyFactory().setKind("User").newKey(attribute[1]);
+                memberEntity = txn.get(memberKey);
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning("Member doesn't exists.");
                     return Response.status(Response.Status.BAD_REQUEST).entity("Member doesn't exists.").build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                jobs = userPersonalList.split("|");
+                jobs = userPersonalList.split("#");
                 targetJob = null;
                 for (String job: jobs) {
                     if (job.contains(department.getString("id"))) {
@@ -491,7 +604,7 @@ public class DepartmentResource {
                 list = list.replace(targetJob +"-"+attribute[1], attribute[0]+"-"+attribute[1]);
 
                 userPersonalList = userPersonalList.replace(department.getString("id") + "-" + targetJob, department.getString("id") + "-" + attribute[0]);
-                Entity newUser = Entity.newBuilder(memberEntity)
+                newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())
                         .build();
