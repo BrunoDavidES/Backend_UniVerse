@@ -61,7 +61,7 @@ public class NucleusResource {
             if (president == null){
                 txn.rollback();
                 LOG.warning("President does not exist");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Nucleus already exists").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("President does not exist").build();
             }
 
             String creatorUsername = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
@@ -92,7 +92,7 @@ public class NucleusResource {
                 }
             }
 
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.name);
+            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus != null ) {
@@ -106,6 +106,13 @@ public class NucleusResource {
                         .set("name", data.name)
                         .set("id", data.id)
                         .set("president", data.president)
+                        .set("website", "")
+                        .set("instagram", "")
+                        .set("twitter", "")
+                        .set("facebook", "")
+                        .set("youtube", "")
+                        .set("linkedIn", "")
+                        .set("description", "")
                         .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
@@ -145,7 +152,7 @@ public class NucleusResource {
                 return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
             }
 
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.name);
+            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus == null ) {
@@ -186,7 +193,7 @@ public class NucleusResource {
                     .set("name", data.newName)
                     .set("id", data.id)
                     .set("president", data.president)
-                    .set("nucleusEmail", data.nucleusEmail)
+                    .set("email", data.nucleusEmail)
                     .set("website", data.website)
                     .set("instagram", data.instagram)
                     .set("twitter", data.twitter)
@@ -210,8 +217,8 @@ public class NucleusResource {
     }
 
     @DELETE
-    @Path("/delete/{id}")
-    public Response deleteNucleus(@Context HttpServletRequest request, @QueryParam("acronym") String id){
+    @Path("/delete")
+    public Response deleteNucleus(@Context HttpServletRequest request, @QueryParam("id") String id){
         LOG.fine("Attempt to delete nucleus.");
 
         Transaction txn = datastore.newTransaction();
