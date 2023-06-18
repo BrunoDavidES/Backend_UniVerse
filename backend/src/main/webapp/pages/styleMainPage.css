@@ -163,19 +163,18 @@
         background: #fff;
         border-radius: 6px;
         position: absolute;
-        top: 0%;
+        top: 320%;
         left: 45%;
         transform: translate(-50%, -50%) scale(0.1);
         text-align: center;
         padding: 10px 30px 30px;
         visibility: hidden;
         box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
-        transition: transform 0.4s, top 0.4s
+        transition: transform 0.4s;
     }
 
     .open-popup{
         visibility: visible;
-        top: 320%;
         transform:  translate(-50%, -50%) scale(1.05);
     }
 
