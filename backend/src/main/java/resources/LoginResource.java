@@ -29,8 +29,8 @@ public class LoginResource {
 		}*/
 
 		try {
-			FirebaseToken token = FirebaseAuth.getInstance().verifyIdToken(data.token);
-			String uid = token.getUid();
+			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(data.token);
+			String uid = decodedToken.getUid();
 
 			LOG.info("User logged in: " + uid);
 			return Response.ok(uid).build();
