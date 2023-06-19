@@ -139,7 +139,9 @@ public class LoginResource {
 			String token = generator.generateToken(claims);
 			Cookie cookie = new Cookie("token", token);
 			cookie.setHttpOnly(true);
-			cookie.setMaxAge(600);
+			cookie.setMaxAge(3600);
+			cookie.setPath("/rest");
+			cookie.setSecure(true); // Set the Secure attribute to ensure the cookie is only sent over HTTPS
 			response.addCookie(cookie);
 		} catch (Exception e) {
 			e.printStackTrace();

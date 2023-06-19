@@ -96,7 +96,7 @@
     </div>
     <h1> Back Office da FCT NOVA</h1>
     <div class="profile-details" id="auxLogged">
-      <img src="images/profile.jpg" alt="">
+      <img src="img/profile.jpg" alt="">
       <span class="admin_name" id="name"></span>
     </div>
   </nav>
@@ -111,83 +111,7 @@
   </div>
 </section>
 
-<script>
-  let popup = document.getElementById("popup");
-
-  function openPopup(){
-    popup.classList.add("open-popup");
-  }
-
-  function closePopup(){
-    popup.classList.remove("open-popup");
-  }
-</script>
-
-<script>
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".sidebarBtn");
-  sidebarBtn.onclick = function() {
-    sidebar.classList.toggle("active");
-    if(sidebar.classList.contains("active")){
-      sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
-    }else
-      sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-   }
-</script>
-
-<script>
-  function loadLoggedUser() {
-    var xmlhttp = new XMLHttpRequest();
-	var user = localStorage.getItem("userLogged");
-
-	var postLogged = {
-		"username": user
-	}
-
-	var json = JSON.stringify(postLogged);
-
-	xmlhttp.onreadystatechange = function() {
-	  if (xmlhttp.readyState == 4) {
-	    if (xmlhttp.status == 200) {
-			var userLogged = JSON.parse(this.responseText);
-
-			document.getElementById("name").innerHTML = userLogged.name;
-
-			xmlhttp.open("POST", document.location.origin + "/rest/profile/", true);
-			xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-			xmlhttp.send(json);
-		}
-	  }
-	}
-  }
-	function goToLogin(){
-	  if(localStorage.getItem("userLogged") === ""){
-	    window.location.href = "/pages/index.html";
-      }
-	}
-</script>
-
-<script>
-  function logout(){
-	var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.onreadystatechange = function() {
-      if(xmlhttp.readyState == 4) {
-	    if(xmlhttp.status == 200) {
-		  localStorage.setItem("userLogged", "");
-		  window.location.href = "/pages/index.html";
-		}
-		else{
-		  xmlhttp.responseText;
-		}
-      }
-    }
-
-	xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
-    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-	xmlhttp.send(JSON.stringify({ });
-  }
-</script>
+<script src="/js/functions.js"></script>
 
 </body>
 </html>
