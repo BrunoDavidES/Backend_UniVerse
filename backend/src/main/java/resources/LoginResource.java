@@ -23,10 +23,10 @@ public class LoginResource {
 	public Response login(UserData data) {
 		LOG.fine("Attempt to login user: " + data.username);
 
-		if (!data.validateLogin()) {
+		/*if (!data.validateLogin()) {
 			LOG.warning("Missing or wrong parameter");
 			return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-		}
+		}*/
 
 		try {
 			FirebaseToken token = FirebaseAuth.getInstance().verifyIdToken(data.token);

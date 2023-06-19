@@ -1,10 +1,5 @@
 package util;
 
-import com.google.cloud.datastore.Entity;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public class UserData {
 	private static final String ALUNO = "A";
 	private static final String UNCHECKED = "EMPTY";

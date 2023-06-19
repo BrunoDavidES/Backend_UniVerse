@@ -17,6 +17,7 @@ public class FirebaseInitializer implements ServletContextListener {
                     new FileInputStream("./serviceAccountKey.json");
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://magikarp-fct-default-rtdb.europe-west1.firebasedatabase.app")
                     .build();
             FirebaseApp.initializeApp(options);
         } catch (IOException e) {
