@@ -30,10 +30,10 @@ public class FeedData {
             this.department = "ᓚᘏᗢ  EMPTY  ᓚᘏᗢ";
 
         if(isPublic == null)
-            this.isPublic = "no";
+            this.isPublic = "No";
 
         if(isItPaid == null)
-            this.isItPaid = "no";
+            this.isItPaid = "No";
 
         if(kind.equals("Event")) {
             return startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
@@ -75,7 +75,7 @@ public class FeedData {
 
         if (isPublic == null){
             isPublic = entry.getString("isPublic");
-        } else if (!isPublic.equals("no") && !isPublic.equals("yes")) return false;
+        } else if (!isPublic.equals("No") && !isPublic.equals("Yes")) return false;
 
         if (capacity == null){
             capacity = entry.getString("capacity");
@@ -86,7 +86,7 @@ public class FeedData {
             isItPaid = entry.getString("isItPaid");
             return true;
         }
-        return isItPaid.equals("no") || isItPaid.equals("ofc");
+        return isItPaid.equals("No") || isItPaid.equals("Yes");
 
     }
 
