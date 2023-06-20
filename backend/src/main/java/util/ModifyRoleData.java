@@ -11,4 +11,8 @@ public class ModifyRoleData {
             return true;
         return modifierRole.equals("D") && targetRole.equals("A") && newRole.equals("D");
     }
+
+    public boolean validateDelete(String modifierRole, String targetRole) {
+        return modifierRole.equals("BO") && !targetRole.equals("BO");
+    }
 }

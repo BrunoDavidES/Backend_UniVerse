@@ -161,4 +161,47 @@ public class ModifyUserResource {
             }
         }
     }
+
+    @DELETE
+    @Path("/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@Context HttpServletRequest request, ModifyRoleData data){
+        LOG.fine("Attempt to delete: " + data.target +".");
+        Transaction txn = datastore.newTransaction();
+        try {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning("Token not found");
+                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+            }
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
+            Key targetKey = datastore.newKeyFactory().setKind("User").newKey(data.target);
+            Entity user = txn.get(userKey);
+            Entity target = txn.get(targetKey);
+
+            //Falta criar token novo e apagar o antigo
+
+            if(user == null || target == null) {
+                txn.rollback();
+                LOG.warning("One of the users does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
+            } else
+            if( !data.validateDelete(String.valueOf(token.getClaim("role")).replaceAll("\"", ""), target.getString("role"))) {
+                txn.rollback();
+                LOG.warning("Wrong permissions.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
+            } else {
+                txn.delete(targetKey);
+                LOG.info("Target deleted.");
+                txn.commit();
+                return Response.ok(target).build();
+            }
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
 }
