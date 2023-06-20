@@ -58,4 +58,8 @@
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
+    <listener>
+        <listener-class>services.FirebaseInitializer</listener-class>
+    </listener>
+
 </web-app>

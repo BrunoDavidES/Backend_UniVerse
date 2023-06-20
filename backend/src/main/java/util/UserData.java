@@ -17,6 +17,8 @@ public class UserData {
 	public String confirmation;
 	public String status;
 
+	public String token;
+
 
 	public UserData() { }
 
