@@ -109,7 +109,31 @@
             <button type="button" onclick="closePopup()">Não</button>
         </div>
     </div>
+
+    <div class="event-content">
+        <button name="modifyRole" id="modifyRoleBtn" type="button" onClick="modifyUserRole()">Modify User's Role</button>
+        <button name="listUsers" id="listUsersBtn" type="button" onClick="queryUsers()">List Users</button>
+        <button name="getProfile" id="getProfileBtn" type="button" onClick="getProfile()">Get Profile</button>
+        <button name="deleteUser" id="deleteUserBtn" type="button" onClick="deleteUser()">Delete User</button>
+
+        <br><br>
+        <label for="target">User</label>
+        <input type ="text" id = "target" name="eventTitle">
+        <br>
+        <label for="newRole">New Role</label>
+        <select id="newRole">
+            <option value=""></option>
+            <option value="BO">Back Office</option>
+            <option value="TI">Teacher/Investigator</option>
+            <option value="S">Student</option>
+            <option value="US">University Staff</option>
+        </select>
+
+    </div>
+
 </section>
+
+
 
 <script src="/js/users.js"></script>
 
