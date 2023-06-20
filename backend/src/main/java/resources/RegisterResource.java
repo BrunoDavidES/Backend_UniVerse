@@ -1,21 +1,15 @@
 package resources;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.Timestamp;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import util.UserData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,7 +37,7 @@ public class RegisterResource {
                     .setUid(data.username)
                     .setEmail(data.email)
                     .setEmailVerified(false)
-                    .setPassword(BCrypt.withDefaults().hashToString(12, data.password.toCharArray()))
+                    .setPassword(data.password)
                     .setDisplayName(data.name)
                     .setDisabled(true)
             );
