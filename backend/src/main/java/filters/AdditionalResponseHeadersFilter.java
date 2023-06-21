@@ -16,8 +16,8 @@ public class AdditionalResponseHeadersFilter implements ContainerResponseFilter 
 			throws IOException {
 		responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
 		responseContext.getHeaders().add("Access-Control-Allow-Methods", "HEAD,GET,PUT,POST,DELETE,OPTIONS");
-		responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
-		//responseContext.getHeaders().add("Access-Control-Allow-Origin", "https://universe-fct.oa.r.appspot.com");
+		//responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+		responseContext.getHeaders().add("Access-Control-Allow-Origin", "https://universe-fct.oa.r.appspot.com");
 		responseContext.getHeaders().add("Access-Control-Allow-Headers", "Content-Type, X-Requested-With");   //Cookie
 	}
 }

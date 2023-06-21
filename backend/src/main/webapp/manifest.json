@@ -1,11 +1,11 @@
 {
-    "name": "project",
-    "short_name": "project",
+    "name": "UniVerse ּ  FCT NOVA",
+    "short_name": "Universe",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Site da NOVA FCT\\nPowered by CapiCrew",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
