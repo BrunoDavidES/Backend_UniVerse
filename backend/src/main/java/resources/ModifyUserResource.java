@@ -28,8 +28,7 @@ public class ModifyUserResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -75,8 +74,7 @@ public class ModifyUserResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -121,8 +119,7 @@ public class ModifyUserResource {
         LOG.fine("Attempt to modify role of: " + data.target + " to " + data.newRole + ".");
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -169,8 +166,7 @@ public class ModifyUserResource {
         LOG.fine("Attempt to delete: " + data.target +".");
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");

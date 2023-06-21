@@ -8,7 +8,7 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 import util.DepartmentData;
-import util.ValToken;
+import util.AuthToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -42,8 +42,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -125,8 +124,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -200,8 +198,7 @@ public class DepartmentResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -284,8 +281,7 @@ public class DepartmentResource {
         LOG.fine("Attempt to query departments.");
 
         //Verificar, caso for evento privado, se o token é valido
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
+        DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
             LOG.warning("Token not found");
@@ -354,8 +350,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -447,8 +442,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -537,8 +531,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");

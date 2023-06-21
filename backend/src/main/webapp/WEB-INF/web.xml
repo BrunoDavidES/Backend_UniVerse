@@ -62,4 +62,12 @@
         <listener-class>services.FirebaseInitializer</listener-class>
     </listener>
 
+    <listener>
+        <listener-class>services.ServerKeys</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>services.BlacklistToken</listener-class>
+    </listener>
+
 </web-app>

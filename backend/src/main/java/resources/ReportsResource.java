@@ -4,8 +4,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
+import util.AuthToken;
 import util.ReportData;
-import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -38,8 +38,7 @@ public class ReportsResource {
 
         try {
 
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -86,8 +85,7 @@ public class ReportsResource {
 
         try {
 
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -131,8 +129,7 @@ public class ReportsResource {
                                  @QueryParam("offset") int offset, Map<String, String> filters) {
         LOG.fine("Attempt to query reports.");
 
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
+        DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
             LOG.warning("Token not found");

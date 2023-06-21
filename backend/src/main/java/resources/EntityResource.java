@@ -2,9 +2,8 @@ package resources;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.*;
-import util.ValToken;
+import util.AuthToken;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -29,8 +28,7 @@ public class EntityResource {
 
             Transaction txn = datastore.newTransaction();
             try {
-                final ValToken validator = new ValToken();
-                DecodedJWT token = validator.checkToken(request);
+                DecodedJWT token = AuthToken.validateToken(request);
 
                 if (token == null) {
                     LOG.warning("Token not found");

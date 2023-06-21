@@ -3,12 +3,11 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import util.AuthToken;
 import util.FeedData;
 
 import com.google.gson.Gson;
-import util.ValToken;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -37,8 +36,7 @@ public class FeedResource {
         }
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -126,8 +124,7 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -200,8 +197,7 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.warning("Token not found");
@@ -245,8 +241,7 @@ public class FeedResource {
 
         //Verificar, caso for evento privado, se o token é valido
         if(kind.equals("Event")) {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            DecodedJWT token = AuthToken.validateToken(request);
 
             if (token == null) {
                 LOG.info("Token not found");

@@ -3,8 +3,8 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
+import util.AuthToken;
 import util.ProfileData;
-import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -41,8 +41,7 @@ public class ProfileResource {
 
 
 
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
+        DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
             LOG.warning("Token not found");
@@ -90,8 +89,7 @@ public class ProfileResource {
         LOG.fine("Attempt to query users.");
 
         //Verificar, caso for evento privado, se o token é valido
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
+        DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
             LOG.warning("Token not found");
