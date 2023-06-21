@@ -3,11 +3,16 @@ package resources;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import util.AuthToken;
 import util.UserData;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Path("/login")
@@ -37,6 +42,27 @@ public class LoginResource {
 		} catch (FirebaseAuthException e) {
 			LOG.warning("User login failed: " + e.getMessage());
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User login failed: " + e.getMessage()).build();
+		}
+	}
+
+	private void loginToken(HttpServletResponse response, String name, String username, String role) {
+		try {
+			AuthToken generator = new AuthToken();
+			Map<String, String> claims = new HashMap<>();
+
+			claims.put("user", username);
+			claims.put("name", name);
+			claims.put("role", role);
+
+			String token = generator.generateToken(claims);
+			Cookie cookie = new Cookie("token", token);
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(3600);
+			cookie.setPath("/rest");
+			cookie.setSecure(true); // Set the Secure attribute to ensure the cookie is only sent over HTTPS
+			response.addCookie(cookie);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
