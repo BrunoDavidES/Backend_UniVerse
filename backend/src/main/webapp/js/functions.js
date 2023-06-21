@@ -286,34 +286,6 @@ function modifyUserRole(){
       };
     }
 
-function queryUsers(){
-
-      var target = document.getElementById("target").value;
-      var newRole = document.getElementById("newRole").value;
-
-      var data = {
-            "target": target,
-            "newRole": newRole
-            };
-
-      var request = new XMLHttpRequest();
-
-      request.open("POST", document.location.origin + "/rest/modify/role", true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(data));
-      request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        } else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-      };
-    }
-
-
 function deleteUser(){
 
       var target = document.getElementById("target").value;
@@ -338,3 +310,138 @@ function deleteUser(){
         }
       };
     }
+
+function queryUsers(){
+
+      var limit = document.getElementById("limit").value;
+      var offset = document.getElementById("offset").value;
+
+      var data = {};
+
+      var email = document.getElementById("email").value;
+      if (email !== "") {
+          data.email = email;
+      }
+
+      var name = document.getElementById("name").value;
+      if (name !== "") {
+          data.name = name;
+      }
+
+      var role = document.getElementById("role").value;
+      if (role !== "") {
+          data.role = role;
+      }
+
+      var status = document.getElementById("status").value;
+      if (status !== "") {
+          data.status = status;
+      }
+
+      var request = new XMLHttpRequest();
+
+      request.open("POST", document.location.origin + "/rest/modify/profile/query?limit="+limit+"&offset="+offset, true);
+      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      request.send(JSON.stringify(data));
+      request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+      };
+    }
+
+function getUser(){
+
+      var target = document.getElementById("target").value;
+
+      var request = new XMLHttpRequest();
+
+      request.open("GET", document.location.origin + "/rest/profile/" + target, true);
+      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      request.send(JSON.stringify(null));
+      request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+      };
+    }
+
+    //REPORTS
+
+function queryReports(){
+
+      var limit = document.getElementById("limit").value;
+      var offset = document.getElementById("offset").value;
+
+      var data = {};
+
+      var title = document.getElementById("title").value;
+      if (title !== "") {
+          data.title = title;
+      }
+      var id = document.getElementById("id").value;
+        if (id !== "") {
+            data.id = id;
+        }
+      var reporter = document.getElementById("reporter").value;
+        if (reporter !== "") {
+            data.reporter = reporter;
+        }
+      var location = document.getElementById("location").value;
+        if (location !== "") {
+            data.location = location;
+        }
+      var status = document.getElementById("status").value;
+        if (status !== "") {
+            data.status = status;
+        }
+
+      var request = new XMLHttpRequest();
+
+      request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+offset, true);
+      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      request.send(JSON.stringify(data));
+      request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+      };
+    }
+
+function reportStatus(){
+
+      var target = document.getElementById("target").value;
+      var status = document.getElementById("status").value;
+
+      var request = new XMLHttpRequest();
+
+      request.open("GET", document.location.origin + "/rest/reports/status/" + target + "/" + status, true);
+      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      request.send(JSON.stringify(null));
+      request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+      };
+    }
+
