@@ -1,6 +1,7 @@
 package resources;
 
 import com.google.cloud.Timestamp;
+import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
@@ -18,6 +19,7 @@ import java.util.logging.Logger;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
+    private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public RegisterResource() {}
 
@@ -44,10 +46,36 @@ public class RegisterResource {
 
             Map<String, Object> customClaims = new HashMap<>();
             customClaims.put("role", data.getRole());
-            customClaims.put("time_creation", Timestamp.now());
-            customClaims.put("time_lastupdate", Timestamp.now());
 
             FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), customClaims);
+
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.username);
+                Entity user = txn.get(userKey);
+
+                if( user != null ) {
+                    txn.rollback();
+                    LOG.warning("User already exists");
+                    return Response.status(Response.Status.BAD_REQUEST).entity("User already exists").build();
+                } else {
+
+                    user = Entity.newBuilder(userKey)
+                            .set("email", data.email)
+                            .set("name", data.name)
+                            .set("job_list", "")
+                            .set("time_lastupdate", Timestamp.now())
+                            .build();
+                    txn.add(user);
+
+                    LOG.info("User registered in datastore " + data.username);
+                    txn.commit();
+                }
+            } finally {
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
+            }
 
             LOG.info("User registered: " + userRecord.getUid());
             return Response.ok(userRecord).build();
