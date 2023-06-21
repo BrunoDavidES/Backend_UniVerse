@@ -68,7 +68,7 @@ public class LoginResource {
 	@POST
 	@Path("/backOffice")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response loginBackOffice(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
+	public Response loginBackOffice(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data){
 		LOG.fine("Attempt to login user: " + data.email);
 
 		if(!data.validateLogin()) {
