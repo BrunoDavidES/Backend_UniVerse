@@ -3,12 +3,15 @@ package resources;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.auth.UserRecord;
 import util.AuthToken;
 import util.UserData;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -25,17 +28,16 @@ public class LoginResource {
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response login(UserData data) {
+	public Response login(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
 		LOG.fine("Attempt to login user: " + data.username);
-
-		/*if (!data.validateLogin()) {
-			LOG.warning("Missing or wrong parameter");
-			return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
-		}*/
 
 		try {
 			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(data.token);
 			String uid = decodedToken.getUid();
+
+			UserRecord userRecord = FirebaseAuth.getInstance().getUser(decodedToken.getUid());
+
+			loginToken(response, userRecord.getDisplayName(), userRecord.getUid(), userRecord.getCustomClaims().get("role").toString());
 
 			LOG.info("User logged in: " + uid);
 			return Response.ok(uid).build();
