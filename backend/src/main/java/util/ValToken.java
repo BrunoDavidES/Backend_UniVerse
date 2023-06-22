@@ -110,3 +110,5 @@ public class ValToken{
     }
 
 }
+
+//ITS ALL A SCAMMMM
