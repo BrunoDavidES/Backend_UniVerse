@@ -1,32 +1,6 @@
- let popup = document.getElementById("popup");
-
-  function openPopup(){
-    popup.classList.add("open-popup");
-  }
-
-  function closePopup(){
-    popup.classList.remove("open-popup");
-  }
-
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".sidebarBtn");
-  sidebarBtn.onclick = function() {
-    sidebar.classList.toggle("active");
-    if(sidebar.classList.contains("active")){
-      sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
-    }else
-      sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-   }
-
-  function loadLoggedUser() {
+function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
-	var user = localStorage.getItem("userLogged");
-
-	var postLogged = {
-		"username": user
-	}
-
-	var json = JSON.stringify(postLogged);
+    var user = localStorage.getItem("userLogged");
 
 	xmlhttp.onreadystatechange = function() {
 	  if (xmlhttp.readyState == 4) {
@@ -35,26 +9,22 @@
 
 			document.getElementById("name").innerHTML = userLogged.name;
 
-			xmlhttp.open("POST", document.location.origin + "/rest/profile/", true);
+			xmlhttp.open("POST", document.location.origin + "/rest/profile/" + user, true);
 			xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-			xmlhttp.send(json);
+			xmlhttp.send();
 		}
 	  }
-	}
-  }
-	function goToLogin(){
-	  if(localStorage.getItem("userLogged") === ""){
+    }
+}
+function goToLogin(){
+	if(localStorage.getItem("userLogged") === ""){
 	    window.location.href = "/pages/index.html";
-      }
-	}
+    }
+}
 
 function logout(){
     var xmlhttp = new XMLHttpRequest();
 
-
-    var j = {}
-
-    var json = JSON.stringify(j);
     xmlhttp.onreadystatechange = function() {
       if(xmlhttp.readyState == 4) {
         if(xmlhttp.status == 200) {
@@ -69,7 +39,7 @@ function logout(){
 
     xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xmlhttp.send(null);
+    xmlhttp.send();
 }
 
   //FEEDS
@@ -140,7 +110,7 @@ function editEvent(){
 
   var request = new XMLHttpRequest();
 
-  request.open("PATCH", document.location.origin + "/rest/feed/edit/Event" + id, true);
+  request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
   request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   request.send(JSON.stringify(data));
   request.onreadystatechange  = function() {
@@ -161,7 +131,7 @@ function deleteEvent(){
 
       var request = new XMLHttpRequest();
 
-      request.open("DELETE", document.location.origin + "/rest/feed/delete/Event" + id, true);
+      request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       request.send(JSON.stringify(null));
       request.onreadystatechange  = function() {
@@ -219,7 +189,7 @@ function editNews(){
 
     var request = new XMLHttpRequest();
 
-    request.open("PATCH", document.location.origin + "/rest/feed/edit/News" + id, true);
+    request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
@@ -240,7 +210,7 @@ function deleteNews(){
 
       var request = new XMLHttpRequest();
 
-      request.open("DELETE", document.location.origin + "/rest/feed/delete/News" + id, true);
+      request.open("DELETE", document.location.origin + "/rest/feed/delete/News/" + id, true);
       request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       request.send(JSON.stringify(null));
       request.onreadystatechange  = function() {
