@@ -1,3 +1,23 @@
+let popup = document.getElementById("popup");
+
+      function openPopup(){
+        popup.classList.add("open-popup");
+      }
+
+      function closePopup(){
+        popup.classList.remove("open-popup");
+      }
+
+      let sidebar = document.querySelector(".sidebar");
+      let sidebarBtn = document.querySelector(".sidebarBtn");
+      sidebarBtn.onclick = function() {
+      sidebar.classList.toggle("active");
+      if(sidebar.classList.contains("active")){
+        sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+      }else
+        sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+      }
+
 function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
@@ -148,7 +168,69 @@ function deleteEvent(){
 
     //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+function queryEvents(){
+    const buttonContainer = document.getElementById('button-container');
 
+    var limit = document.getElementById("limit").value;
+    var offset = document.getElementById("offset").value;
+
+    var data = {};
+    var filters = {data}
+
+    var id = document.getElementById("eventID").value;
+    if (id !== "") {
+          data.id = id;
+    }
+
+    var title = document.getElementById("title").value;
+    if (title !== "") {
+        data.title = title;
+    }
+
+    var startDate = document.getElementById("startDate").value;
+    if (startDate !== "") {
+        data.startDate = startDate;
+    }
+
+    var endDate = document.getElementById("endDate").value;
+    if (endDate !== "") {
+        data.endDate = endDate;
+    }
+    var location = document.getElementById("location").value;
+    if (location !== "") {
+        data.location = location;
+    }
+    var department = document.getElementById("department").value;
+    if (department !== "") {
+        data.department = department;
+    }
+    var isPublic = document.getElementById("isPublic").value;
+    if (isPublic !== "") {
+        data.isPublic = isPublic;
+    }
+    var capacity = document.getElementById("capacity").value;
+    if (capacity !== "") {
+        data.capacity = capacity;
+   }
+    var isItPaid = document.getElementById("isItPaid").value;
+    if (isItPaid !== "") {
+        data.isItPaid = isItPaid;
+    }
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + offset, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(filters));
+    request.onreadystatechange  = function() {
+        const entities = request.JSON.parse(request.responseText);
+        entities.forEach(entity => {
+            const button = document.createElement('button');
+            button.textContent = entity.getString("username") + " " + entity.getString("email");
+            buttonContainer.appendChild(button);
+        });
+    }
+}
 
 
 

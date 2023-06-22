@@ -15,7 +15,7 @@
     </div>
     <ul class="nav-links">
         <li>
-            <button onclick="window.location.href = '/pages/mainPage.html'">
+            <button onclick="window.location.href = '/backoffice/mainPage.html'">
                 <a href="#">
                     <i class='bx bx-grid-alt' ></i>
                     <span class="links_name">Home</span>
@@ -23,7 +23,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageNews.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
                 <a href="#news">
                     <i class='bx bx-message'></i>
                     <span class="links_name">Noticias</span>
@@ -31,7 +31,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageEvents.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageEvents.html'">
                 <a href="#events">
                     <i class='bx bx-list-ul' ></i>
                     <span class="links_name">Eventos</span>
@@ -39,7 +39,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageUsers.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
                 <a href="#users">
                     <i class='bx bx-user' ></i>
                     <span class="links_name">Users</span>
@@ -47,7 +47,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageStats.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageStats.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
                     <span class="links_name">Estatísticas</span>
@@ -55,7 +55,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageReports.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
                 <a href="#reposts">
                     <i class='bx bx-book-alt' ></i>
                     <span class="links_name">Reportes</span>
@@ -63,7 +63,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageFav.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageFav.html'">
                 <a href="#fav">
                     <i class='bx bx-heart' ></i>
                     <span class="links_name">Favoritos</span>
@@ -71,7 +71,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/pages/mainPageSettings.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
                 <a href="#settings" class="active">
                     <i class='bx bx-cog' ></i>
                     <span class="links_name">Definições</span>
@@ -111,61 +111,6 @@
     </div>
 </section>
 
-<script>
-  let popup = document.getElementById("popup");
-
-  function openPopup(){
-    popup.classList.add("open-popup");
-  }
-
-  function closePopup(){
-    popup.classList.remove("open-popup");
-  }
-</script>
-
-<script>
-  let sidebar = document.querySelector(".sidebar");
-  let sidebarBtn = document.querySelector(".sidebarBtn");
-  sidebarBtn.onclick = function() {
-    sidebar.classList.toggle("active");
-    if(sidebar.classList.contains("active")){
-      sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
-    }else
-      sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-   }
-</script>
-
-<script>
-  function loadLoggedUser() {
-    var xmlhttp = new XMLHttpRequest();
-	var user = localStorage.getItem("userLogged");
-
-	var postLogged = {
-		"username": user
-	}
-
-	var json = JSON.stringify(postLogged);
-
-	xmlhttp.onreadystatechange = function() {
-	  if (xmlhttp.readyState == 4) {
-	    if (xmlhttp.status == 200) {
-			var userLogged = JSON.parse(this.responseText);
-
-			document.getElementById("name").innerHTML = userLogged.name;
-
-			xmlhttp.open("POST", document.location.origin + "/rest/profile/", true);
-			xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-			xmlhttp.send(json);
-		}
-	  }
-	}
-
-	function goToLogin(){
-	  if(localStorage.getItem("userLogged") === ""){
-	    window.location.href = "/index.html";
-      }
-	}
-</script>
 
 <script src="/js/functions.js"></script>
 <script>
