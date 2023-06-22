@@ -175,58 +175,72 @@ function queryEvents(){
     var offset = document.getElementById("offset").value;
 
     var data = {};
-    var filters = {data}
 
     var id = document.getElementById("eventID").value;
     if (id !== "") {
-          data.id = id;
+          data["id"] = id;
     }
 
     var title = document.getElementById("title").value;
     if (title !== "") {
-        data.title = title;
+        data["title"] = title;
     }
 
     var startDate = document.getElementById("startDate").value;
     if (startDate !== "") {
-        data.startDate = startDate;
+        data["startDate"] = startDate;
     }
 
     var endDate = document.getElementById("endDate").value;
     if (endDate !== "") {
-        data.endDate = endDate;
+        data["endDate"] = endDate;
     }
     var location = document.getElementById("location").value;
     if (location !== "") {
-        data.location = location;
+        data["location"] = location;
     }
     var department = document.getElementById("department").value;
     if (department !== "") {
-        data.department = department;
+        data["department"] = department;
     }
     var isPublic = document.getElementById("isPublic").value;
     if (isPublic !== "") {
-        data.isPublic = isPublic;
+        data["isPublic"] = isPublic;
     }
     var capacity = document.getElementById("capacity").value;
     if (capacity !== "") {
-        data.capacity = capacity;
+        data["capacity"] = capacity;
    }
     var isItPaid = document.getElementById("isItPaid").value;
     if (isItPaid !== "") {
-        data.isItPaid = isItPaid;
+        data["isItPaid"] = isItPaid;
     }
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + offset, true);
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + offset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(filters));
+    request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
-        const entities = request.JSON.parse(request.responseText);
-        entities.forEach(entity => {
+         if (request.readyState === 4 && request.status === 200) {
+            const response = JSON.parse(request.responseText);
+            const entities = response.map(function(entity) {
+            return {
+                authorUsername: entity.properties.authorUsername.value,
+                authorEmail: entity.properties.authorEmail.value,
+                title: entity.properties.title,
+                startDate: entity.properties.startDate,
+                endDate: entity.properties.endDate,
+                location: entity.properties.location,
+                isPublic: entity.properties.isPublic,
+                capacity: entity.properties.capacity,
+                isItPaid: entity.properties.isItPaid
+                };
+            });
+        entities.forEach(function(entity) {
             const button = document.createElement('button');
-            button.textContent = entity.getString("username") + " " + entity.getString("email");
+            console.log(entity.properties.authorName);
+            button.textContent = entity.title + " " + entity.startDate + " - " + entity.endDate;
             buttonContainer.appendChild(button);
         });
     }
