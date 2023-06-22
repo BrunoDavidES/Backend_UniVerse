@@ -1,22 +1,4 @@
-let popup = document.getElementById("popup");
 
-      function openPopup(){
-        popup.classList.add("open-popup");
-      }
-
-      function closePopup(){
-        popup.classList.remove("open-popup");
-      }
-
-      let sidebar = document.querySelector(".sidebar");
-      let sidebarBtn = document.querySelector(".sidebarBtn");
-      sidebarBtn.onclick = function() {
-      sidebar.classList.toggle("active");
-      if(sidebar.classList.contains("active")){
-        sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
-      }else
-        sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-      }
 
 function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
@@ -226,8 +208,8 @@ function queryEvents(){
             const response = JSON.parse(request.responseText);
             const entities = response.map(function(entity) {
             return {
-                authorUsername: entity.properties.authorUsername.value,
-                authorEmail: entity.properties.authorEmail.value,
+                authorUsername: entity.properties.authorUsername,
+                authorEmail: entity.properties.authorEmail,
                 title: entity.properties.title,
                 startDate: entity.properties.startDate,
                 endDate: entity.properties.endDate,
@@ -239,11 +221,11 @@ function queryEvents(){
             });
         entities.forEach(function(entity) {
             const button = document.createElement('button');
-            console.log(entity.properties.authorName);
-            button.textContent = entity.title + " " + entity.startDate + " - " + entity.endDate;
+            button.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
             buttonContainer.appendChild(button);
         });
     }
+}
 }
 
 
@@ -511,3 +493,4 @@ function reportStatus(){
       };
     }
 
+window.addEventListener('load', loadLoggedUser);
