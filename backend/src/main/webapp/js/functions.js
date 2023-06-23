@@ -129,7 +129,7 @@ function editEvent(){
 }
 
 function deleteEvent(){
-      var id = document.getElementById("eventID").value;
+      var id = document.getElementById("idEventDelete").value;
 
       var request = new XMLHttpRequest();
 

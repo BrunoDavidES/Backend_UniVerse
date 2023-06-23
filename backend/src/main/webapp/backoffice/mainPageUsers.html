@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
+<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title> Users FCT NOVA</title>
@@ -58,7 +58,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
                 <a href="#reposts">
                     <i class='bx bx-book-alt' ></i>
-                    <span class="links_name">Reportes</span>
+                    <span class="links_name">Reports</span>
                 </a>
             </button>
         </li>
@@ -102,32 +102,70 @@
     </nav>
 
     <div class="home-content">
-        <div class="popup" id="popup" style="">
-            <h3>Está prestes a fazer logout</h3>
-            <p>Tem a certeza?</p>
-            <button type="button" onclick="logout()">Sim</button> &ensp;
-            <button type="button" onclick="closePopup()">Não</button>
+        <div class="topnav" id="myTopnav">
+            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'userList')" class="active">Modificar role do User</button>
+            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'userList')">Obter peril do User</button>
+            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'userList')">Apagar User</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'userList', 'delUser', 'modRole', 'getProfile')">Listar Users</button>
         </div>
-    </div>
-
-    <div class="event-content">
-        <button name="modifyRole" id="modifyRoleBtn" type="button" onClick="modifyUserRole()">Modify User's Role</button>
-        <button name="listUsers" id="listUsersBtn" type="button" onClick="queryUsers()">List Users</button>
-        <button name="getProfile" id="getProfileBtn" type="button" onClick="getProfile()">Get Profile</button>
-        <button name="deleteUser" id="deleteUserBtn" type="button" onClick="deleteUser()">Delete User</button>
 
         <br><br>
-        <label for="target">User</label>
-        <input type ="text" id = "target" name="eventTitle">
-        <br>
-        <label for="newRole">New Role</label>
-        <select id="newRole">
-            <option value=""></option>
-            <option value="BO">Back Office</option>
-            <option value="TI">Teacher/Investigator</option>
-            <option value="S">Student</option>
-            <option value="US">University Staff</option>
-        </select>
+        <div id="modRole">
+            <div class="form">
+                <div class="title">Modificar Role do User</div>
+                <div class="subtitle">Vamos modificar o estatuto de um user!</div>
+                <div class="input-container ic1">
+                    <input id="target" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Username</label>
+                </div><br>
+                <div class="child">
+                    <select name="roles" class="select" id="newRole">
+                        <option selected>Novo estatuto do User</option>
+                        <option id="US" value="US">Estudante</option>
+                        <option id="TI" value="TI">Professor/Investigador</option>
+                        <option id="S" value="S">Funcionário</option>
+                        <option id="BO" value="BO">Operador BackOffice</option>
+                    </select>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Mudar estatuto do user</button>
+            </div>
+        </div>
+        <div id="getProfile" style="display: none;">
+            <br><br>
+            <div class="form">
+                <div class="title">Obter perfil do User</div>
+                <div class="subtitle">Vamos obter o perfil de um user!</div>
+                <div class="input-container ic1">
+                    <input id="targetGetProfile" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Username</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Obter perfil do user</button>
+            </div>
+        </div>
+        <div id="delUser" style="display: none;">
+            <br><br>
+            <div class="form">
+                <div class="title">Apagar User</div>
+                <div class="subtitle">Vamos apagar um user do sistema!</div>
+                <div class="input-container ic1">
+                    <input id="targetDelUser" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Username a apagar</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Apagar user</button>
+            </div>
+        </div>
+        <div id="userList" style="display: none;">
+
+        </div>
+    </div>
+    <div class="popup" id="popup" style="">
+        <h3>Está prestes a fazer logout</h3>
+        <p>Tem a certeza?</p>
+        <button type="button" onclick="logout()">Sim</button> &ensp;
+        <button type="button" onclick="closePopup()">Não</button>
     </div>
 </section>
 
@@ -135,6 +173,26 @@
 
 <script src="/js/functions.js"></script>
 <script>
+      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+        var appear = document.getElementById(div);
+        var gone = document.getElementById(div1);
+        var gone2 = document.getElementById(div2);
+        var gone3 = document.getElementById(div3);
+        var button = document.getElementById(btn);
+        var button2 = document.getElementById(btn1);
+        var button3 = document.getElementById(btn2);
+        var button4 = document.getElementById(btn3);
+
+        appear.style.display = 'block';
+        gone.style.display = 'none';
+        gone2.style.display = 'none';
+        gone3.style.display = 'none';
+        button.classList.add("active");
+        button2.classList.remove("active");
+        button3.classList.remove("active");
+        button4.classList.remove("active");
+      }
+
       let popup = document.getElementById("popup");
 
       function openPopup(){

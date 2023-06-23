@@ -58,7 +58,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
                 <a href="#reposts">
                     <i class='bx bx-book-alt' ></i>
-                    <span class="links_name">Reportes</span>
+                    <span class="links_name">Reports</span>
                 </a>
             </button>
         </li>
@@ -132,7 +132,16 @@
             </div>
         </div>
         <div id="newsMod" style="display: none;">
-            <h1> Modificar Noticias</h1>
+            <div class="form">
+                <div class="title">Modificar Notícia</div>
+                <div class="subtitle">Vamos obter a notícia e modificalo como quer</div>
+                <div class="input-container ic1">
+                    <input id="idEventMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id do Evento</label>
+                </div>
+                <button type="text" class="submit" onclick="">Apagar</button>
+            </div>
         </div>
         <div id="newsDel" style="display: none;">
             <div class="form">
@@ -149,17 +158,17 @@
         <div id="newsList" style="display: none;">
             <h1> Listar Noticias</h1>
         </div>
-        <div class="popup" id="popup">
-            <h3>Está prestes a fazer logout</h3>
-            <p>Tem a certeza?</p>
-            <button type="button" onclick="logout()">Sim</button> &ensp;
-            <button type="button" onclick="closePopup()">Não</button>
-        </div>
-        <div class="popup" id="loadingPopup">
-            <div class="loading-icon"></div>
-            <br>
-            <h3>Espera caralho...</h3>
-        </div>
+    </div>
+    <div class="popup" id="popup">
+        <h3>Está prestes a fazer logout</h3>
+        <p>Tem a certeza?</p>
+        <button type="button" onclick="logout()">Sim</button> &ensp;
+        <button type="button" onclick="closePopup()">Não</button>
+    </div>
+    <div class="popup" id="loadingPopup">
+        <div class="loading-icon"></div>
+        <br>
+        <h3>Espera caralho...</h3>
     </div>
 </section>
 
