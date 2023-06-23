@@ -96,7 +96,7 @@
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
-            <img src="images/logo.png" alt="">
+            <img src="img/logo.png" alt="">
             <span class="admin_name" id="name" style="text-align: center;"></span>
         </div>
     </nav>
@@ -145,13 +145,13 @@
                 <div class="subtitle" style="margin-left: 10px; text-align: center;">
                     <label for="isPublic">Evento público? &emsp;</label>
                     <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isPublic">
-                        <option value="ACTIVE">Não</option>
-                        <option value="INACTIVE">Sim</option>
+                        <option value="no">Não</option>
+                        <option value="yes">Sim</option>
                     </select>&emsp;&emsp;
                     <label for="isItPaid">Evento a pagar? &emsp;</label>
                     <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isItPaid">
-                        <option value="ACTIVE">Não</option>
-                        <option value="INACTIVE">Sim</option>
+                        <option value="no">Não</option>
+                        <option value="yes">Sim</option>
                     </select>
                 </div>
                 <button type="text" class="submit" onclick="postEvent()">Adicionar</button>
@@ -161,7 +161,16 @@
             <h1> Modificar Eventos</h1>
         </div>
         <div id="eventDel" style="display: none;">
-            <h1> Apagar Eventos</h1>
+            <div class="form">
+                <div class="title">Apagar Evento</div>
+                <div class="subtitle">Vamos apagar o evento com base no Identificador (ID)</div>
+                <div class="input-container ic1">
+                    <input id="idEventDelete" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id do Evento</label>
+                </div>
+                <button type="text" class="submit" onclick="deleteEvent()">Apagar</button>
+            </div>
         </div>
         <div id="eventList" style="display: none;">
             <h1> Listar Eventos</h1>
@@ -171,6 +180,11 @@
             <p>Tem a certeza?</p>
             <button type="button" onclick="logout()">Sim</button> &ensp;
             <button type="button" onclick="closePopup()">Não</button>
+        </div>
+        <div class="popup" id="loadingPopup">
+            <div class="loading-icon"></div>
+            <br>
+            <h3>Espera caralho...</h3>
         </div>
     </div>
 </section>

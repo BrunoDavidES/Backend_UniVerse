@@ -49,6 +49,10 @@ function logout(){
     //Events
 function postEvent(){
 
+    let popup = document.getElementById("loadingPopup");
+
+    popup.classList.add("open-popup");
+
     var title = document.getElementById("title").value;
     var startDate = document.getElementById("startDate").value;
     var endDate = document.getElementById("endDate").value;
@@ -78,12 +82,16 @@ function postEvent(){
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
           console.log("SUCCESS");
+          popup.classList.remove("open-popup");
           alert(request.responseText);
       } else if (request.readyState === 4) {
           console.log(request.responseText);
+          popup.classList.remove("open-popup");
           console.log("FAIL");
       }
     };
+
+    popup.classList.remove("open-popup");
 }
 
 function editEvent(){

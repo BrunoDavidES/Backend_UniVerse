@@ -96,7 +96,7 @@
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
-            <img src="images/logo.png" alt="">
+            <img src="img/logo.png" alt="">
             <span class="admin_name" id="name"></span>
         </div>
     </nav>
@@ -105,7 +105,7 @@
         <div class="topnav" id="myTopnav">
             <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'newsAdd', 'newsMod', 'newsDel', 'newsList')" class="active">Adicionar Noticia</button>
             <button id="editBtn" onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'newsMod', 'newsAdd', 'newsDel', 'newsList')">Modificar Noticia</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList')">Apagar Noticia</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList')">Remover Noticia</button>
             <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'newsList', 'newsAdd', 'newsMod', 'newsDel')">Listar Noticias</button>
         </div>
         <br><br>
@@ -123,24 +123,28 @@
                     <div class="cut"></div>
                     <label for="author" class="placeholder">Autor da Notícia</label>
                 </div>
-                <div class="input-container ic2">
-                    <input id="published" class="input" type="text" placeholder=" " />
-                    <div class="cut cut"></div>
-                    <label for="published" class="placeholder">Data de Publicação</label>
-                </div>
                 <div class="input-container2 ic2">
                     <textarea id="text" class="input" cols="40" rows="5"></textarea>
                     <div class="cut cut"></div>
                     <label for="text" class="placeholder">Corpo da Notícia</label>
                 </div>
-                <button type="text" class="submit">Adicionar</button>
+                <button type="text" class="submit" onclick="postNews()">Adicionar</button>
             </div>
         </div>
         <div id="newsMod" style="display: none;">
             <h1> Modificar Noticias</h1>
         </div>
         <div id="newsDel" style="display: none;">
-            <h1> Apagar Noticias</h1>
+            <div class="form">
+                <div class="title">Remover Notícia</div>
+                <div class="subtitle">Vamos tirar a notícia do site com base no Identificador (ID)</div>
+                <div class="input-container ic1">
+                    <input id="idEventDelete" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id do Evento</label>
+                </div>
+                <button type="text" class="submit" onclick="">Apagar</button>
+            </div>
         </div>
         <div id="newsList" style="display: none;">
             <h1> Listar Noticias</h1>
@@ -150,6 +154,11 @@
             <p>Tem a certeza?</p>
             <button type="button" onclick="logout()">Sim</button> &ensp;
             <button type="button" onclick="closePopup()">Não</button>
+        </div>
+        <div class="popup" id="loadingPopup">
+            <div class="loading-icon"></div>
+            <br>
+            <h3>Espera caralho...</h3>
         </div>
     </div>
 </section>
