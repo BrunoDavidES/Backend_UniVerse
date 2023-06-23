@@ -4,16 +4,15 @@ function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
 
+    xmlhttp.open("POST", document.location.origin + "/rest/profile/" + user, true);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send();
+
 	xmlhttp.onreadystatechange = function() {
 	  if (xmlhttp.readyState == 4) {
 	    if (xmlhttp.status == 200) {
 			var userLogged = JSON.parse(this.responseText);
-
 			document.getElementById("name").innerHTML = userLogged.name;
-
-			xmlhttp.open("POST", document.location.origin + "/rest/profile/" + user, true);
-			xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-			xmlhttp.send();
 		}
 	  }
     }
@@ -27,6 +26,9 @@ function goToLogin(){
 function logout(){
     var xmlhttp = new XMLHttpRequest();
 
+    xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.send();
     xmlhttp.onreadystatechange = function() {
       if(xmlhttp.readyState == 4) {
         if(xmlhttp.status == 200) {
@@ -39,9 +41,7 @@ function logout(){
       }
     }
 
-    xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
-    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xmlhttp.send();
+
 }
 
   //FEEDS
