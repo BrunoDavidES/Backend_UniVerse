@@ -174,7 +174,22 @@
         </div>
         <div id="eventList" style="display: none;">
             <h1> Listar Eventos</h1>
+            <label for="listLimitId">Eventos por página</label>
+            <select id="listLimitId">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
+
+            <ul id="listOfEvents"></ul>
+
+            <div id="details"></div>
+            <button class="submit" onclick="queryEvents()">Listar</button>
         </div>
+
+
+
         <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>
             <p>Tem a certeza?</p>

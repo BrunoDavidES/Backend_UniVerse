@@ -150,14 +150,33 @@ function deleteEvent(){
 
     //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-function queryEvents(){
-    const buttonContainer = document.getElementById('button-container');
+var eventsQueryOffset = 0;
+var firstQuery = true;
+var eventsSelect = document.getElementById('listLimitId');
 
-    var limit = document.getElementById("limit").value;
-    var offset = document.getElementById("offset").value;
+eventsSelect.addEventListener('change', function(){
+   eventsQueryOffset = 0;
+   var firstQuery = true;
+});
+
+function queryEvents(){
+    //const buttonContainer = document.getElementById('button-container');
+
+
+    var list = document.getElementById('listOfEvents');
+
+    var limit = document.getElementById("limit");
+
+    if (firstQuery){
+        firstQuery = false;
+        eventsQueryOffset -= limit;
+    }
+
+    eventsQueryOffset += limit;
 
     var data = {};
 
+/*
     var id = document.getElementById("eventID").value;
     if (id !== "") {
           data["id"] = id;
@@ -197,7 +216,7 @@ function queryEvents(){
     if (isItPaid !== "") {
         data["isItPaid"] = isItPaid;
     }
-
+*/
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + offset, true);
@@ -220,9 +239,28 @@ function queryEvents(){
                 };
             });
         entities.forEach(function(entity) {
-            const button = document.createElement('button');
-            button.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
-            buttonContainer.appendChild(button);
+            //const button = document.createElement('button');
+            //button.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
+            //buttonContainer.appendChild(button);
+
+            var listItem = document.createElement("li");
+            listItem.textContext = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
+            listItem.addEventListener('click', function() {
+                  var details = document.getElementById('details');
+                  details.innerHTML = '';
+
+                  var title = document.createElement('h2');
+                  title.textContent = entity.title.value;
+                  details.appendChild(title);
+
+                  var description = document.createElement('p');
+                  description.textContent = entity.description;
+                  details.appendChild(description);
+
+                });
+
+            list.appendChild(listItem);
+
         });
     }
 }
