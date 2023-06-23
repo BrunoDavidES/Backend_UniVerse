@@ -5,7 +5,6 @@
     <title> Eventos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-    <script src="/js/functions.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
@@ -16,7 +15,7 @@
     </div>
     <ul class="nav-links">
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPage.html'">
+            <button onclick="window.location.href = '/pages/mainPage.html'">
                 <a href="#">
                     <i class='bx bx-grid-alt' ></i>
                     <span class="links_name">Home</span>
@@ -24,7 +23,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
+            <button onclick="window.location.href = '/pages/mainPageNews.html'">
                 <a href="#news">
                     <i class='bx bx-message'></i>
                     <span class="links_name">Noticias</span>
@@ -32,7 +31,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageEvents.html'">
+            <button onclick="window.location.href = '/pages/mainPageEvents.html'">
                 <a href="#events" class="active">
                     <i class='bx bx-list-ul' ></i>
                     <span class="links_name">Eventos</span>
@@ -40,7 +39,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
+            <button onclick="window.location.href = '/pages/mainPageUsers.html'">
                 <a href="#users">
                     <i class='bx bx-user' ></i>
                     <span class="links_name">Users</span>
@@ -48,7 +47,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageStats.html'">
+            <button onclick="window.location.href = '/pages/mainPageStats.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
                     <span class="links_name">Estatísticas</span>
@@ -56,7 +55,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
+            <button onclick="window.location.href = '/pages/mainPageReports.html'">
                 <a href="#reposts">
                     <i class='bx bx-book-alt' ></i>
                     <span class="links_name">Reportes</span>
@@ -64,7 +63,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageFav.html'">
+            <button onclick="window.location.href = '/pages/mainPageFav.html'">
                 <a href="#fav">
                     <i class='bx bx-heart' ></i>
                     <span class="links_name">Favoritos</span>
@@ -72,7 +71,7 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
+            <button onclick="window.location.href = '/pages/mainPageSettings.html'">
                 <a href="#settings">
                     <i class='bx bx-cog' ></i>
                     <span class="links_name">Definições</span>
@@ -103,65 +102,102 @@
     </nav>
 
     <div class="home-content">
-        <div class="popup" id="popup" style="">
+        <div class="topnav" id="myTopnav">
+            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventMod', 'eventDel', 'eventList')" class="active">Adicionar Evento</button>
+            <button id="editBtn"  onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventAdd', 'eventDel', 'eventList')">Modificar Evento</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventAdd', 'eventMod', 'eventList')">Apagar Evento</button>
+            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventAdd', 'eventMod', 'eventDel')">Listar Eventos</button>
+        </div>
+        <br><br>
+        <div id="eventAdd">
+            <div class="form">
+                <div class="title">Evento</div>
+                <div class="subtitle">Vamos criar um novo evento!</div>
+                <div class="input-container ic1">
+                    <input id="title" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Título do Evento</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="startDate" class="input" type="text" placeholder=" " />
+                    <div class="cut"></div>
+                    <label for="startDate" class="placeholder">Data de Inicio</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="endDate" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="endDate" class="placeholder">Date de Fim</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="location" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="location" class="placeholder">Localização</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="department" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="department" class="placeholder">Departamento</label>
+                </div>
+                <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
+                    <label for="title">Capacidade máxima do Evento: &emsp;</label>
+                    <input type ="text" style="width: 50%; border-radius: 5px; text-align: center;" id = "capacity" name="eventCapacity" >
+                </div>
+                <div class="subtitle" style="margin-left: 10px; text-align: center;">
+                    <label for="isPublic">Evento público? &emsp;</label>
+                    <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isPublic">
+                        <option value="ACTIVE">Não</option>
+                        <option value="INACTIVE">Sim</option>
+                    </select>
+                    &emsp;&emsp;
+                    <label for="isItPaid">Evento a pagar? &emsp;</label>
+                    <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isItPaid">
+                        <option value="ACTIVE">Não</option>
+                        <option value="INACTIVE">Sim</option>
+                    </select>
+                </div>
+                <button type="text" class="submit">Adicionar</button>
+            </div>
+        </div>
+        <div id="eventMod" style="display: none;">
+            <h1> Modificar Eventos</h1>
+        </div>
+        <div id="eventDel" style="display: none;">
+            <h1> Apagar Eventos</h1>
+        </div>
+        <div id="eventList" style="display: none;">
+            <h1> Listar Eventos</h1>
+        </div>
+        <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>
             <p>Tem a certeza?</p>
             <button type="button">Sim</button> &ensp;
             <button type="button" onclick="closePopup()">Não</button>
         </div>
     </div>
-    <div class="event-content">
-        <button id="postEventBtn" type="button" onClick="postEvent()">Post Event</button>
-        <button id="editEventBtn" type="button" onClick="editEvent()">Edit Event</button>
-        <button id="deleteEventBtn" type="button" onClick="deleteEvent()">Delete Event</button>
-        <button id="queryEventsBtn" type="button" onClick="queryEvents()">List Events</button>
-
-        <br><br>
-        <label for="title">Title</label>
-        <input type ="text" id = "title" name="eventTitle">
-        <br>
-        <label for="startDate">Start Date</label>
-        <input type ="text" id = "startDate" name="eventStartDate" >
-        <br>
-        <label for="endDate">End Date</label>
-        <input type ="text" id = "endDate" name="eventEndDate" >
-        <br>
-        <label for="location">Location</label>
-        <input type ="text" id = "location" name="eventLocation" >
-        <br>
-        <label for="department">Department</label>
-        <input type ="text" id = "department" name="eventDepartment" >
-        <br>
-        <label for="isPublic">Is it a public event?</label>
-        <select id="isPublic">
-            <option value=""></option>
-            <option value="ACTIVE">No</option>
-            <option value="INACTIVE">Yes</option>
-        </select>
-        <br>
-        <label for="capacity">Max capacity</label>
-        <input type ="text" id = "capacity" name="eventCapacity" >
-        <br>
-        <label for="isItPaid">Is it paid?</label>
-        <select id="isItPaid">
-            <option value=""></option>
-            <option value="ACTIVE">No</option>
-            <option value="INACTIVE">Yes</option>
-        </select>
-        <br>
-        <label for="eventID">Event ID</label>
-        <input type ="text" id = "eventID" name="eventId" >
-        <br>
-        <label for="limit">Limit</label>
-        <input type ="text" id = "limit" name="eventQueryLimit" >
-        <label for="offset">Offset</label>
-        <input type ="text" id = "offset" name="eventQueryOffset" >
-    </div>
-    <div id="button-container"></div>
-
 </section>
 
+<script src="/js/functions.js"></script>
 <script>
+      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+        var appear = document.getElementById(div);
+        var gone = document.getElementById(div1);
+        var gone2 = document.getElementById(div2);
+        var gone3 = document.getElementById(div3);
+        var button = document.getElementById(btn);
+        var button2 = document.getElementById(btn1);
+        var button3 = document.getElementById(btn2);
+        var button4 = document.getElementById(btn3);
+
+        appear.style.display = 'block';
+        gone.style.display = 'none';
+        gone2.style.display = 'none';
+        gone3.style.display = 'none';
+        button.classList.add("active");
+        button2.classList.remove("active");
+        button3.classList.remove("active");
+        button4.classList.remove("active");
+      }
+
       let popup = document.getElementById("popup");
 
       function openPopup(){
@@ -182,8 +218,6 @@
         sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
       }
 </script>
-
-
 
 </body>
 </html>
