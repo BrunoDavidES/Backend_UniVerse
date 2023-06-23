@@ -96,8 +96,8 @@
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
-            <img src="images/profile.jpg" alt="">
-            <span class="admin_name" id="name"></span>
+            <img src="images/logo.png" alt="">
+            <span class="admin_name" id="name" style="text-align: center;"></span>
         </div>
     </nav>
 
@@ -147,15 +147,14 @@
                     <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isPublic">
                         <option value="ACTIVE">Não</option>
                         <option value="INACTIVE">Sim</option>
-                    </select>
-                    &emsp;&emsp;
+                    </select>&emsp;&emsp;
                     <label for="isItPaid">Evento a pagar? &emsp;</label>
                     <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isItPaid">
                         <option value="ACTIVE">Não</option>
                         <option value="INACTIVE">Sim</option>
                     </select>
                 </div>
-                <button type="text" class="submit">Adicionar</button>
+                <button type="text" class="submit" onclick="postEvent()">Adicionar</button>
             </div>
         </div>
         <div id="eventMod" style="display: none;">

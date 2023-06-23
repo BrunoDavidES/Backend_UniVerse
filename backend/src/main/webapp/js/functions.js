@@ -4,6 +4,10 @@ function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
 
+    if(user === ""){
+        window.location.href = "/backoffice/index.html";
+    }
+
     xmlhttp.open("GET", document.location.origin + "/rest/profile/" + user, true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xmlhttp.send();
@@ -15,11 +19,6 @@ function loadLoggedUser() {
 			document.getElementById("name").innerHTML = userLogged.name;
 		}
 	  }
-    }
-}
-function goToLogin(){
-	if(localStorage.getItem("userLogged") === ""){
-	    window.location.href = "/backoffice/index.html";
     }
 }
 

@@ -380,10 +380,15 @@
 
     @media (max-width: 700px) {
       nav .sidebar-button .home,
-      nav .profile-details .admin_name,
+      nav .profile-details,
       nav .profile-details i{
         display: none;
       }
+
+      nav .admin_name{
+        text-align: center;
+      }
+
       .home-section nav .profile-details{
         height: 50px;
         min-width: 40px;
