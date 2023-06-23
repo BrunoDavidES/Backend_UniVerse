@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import util.UserData;
 
 import javax.ws.rs.*;
@@ -20,6 +22,8 @@ import java.util.logging.Logger;
 public class RegisterResource {
     private static final Logger LOG = Logger.getLogger(RegisterResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
     public RegisterResource() {}
 
@@ -35,7 +39,7 @@ public class RegisterResource {
         }
 
         try {
-            UserRecord userRecord = FirebaseAuth.getInstance().createUser( new CreateRequest()
+            UserRecord userRecord = firebaseAuth.createUser( new CreateRequest()
                     .setUid(data.username)
                     .setEmail(data.email)
                     .setEmailVerified(false)
@@ -47,7 +51,18 @@ public class RegisterResource {
             Map<String, Object> customClaims = new HashMap<>();
             customClaims.put("role", data.getRole());
 
-            FirebaseAuth.getInstance().setCustomUserClaims(userRecord.getUid(), customClaims);
+            firebaseAuth.setCustomUserClaims(userRecord.getUid(), customClaims);
+
+            try {
+                DatabaseReference userRef = firebaseDatabase.getReference("Users").child(userRecord.getUid());
+
+                userRef.child("privacy").child("Location").setValueAsync("Public");
+                userRef.child("privacy").child("Messages").setValueAsync("Public");
+                userRef.child("location").setValueAsync("0");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
 
             Transaction txn = datastore.newTransaction();
             try {
