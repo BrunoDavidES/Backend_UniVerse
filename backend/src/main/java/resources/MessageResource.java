@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Path("/message")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -43,28 +44,34 @@ public class MessageResource {
     }
 
     @GET
-    @Path("/conversation")
+    @Path("/chat")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getChat(@QueryParam("senderId") String userId, @QueryParam("recipientId") String targetId) {
+    public Response getChat(@QueryParam("userId") String userId, @QueryParam("targetId") String targetId) {
         try {
-            DatabaseReference userRef = firebaseDatabase.getReference("Users").child(userId);
+            DatabaseReference chatRef = firebaseDatabase.getReference("Users").child(userId).child("inbox").child(targetId);
 
+            CompletableFuture<List<MessageData>> future = new CompletableFuture<>();
             List<MessageData> messages = new ArrayList<>();
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
                         MessageData messageData = messageSnapshot.getValue(MessageData.class);
                         messages.add(messageData);
                     }
+                    future.complete(messages);
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    future.completeExceptionally(databaseError.toException());
                 }
             });
-            return Response.ok(messages).build();
+
+            List<MessageData> retrievedMessages = future.get();
+
+            return Response.ok(retrievedMessages).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
