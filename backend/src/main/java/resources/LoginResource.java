@@ -1,5 +1,6 @@
 package resources;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -45,6 +46,22 @@ public class LoginResource {
 			LOG.warning("User login failed: " + e.getMessage());
 			return Response.status(Response.Status.UNAUTHORIZED).entity("User login failed: " + e.getMessage()).build();
 		}
+	}
+
+	@GET
+	@Path("/validate")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response validateLogin(@Context HttpServletRequest request, @Context HttpServletResponse response) {
+		LOG.fine("Attempt to validate login: ");
+
+		DecodedJWT token = AuthToken.validateToken(request);
+
+		if (token == null) {
+			LOG.warning("Token not found");
+			return Response.status(Response.Status.FORBIDDEN).entity("Token invalid").build();
+		}
+
+		return Response.ok(token).build();
 	}
 
 	private void loginToken(HttpServletResponse response, String name, String username, String role) {

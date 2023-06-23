@@ -22,19 +22,31 @@ public class MessageResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendMessage(MessageData messageData) throws FirebaseAuthException {
         String senderId = messageData.getSenderId();
-        String recipientId = messageData.getRecipientId();
+        List<String> recipientIds = messageData.getRecipientIds();
 
-        if(firebaseAuth.getUser(senderId) == null || firebaseAuth.getUser(recipientId) == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if (!userExists(senderId)) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Sender does not exist").build();
+        }
+
+        for (String recipientId : recipientIds) {
+            if (!userExists(recipientId)) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Recipient " + recipientId + " does not exist").build();
+            }
+            if (senderId.equals(recipientId)) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Sender and recipient cannot be the same").build();
+            }
         }
 
         try {
             DatabaseReference senderRef = firebaseDatabase.getReference("Users").child(senderId);
-            String messageId = senderRef.child("inbox").child(recipientId).push().getKey();
-            senderRef.child("inbox").child(recipientId).child(messageId).setValueAsync(messageData);
+            String chatId = senderRef.child("inbox").push().getKey();
+            String messageId = senderRef.child("inbox").child(chatId).push().getKey();
+            senderRef.child("inbox").child(chatId).child(messageId).setValueAsync(messageData);
 
-            DatabaseReference recipientRef = firebaseDatabase.getReference("Users").child(recipientId);
-            recipientRef.child("inbox").child(senderId).child(messageId).setValueAsync(messageData);
+            for(String recipientId : recipientIds) {
+                DatabaseReference recipientRef = firebaseDatabase.getReference("Users").child(recipientId);
+                recipientRef.child("inbox").child(chatId).child(messageId).setValueAsync(messageData);
+            }
 
             return Response.ok("Message sent").build();
         } catch (Exception e) {
@@ -46,9 +58,9 @@ public class MessageResource {
     @GET
     @Path("/chat")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getChat(@QueryParam("userId") String userId, @QueryParam("targetId") String targetId) {
+    public Response getChat(@QueryParam("userId") String userId, @QueryParam("chatId") String chatId) {
         try {
-            DatabaseReference chatRef = firebaseDatabase.getReference("Users").child(userId).child("inbox").child(targetId);
+            DatabaseReference chatRef = firebaseDatabase.getReference("Users").child(userId).child("inbox").child(chatId);
 
             CompletableFuture<List<MessageData>> future = new CompletableFuture<>();
             List<MessageData> messages = new ArrayList<>();
@@ -75,6 +87,15 @@ public class MessageResource {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    private boolean userExists(String userId) {
+        try {
+            firebaseAuth.getUser(userId);
+            return true;
+        } catch (FirebaseAuthException e) {
+            return false;
         }
     }
 

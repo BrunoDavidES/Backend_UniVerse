@@ -1,17 +1,20 @@
 package util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MessageData {
     private String senderId;
-    private String recipientId;
+    private List<String> recipientIds = new ArrayList<>();
     private String message;
 
     public MessageData() {
-        // Default constructor required for Firebase serialization
+
     }
 
-    public MessageData(String senderId, String recipientId, String message) {
+    public MessageData(String senderId, List<String> recipientIds, String message) {
         this.senderId = senderId;
-        this.recipientId = recipientId;
+        this.recipientIds = recipientIds;
         this.message = message;
     }
 
@@ -23,12 +26,12 @@ public class MessageData {
         this.senderId = senderId;
     }
 
-    public String getRecipientId() {
-        return recipientId;
+    public List<String> getRecipientIds() {
+        return recipientIds;
     }
 
-    public void setRecipientId(String recipientId) {
-        this.recipientId = recipientId;
+    public void setRecipientIds(List<String> recipientIds) {
+        this.recipientIds = recipientIds;
     }
 
     public String getMessage() {
