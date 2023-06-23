@@ -49,10 +49,6 @@ function logout(){
     //Events
 function postEvent(){
 
-    let popup = document.getElementById("loadingPopup");
-
-    popup.classList.add("open-popup");
-
     var title = document.getElementById("title").value;
     var startDate = document.getElementById("startDate").value;
     var endDate = document.getElementById("endDate").value;
@@ -90,8 +86,6 @@ function postEvent(){
           console.log("FAIL");
       }
     };
-
-    popup.classList.remove("open-popup");
 }
 
 function editEvent(){
@@ -135,7 +129,6 @@ function editEvent(){
 }
 
 function deleteEvent(){
-
       var id = document.getElementById("eventID").value;
 
       var request = new XMLHttpRequest();
