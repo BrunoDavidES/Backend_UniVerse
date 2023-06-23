@@ -4,7 +4,7 @@ function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
 
-    xmlhttp.open("POST", document.location.origin + "/rest/profile/" + user, true);
+    xmlhttp.open("GET", document.location.origin + "/rest/profile/" + user, true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xmlhttp.send();
 
@@ -19,7 +19,7 @@ function loadLoggedUser() {
 }
 function goToLogin(){
 	if(localStorage.getItem("userLogged") === ""){
-	    window.location.href = "/pages/index.html";
+	    window.location.href = "/backoffice/index.html";
     }
 }
 
@@ -33,7 +33,7 @@ function logout(){
       if(xmlhttp.readyState == 4) {
         if(xmlhttp.status == 200) {
           localStorage.setItem("userLogged", "");
-          window.location.href = "/pages/index.html";
+          window.location.href = "/backoffice/index.html";
         }
         else{
           xmlhttp.responseText;
