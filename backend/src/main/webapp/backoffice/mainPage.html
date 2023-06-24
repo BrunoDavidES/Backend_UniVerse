@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="styleMainPage.css">
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
 <body onload="loadLoggedUser()">
 <div class="sidebar">
@@ -103,9 +102,30 @@
   </nav>
 
   <div class="home-content">
-
+    <div class="cardResize">
+        <div class="card" style="width: 300px;">
+          <img src="../img/logo.png" alt="User Photo" style="width:100%">
+          <h1>Nome do user</h1>
+          <p class="title">Email do user</p>
+          <p class="title">Roles do User</p>
+          <p class="title2">FCT NOVA</p>
+        </div>
+    </div>
+    <div class="form" style="width: 420px; margin-left: 5%;">
+      <div class="title">Pessoas na Aplicação</div>
+      <div class="input-container ic1">
+        <input readonly="readonly" class="input" type="text" placeholder="Número de pessoas online:"/>
+      </div>
+    </div>
+    <br>
+    <div class="form" style="width: 420px; margin-left: 5%;">
+      <div class="title">Pedidos por Resolver</div>
+      <div class="input-container ic1">
+        <input readonly="readonly" class="input" type="text" placeholder="Número de reportes não resolvidos:"/>
+      </div>
+    </div>
   </div>
-  <div class="popup" id="popup" style="">
+  <div class="popup" id="popup">
     <h3>Está prestes a fazer logout</h3>
     <p>Tem a certeza?</p>
     <button type="button" onclick="logout()">Sim</button> &ensp;
@@ -137,5 +157,4 @@
 </script>
 
 </body>
-
 </html>

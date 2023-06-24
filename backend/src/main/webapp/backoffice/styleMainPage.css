@@ -160,6 +160,37 @@
       padding-top: 110px;
     }
 
+    .cardResize{
+        position: relative;
+        margin-left: 80%;
+    }
+
+    .card {
+      border-style: solid;
+      border-width: 0.5px 0.5px 0.5px 0.5px;
+      border-color: rgba(10,37,88, 0.5);
+      position: absolute;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .card .title {
+      color: grey;
+      font-size: 18px;
+      padding-top: 10px;
+    }
+
+     .card .title2 {
+        font-height: 1200;
+        font-size: 16px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+     }
+
+    .card button:hover, a:hover {
+      opacity: 0.7;
+    }
+
     .popup{
         width: 400px;
         background: #fff;
@@ -210,6 +241,11 @@
             transform: rotate(360deg);
           }
         }
+
+    .openLoadingPopup{
+        visibility: visible;
+        transform:  translate(-50%, -50%) scale(1.05);
+    }
 
     .topnav {
       overflow: hidden;
@@ -387,7 +423,7 @@
      .select {
        position: relative;
        display: flex;
-       width: 20em;
+       width: 100%;
        line-height: 3;
        background: #303235;
        border-radius: 10px;
@@ -403,6 +439,12 @@
     }
 
     /* Responsive Media Query */
+    @media (max-width: 1550px) {
+        .cardResize{
+            margin-left: 75%;
+        }
+    }
+
     @media (max-width: 1240px) {
       .sidebar{
         width: 60px;
@@ -426,6 +468,35 @@
         width: calc(100% - 220px);
         left: 220px;
       }
+
+      .cardResize{
+        margin-left: 70%;
+      }
+    }
+
+    @media (max-width: 1700px) {
+        .cardResize{
+            margin-left: 75%;
+        }
+    }
+
+    @media (max-width: 1400px) {
+        .cardResize{
+            margin-left: 68%;
+        }
+    }
+
+    @media (max-width:  1050px) {
+        .cardResize{
+            margin-left: 65%;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .cardResize{
+            margin-left: 50%;
+            visibility: hidden;
+        }
     }
 
     @media (max-width: 700px) {
@@ -446,6 +517,11 @@
 
       .open-popup{
         width: 300px;
+      }
+
+      .cardResize{
+        margin-left: 25%;
+        visibility: hidden;
       }
     }
 
@@ -475,5 +551,10 @@
 
       .open-popup{
         width: 300px;
+      }
+
+      .cardResize{
+        visibility: hidden;
+        margin-left: 5%;
       }
     }

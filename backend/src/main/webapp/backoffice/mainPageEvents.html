@@ -196,6 +196,8 @@
 
             <div id="details"></div>
             <button class="submit" onclick="queryEvents()">Listar</button>
+            <button class="submit" onclick="loadingPopupOn()" style="width: 50%;">Aparecer loading</button>
+            <button class="submit" onclick="loadingPopupOff()" style="width: 50%;">Desaparecer loading</button>
         </div>
         <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>
@@ -213,6 +215,16 @@
 
 <script src="/js/functions.js"></script>
 <script>
+      let loading = document.getElementById("loadingPopup");
+
+      function loadingPopupOn(){
+           loading.classList.add("openLoadingPopup");
+      }
+
+      function loadingPopupOff(){
+           loading.classList.remove("openLoadingPopup");
+      }
+
       function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
