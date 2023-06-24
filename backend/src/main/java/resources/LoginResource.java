@@ -30,7 +30,7 @@ public class LoginResource {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpServletRequest request, @Context HttpServletResponse response, UserData data) {
-		LOG.fine("Attempt to login user: " + data.username);
+		LOG.fine("Attempt to login user: ");
 
 		try {
 			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(data.token);
@@ -74,12 +74,13 @@ public class LoginResource {
 			claims.put("role", role);
 
 			String token = generator.generateToken(claims);
-			Cookie cookie = new Cookie("token", token);
-			cookie.setHttpOnly(true);
-			cookie.setMaxAge(3600);
-			cookie.setPath("/rest");
-			cookie.setSecure(true); // Set the Secure attribute to ensure the cookie is only sent over HTTPS
-			response.addCookie(cookie);
+			String cookie = "token=" + token +
+					"; Path=/rest" +
+					"; Secure" +
+					"; HttpOnly" +
+					"; SameSite=None";  // Set the SameSite attribute to "Strict"
+
+			response.setHeader("Set-Cookie", cookie);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
