@@ -165,7 +165,7 @@ function queryEvents(){
 
     var list = document.getElementById('listOfEvents');
 
-    var limit = parseInt(document.getElementById("limit").value);
+    var limit = parseInt(document.getElementById("listLimitId").value);
 
     if (firstQuery){
         firstQuery = false;
@@ -247,7 +247,7 @@ function queryEvents(){
             //buttonContainer.appendChild(button);
 
             var listItem = document.createElement("li");
-            listItem.textContext = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
+            listItem.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
             listItem.addEventListener('click', function() {
                   var details = document.getElementById('details');
                   details.innerHTML = '';
@@ -257,20 +257,26 @@ function queryEvents(){
                   details.appendChild(title);
 
                   var description = document.createElement('p');
-                  description.textContent = "<br> Nome do evento: " + entity.title +
-                                            "<br> ID do evento: " + entity.id +
-                                            "<br> Nome do criador do evento: " + entity.authorName +
-                                            "<br> Username do criador do evento: " + entity.authorUsername +
-                                            "<br> Localização: " + entity.location +
-                                            "<br> Evento público: " + entity.isPublic +
-                                            "<br> Evento pago: " + entity.isItPaid +
-                                            "<br> Capacidade: " + entity.capacity +
-                                            "<br> Início: " + entity.startDate +
-                                            "<br> Fim: " + entity.endDate +
-                                            "<br> Departamento organizador: " + entity.department +
-                                            "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice;
+                  description.innerHTML = " Nome do evento: " + entity.title.value +
+                                            "<br> ID do evento: " + entity.id.value +
+                                            "<br> Nome do criador do evento: " + entity.authorName.value +
+                                            "<br> Username do criador do evento: " + entity.authorUsername.value +
+                                            "<br> Localização: " + entity.location.value +
+                                            "<br> Evento público: " + entity.isPublic.value +
+                                            "<br> Evento pago: " + entity.isItPaid.value +
+                                            "<br> Capacidade: " + entity.capacity.value +
+                                            "<br> Início: " + entity.startDate.value +
+                                            "<br> Fim: " + entity.endDate.value +
+                                            "<br> Departamento organizador: " + entity.department.value +
+                                            "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
 
                   details.appendChild(description);
+
+                  var siblings = Array.from(listItem.parentNode.children);
+                  var currentIndex = siblings.indexOf(listItem);
+                  siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                      sibling.classList.toggle('closed');
+                  });
 
                 });
 
