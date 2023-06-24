@@ -21,6 +21,12 @@ public class MessageResource {
     @Path("/send")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendMessage(MessageData messageData) throws FirebaseAuthException {
+        if(!messageData.validate()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        String chatId = messageData.getChatId();
+        boolean single = chatId == null;
         String senderId = messageData.getSenderId();
         List<String> recipientIds = messageData.getRecipientIds();
 
@@ -39,51 +45,18 @@ public class MessageResource {
 
         try {
             DatabaseReference senderRef = firebaseDatabase.getReference("Users").child(senderId);
-            String chatId = senderRef.child("inbox").push().getKey();
+            if(single) chatId = recipientIds.get(0);
             String messageId = senderRef.child("inbox").child(chatId).push().getKey();
             senderRef.child("inbox").child(chatId).child(messageId).setValueAsync(messageData);
 
+
+            if(single) chatId = senderId;
             for(String recipientId : recipientIds) {
                 DatabaseReference recipientRef = firebaseDatabase.getReference("Users").child(recipientId);
                 recipientRef.child("inbox").child(chatId).child(messageId).setValueAsync(messageData);
             }
 
-            return Response.ok("Message sent").build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GET
-    @Path("/chat")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getChat(@QueryParam("userId") String userId, @QueryParam("chatId") String chatId) {
-        try {
-            DatabaseReference chatRef = firebaseDatabase.getReference("Users").child(userId).child("inbox").child(chatId);
-
-            CompletableFuture<List<MessageData>> future = new CompletableFuture<>();
-            List<MessageData> messages = new ArrayList<>();
-
-            chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot messageSnapshot : dataSnapshot.getChildren()) {
-                        MessageData messageData = messageSnapshot.getValue(MessageData.class);
-                        messages.add(messageData);
-                    }
-                    future.complete(messages);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    future.completeExceptionally(databaseError.toException());
-                }
-            });
-
-            List<MessageData> retrievedMessages = future.get();
-
-            return Response.ok(retrievedMessages).build();
+            return Response.ok(chatId).build();
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

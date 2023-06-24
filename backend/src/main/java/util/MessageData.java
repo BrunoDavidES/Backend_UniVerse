@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageData {
+    private String chatId;
     private String senderId;
     private List<String> recipientIds = new ArrayList<>();
     private String message;
@@ -12,10 +13,8 @@ public class MessageData {
 
     }
 
-    public MessageData(String senderId, List<String> recipientIds, String message) {
-        this.senderId = senderId;
-        this.recipientIds = recipientIds;
-        this.message = message;
+    public boolean validate() {
+        return senderId != null && message != null && (recipientIds.size() == 1 || (recipientIds.size() > 1 && chatId != null));
     }
 
     public String getSenderId() {
@@ -41,4 +40,8 @@ public class MessageData {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public String getChatId() { return chatId; }
+
+    public void setChatId(String chatId) { this.chatId = chatId; }
 }
