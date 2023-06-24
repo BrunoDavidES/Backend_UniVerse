@@ -165,7 +165,7 @@ function queryEvents(){
 
     var list = document.getElementById('listOfEvents');
 
-    var limit = document.getElementById("limit");
+    var limit = parseInt(document.getElementById("limit").value);
 
     if (firstQuery){
         firstQuery = false;
@@ -219,7 +219,7 @@ function queryEvents(){
 */
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + offset, true);
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + eventsQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
@@ -228,14 +228,17 @@ function queryEvents(){
             const entities = response.map(function(entity) {
             return {
                 authorUsername: entity.properties.authorUsername,
-                authorEmail: entity.properties.authorEmail,
+                authorName: entity.properties.authorName,
                 title: entity.properties.title,
                 startDate: entity.properties.startDate,
                 endDate: entity.properties.endDate,
                 location: entity.properties.location,
                 isPublic: entity.properties.isPublic,
                 capacity: entity.properties.capacity,
-                isItPaid: entity.properties.isItPaid
+                isItPaid: entity.properties.isItPaid,
+                id: entity.properties.id,
+                validated_backoffice: entity.properties.validated_backoffice,
+                department: entity.properties.department
                 };
             });
         entities.forEach(function(entity) {
@@ -254,7 +257,19 @@ function queryEvents(){
                   details.appendChild(title);
 
                   var description = document.createElement('p');
-                  description.textContent = entity.description;
+                  description.textContent = "<br> Nome do evento: " + entity.title +
+                                            "<br> ID do evento: " + entity.id +
+                                            "<br> Nome do criador do evento: " + entity.authorName +
+                                            "<br> Username do criador do evento: " + entity.authorUsername +
+                                            "<br> Localização: " + entity.location +
+                                            "<br> Evento público: " + entity.isPublic +
+                                            "<br> Evento pago: " + entity.isItPaid +
+                                            "<br> Capacidade: " + entity.capacity +
+                                            "<br> Início: " + entity.startDate +
+                                            "<br> Fim: " + entity.endDate +
+                                            "<br> Departamento organizador: " + entity.department +
+                                            "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice;
+
                   details.appendChild(description);
 
                 });
