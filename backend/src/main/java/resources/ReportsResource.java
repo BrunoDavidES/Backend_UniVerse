@@ -288,4 +288,43 @@ public class ReportsResource {
         return Response.ok(g.toJson(results)).build();
 
     }
+
+    @GET
+    @Path("/unresolved")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryReports(@Context HttpServletRequest request) {
+        LOG.fine("Trying to know how many unresolved reports exist");
+
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        }
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+        Entity user = datastore.get(userKey);
+        if(!user.getString(ROLE).equals(BO)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("Report")
+                .setFilter(StructuredQuery.PropertyFilter.neq("status", "RESOLVED"))
+                .build();
+
+        QueryResults<Entity> queryResults = datastore.run(query);
+
+        int counter = 0;
+
+        while (queryResults.hasNext()){
+            counter++;
+            queryResults.next();
+        }
+
+        return Response.ok(counter).build();
+
+    }
 }
