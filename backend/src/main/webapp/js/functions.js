@@ -146,16 +146,53 @@ function deleteEvent(){
       };
     }
 
+function getEvent(){
+  var id = document.getElementById("idEventMod").value;
+
+  var idData = {
+    "id":id
+  };
+
+  var request = new XMLHttpRequest();
+
+  request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.send(JSON.stringify(idData));
+  request.onreadystatechange = function() {
+    if (request.readyState === 4 && request.status === 200) {
+    const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                return {
+                    title: entity.properties.title,
+                    startDate: entity.properties.startDate,
+                    endDate: entity.properties.endDate,
+                    location: entity.properties.location,
+                    isPublic: entity.properties.isPublic,
+                    capacity: entity.properties.capacity,
+                    isItPaid: entity.properties.isItPaid,
+                    department: entity.properties.department
+                    };
+        entities.forEach(function(entity) {
+            document.getElementById("titleModeLbl").value = "Título do Evento: " + entity.title.value;
+            document.getElementById("startDateModLbl").value = "Data de Inicio: " + entity.startDate.value;
+            document.getElementById("endDateModLbl").value = "Data de Fim: " + entity.endDate.value;
+            document.getElementById("locationModLbl").value = "Localização: " + entity.location.value;
+            document.getElementById("departmentModLbl").value = "Departamento: " + entity.department.value;
+            document.getElementById("capacityLbl").value = "Capacidade máxima do Evento: " + entity.capacity.value;
+            document.getElementById("isPublicLbl").value = "Evento público: " + entity.isPublic.value;
+            document.getElementById("isItPaidLbl").value = "Evento a pagar: " + entity.isItPaid.value;
+        });
+    });
+  }
+}
+}
+
     //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 var eventsQueryOffset = 0;
 var firstQuery = true;
 var eventsSelect = document.getElementById('listLimitId');
 
-eventsSelect.addEventListener('change', function(){
-   eventsQueryOffset = 0;
-   var firstQuery = true;
-});
 
 function queryEvents(){
     //const buttonContainer = document.getElementById('button-container');

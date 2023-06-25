@@ -291,9 +291,6 @@ public class FeedResource {
                 filters.put("isPublic", "yes");
             }
         }
-        
-
-
 
         QueryResults<Entity> queryResults;
 
