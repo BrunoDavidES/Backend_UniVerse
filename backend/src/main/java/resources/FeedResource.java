@@ -308,15 +308,18 @@ public class FeedResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
+                .setOrderBy(StructuredQuery.OrderBy.desc("time_creation"))
+                .build();
+
+        Query<Entity> newQuery = query.newEntityQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
-                .setOrderBy(StructuredQuery.OrderBy.desc("time_creation"))
                 .build();
 
-        queryResults = datastore.run(query);
+        queryResults = datastore.run(newQuery);
 
         List<Entity> results = new ArrayList<>();
 
