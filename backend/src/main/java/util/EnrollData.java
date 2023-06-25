@@ -1,30 +1,12 @@
 package util;
 
 public class EnrollData {
-    private String username;
-    private String subjectId;
     private String year;
     private String semester;
     private String role;
     private String grade;
 
     public EnrollData() {
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId(String subjectId) {
-        this.subjectId = subjectId;
     }
 
     public String getYear() {

@@ -77,15 +77,15 @@ public class SubjectResource {
     }
 
     @POST
-    @Path("/assign")
+    @Path("/{subjectId}/{userId}/assign")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response assignResponsible(EnrollData enrollData) {
+    public Response assignResponsible(@PathParam("subjectId") String subjectId, @PathParam("userId") String userId, EnrollData enrollData) {
 
         Transaction txn = datastore.newTransaction();
         try {
             Key enrollKey = datastore.newKeyFactory()
-                    .addAncestor(PathElement.of("Subject", enrollData.getSubjectId()))
-                    .addAncestor(PathElement.of("User", enrollData.getUsername()))
+                    .addAncestor(PathElement.of("Subject", subjectId))
+                    .addAncestor(PathElement.of("User", userId))
                     .setKind("Enrollment").newKey(enrollData.getYear()+"#"+enrollData.getSemester());
             Entity enrollment = txn.get(enrollKey);
 
@@ -101,7 +101,7 @@ public class SubjectResource {
                         .build();
                 txn.add(enrollment);
 
-                LOG.info("User " + enrollData.getUsername() + " assigned as " + enrollData.getRole() + " for subject " + enrollData.getSubjectId());
+                LOG.info("User " + userId + " assigned as " + enrollData.getRole() + " for subject " + subjectId);
                 txn.commit();
                 return Response.ok().build();
             }
@@ -113,15 +113,15 @@ public class SubjectResource {
     }
 
     @DELETE
-    @Path("/unassign")
+    @Path("/{subjectId}/{userId}/unassign")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response unassignResponsible(EnrollData enrollData) {
+    public Response unassignResponsible(@PathParam("subjectId") String subjectId, @PathParam("userId") String userId, EnrollData enrollData) {
 
         Transaction txn = datastore.newTransaction();
         try {
             Key enrollKey = datastore.newKeyFactory()
-                    .addAncestor(PathElement.of("Subject", enrollData.getSubjectId()))
-                    .addAncestor(PathElement.of("User", enrollData.getUsername()))
+                    .addAncestor(PathElement.of("Subject", subjectId))
+                    .addAncestor(PathElement.of("User", userId))
                     .setKind("Enrollment").newKey(enrollData.getYear()+"#"+enrollData.getSemester());
             Entity enrollment = txn.get(enrollKey);
 
@@ -132,7 +132,7 @@ public class SubjectResource {
             } else {
                 txn.delete(enrollKey);
 
-                LOG.info("User " + enrollData.getUsername() + " unassigned from subject " + enrollData.getSubjectId());
+                LOG.info("User " + userId + " unassigned from subject " + subjectId);
                 txn.commit();
                 return Response.ok().build();
             }
@@ -144,15 +144,15 @@ public class SubjectResource {
     }
 
     @POST
-    @Path("/enroll")
+    @Path("/{subjectId}/{userId}/enroll")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response enrollStudent(EnrollData enrollData) {
+    public Response enrollStudent(@PathParam("subjectId") String subjectId, @PathParam("userId") String userId, EnrollData enrollData) {
 
         Transaction txn = datastore.newTransaction();
         try {
             Key enrollKey = datastore.newKeyFactory()
-                    .addAncestor(PathElement.of("Subject", enrollData.getSubjectId()))
-                    .addAncestor(PathElement.of("User", enrollData.getUsername()))
+                    .addAncestor(PathElement.of("Subject", subjectId))
+                    .addAncestor(PathElement.of("User", userId))
                     .setKind("Enrollment").newKey(enrollData.getYear()+"#"+enrollData.getSemester());
             Entity enrollment = txn.get(enrollKey);
 
@@ -168,7 +168,7 @@ public class SubjectResource {
                         .build();
                 txn.add(enrollment);
 
-                LOG.info("User " + enrollData.getUsername() + " enrolled in subject " + enrollData.getSubjectId());
+                LOG.info("User " + userId + " enrolled in subject " + subjectId);
                 txn.commit();
                 return Response.ok().build();
             }
@@ -180,15 +180,15 @@ public class SubjectResource {
     }
 
     @DELETE
-    @Path("/withdraw")
+    @Path("/{subjectId}/{userId}/withdraw")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response withdrawStudent(EnrollData enrollData) {
+    public Response withdrawStudent(@PathParam("subjectId") String subjectId, @PathParam("userId") String userId, EnrollData enrollData) {
 
         Transaction txn = datastore.newTransaction();
         try {
             Key enrollKey = datastore.newKeyFactory()
-                    .addAncestor(PathElement.of("Subject", enrollData.getSubjectId()))
-                    .addAncestor(PathElement.of("User", enrollData.getUsername()))
+                    .addAncestor(PathElement.of("Subject", subjectId))
+                    .addAncestor(PathElement.of("User", userId))
                     .setKind("Enrollment").newKey(enrollData.getYear()+"#"+enrollData.getSemester());
             Entity enrollment = txn.get(enrollKey);
 
@@ -199,7 +199,7 @@ public class SubjectResource {
             } else {
                 txn.delete(enrollKey);
 
-                LOG.info("User " + enrollData.getUsername() + " withdraw from subject " + enrollData.getSubjectId());
+                LOG.info("User " + userId + " withdraw from subject " + subjectId);
                 txn.commit();
                 return Response.ok().build();
             }
@@ -211,15 +211,15 @@ public class SubjectResource {
     }
 
     @PUT
-    @Path("/addGrade")
+    @Path("/{subjectId}/{userId}/addGrade")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addGrade(EnrollData enrollData) {
+    public Response addGrade(@PathParam("subjectId") String subjectId, @PathParam("userId") String userId, EnrollData enrollData) {
 
         Transaction txn = datastore.newTransaction();
         try {
             Key enrollKey = datastore.newKeyFactory()
-                    .addAncestor(PathElement.of("Subject", enrollData.getSubjectId()))
-                    .addAncestor(PathElement.of("User", enrollData.getUsername()))
+                    .addAncestor(PathElement.of("Subject", subjectId))
+                    .addAncestor(PathElement.of("User", userId))
                     .setKind("Enrollment").newKey(enrollData.getYear()+"#"+enrollData.getSemester());
             Entity enrollment = txn.get(enrollKey);
 
@@ -234,7 +234,7 @@ public class SubjectResource {
 
                 txn.put(enrollment);
 
-                LOG.info("User " + enrollData.getUsername() + " withdraw from subject " + enrollData.getSubjectId());
+                LOG.info("User " + userId + " withdraw from subject " + subjectId);
                 txn.commit();
                 return Response.ok().build();
             }
