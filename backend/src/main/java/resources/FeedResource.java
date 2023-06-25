@@ -316,6 +316,7 @@ public class FeedResource {
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
+                .setOrderBy(StructuredQuery.OrderBy.asc("time_creation"))
                 .build();
 
         queryResults = datastore.run(query);
