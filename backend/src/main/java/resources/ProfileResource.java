@@ -20,6 +20,54 @@ import java.util.logging.Logger;
 @Path("/profile")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ProfileResource {
+
+    private static final String CAPI = "Your not one of us\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+
+
+    private static final String BO = "BO";
+    private static final String D = "D";
+    private static final String A = "A";
+    private static final String ROLE = "role";
+    private static final String USER = "User";
+    private static final String EVENT = "Event";
+    private static final String NEWS = "News";
+    private static final String STUDENTS_UNION = "Students Union";
+    private static final String USER_CLAIM = "user";
+    private static final String NAME_CLAIM = "name";
+    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
+    private static final String MISSING_PARAMETER = "Missing parameter.";
+    private static final String TOKEN_NOT_FOUND = "Token not found.";
+    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
+    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
+    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
+    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
+    private static final String PASSWORD_INCORRECT = "Password incorrect.";
+    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
+    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
+    private static final String NICE_TRY = "Nice try but your not a capi person.";
+    private static final String PERMISSION_DENIED = "Permission denied.";
+
+    private static final String DEPARTMENT = "Department";
+    private static final String WRONG_PRESIDENT = "President doesn't exists.";
+    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
+    private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ProfileResource.class.getName());
 
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
@@ -39,33 +87,30 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Empty param").build();
         }
 
-
-
         DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
-            LOG.warning("Token not found");
-            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
-        //String.valueOf(token.getClaim("user")).replaceAll("\"", "")
-        String requester = String.valueOf(token.getClaim("user")).replaceAll("\"", "");
-        Key userKey = datastore.newKeyFactory().setKind("User").newKey(requester);
+        String requester = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(requester);
         Entity user = datastore.get(userKey);
 
         if( user == null ) {
-            LOG.warning("User does not exist");
+            LOG.warning(USER_DOES_NOT_EXIST);
             return Response.status(Response.Status.BAD_REQUEST).entity("User does not exist "  + requester).build();
         }
 
         // Vai ter de mudar quando se souber os atributos a devolver em cada caso
         if (!username.equals(requester)){
             // Faz um perfil menos completo
-            userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+            userKey = datastore.newKeyFactory().setKind(USER).newKey(username);
             user = datastore.get(userKey);
 
             if( user == null ) {
-                LOG.warning("User or password incorrect");
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+                LOG.warning(USER_OR_PASSWORD_INCORRECT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
             }
         }
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
@@ -84,36 +129,20 @@ public class ProfileResource {
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryUsers(@Context HttpServletRequest request,
-                                 @QueryParam("limit") String limit,
-                                 @QueryParam("offset") String offset, Map<String, String> filters){
+                               @QueryParam("limit") String limit,
+                               @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query users.");
 
         //Verificar, caso for evento privado, se o token é valido
         DecodedJWT token = AuthToken.validateToken(request);
 
         if (token == null) {
-            LOG.warning("Token not found");
-            return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
-        if(!String.valueOf(token.getClaim("role")).replaceAll("\"", "").equals("BO")){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            LOG.warning("Nice try but your not a capi person");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Your not one of us\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-                    "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-                    "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-                    "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-                    "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-                    "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-                    "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀").build();
+        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
         QueryResults<Entity> queryResults;
 
@@ -132,7 +161,7 @@ public class ProfileResource {
         }
 
         Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind("User")
+                .setKind(USER)
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
@@ -151,4 +180,3 @@ public class ProfileResource {
     }
 
 }
-
