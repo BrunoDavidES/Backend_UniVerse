@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title> Users FCT NOVA</title>
+    <title>Departamentos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +50,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Nucleos</span>
+                    <span class="links_name">Núcleos</span>
                 </a>
             </button>
         </li>
@@ -92,7 +92,7 @@
     <nav>
         <div class="sidebar-button">
             <i class='bx bx-menu sidebarBtn'></i>
-            <span class="home">Users</span>
+            <span class="home">Departamentos</span>
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
@@ -103,91 +103,117 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'userList')" class="active">Modificar role do User</button>
-            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'userList')">Obter peril do User</button>
-            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'userList')">Apagar User</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'userList', 'delUser', 'modRole', 'getProfile')">Listar Users</button>
+            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addDpt', 'modDpt', 'delDpt', 'dptList')" class="active">Criar Departamento</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modDpt', 'addDpt', 'delDpt', 'dptList')">Mudar perfil do Departamento</button>
+            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delDpt', 'modDpt', 'addDpt', 'dptList')">Apagar Departamento</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'dptList', 'delDpt', 'addDpt', 'modDpt')">Listar Departamentos</button>
         </div>
 
         <br><br>
-        <div id="modRole">
+        <div id="addDpt">
             <div class="form">
-                <div class="title">Modificar Role do User</div>
-                <div class="subtitle">Vamos modificar o estatuto de um user!</div>
+                <div class="title">Criar Departamento</div>
+                <div class="subtitle">Vamos criar um novo Departamento!</div>
                 <div class="input-container ic1">
-                    <input id="target" class="input" type="text" placeholder=" "/>
+                    <input id="idDpt" class="input" type="text" placeholder=" " required/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
-                </div><br>
-                <div class="child">
-                    <select name="roles" class="select" id="newRole">
-                        <option selected>Novo estatuto do User</option>
-                        <option id="US" value="US">Estudante</option>
-                        <option id="TI" value="TI">Professor/Investigador</option>
-                        <option id="S" value="S">Funcionário</option>
-                        <option id="BO" value="BO">Operador BackOffice</option>
-                    </select>
+                    <label for="idDpt" class="placeholder">ID do departamento</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar estatuto do user</button>
+                <div class="input-container ic1">
+                    <input id="address" class="input" type="text" placeholder=" " required/>
+                    <div class="cut"></div>
+                    <label for="address" class="placeholder">Localização</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="email" class="input" type="text" placeholder=" " required/>
+                    <div class="cut"></div>
+                    <label for="email" class="placeholder">Email do Departamento</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="fax" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="fax" class="placeholder">Fax (Opcional)</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="nameDpt" class="input" type="text" placeholder=" " required/>
+                    <div class="cut"></div>
+                    <label for="nameDpt" class="placeholder">Nome do Departamento</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="phoneNumber" class="input" type="text" placeholder=" " required/>
+                    <div class="cut"></div>
+                    <label for="phoneNumber" class="placeholder">Número de telemóvel</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="presDpt" class="input" type="text" placeholder=" " required/>
+                    <div class="cut"></div>
+                    <label for="presDpt" class="placeholder">Presidente do Departamento</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Criar Departamento</button>
             </div>
         </div>
-        <div id="getProfile" style="display: none;">
+        <div id="modDpt" style="display: none;">
             <div class="form">
-                <div class="title">Obter perfil do User</div>
-                <div class="subtitle">Vamos obter o perfil de um user!</div>
+                <div class="title">Departamento</div>
+                <div class="subtitle">Vamos obter o Departamento a alterar!</div>
                 <div class="input-container ic1">
-                    <input id="targetGetProfile" class="input" type="text" placeholder=" "/>
+                    <input id="dptId" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
+                    <label for="dptId" class="placeholder">ID do Departmento</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Obter perfil do user</button>
+                <button type="text" class="submit" onclick="postEvent()">Obter Departamento</button>
             </div>
             <br>
             <div class="form">
-                <div class="title" id="username">Username</div>
                 <div class="input-container ic1">
-                    <input id="nameMod" class="input" type="text" placeholder=""/>
+                    <input id="addressMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
+                    <label for="addressMod" class="placeholder">Localização</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="emailMod" class="input" type="text" placeholder=""/>
+                    <input id="emailMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Email</label>
+                    <label for="emailMod" class="placeholder">Email do Departamento</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="roleMod" class="input" type="text" readonly/>
+                    <input id="faxMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Role</label>
+                    <label for="faxMod" class="placeholder">Fax</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="jobsMod" class="input" type="text"/>
+                    <input id="nameDptMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Trabalho</label>
+                    <label for="nameDptMod" class="placeholder">Nome do Departamento</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="matriculaMod" class="input" type="text"/>
+                    <input id="phoneNumberMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Matricula do carro</label>
+                    <label for="phoneNumberMod" class="placeholder">Número de telemóvel</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar perfil do user</button>
+                <div class="input-container ic1">
+                    <input id="presDptMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="presDptMod" class="placeholder">Presidente do Departamento</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Mudar Departamento</button>
             </div>
         </div>
-        <div id="delUser" style="display: none;">
-            <div class="form">
-                <div class="title">Apagar User</div>
-                <div class="subtitle">Vamos apagar um user do sistema!</div>
-                <div class="input-container ic1">
-                    <input id="targetDelUser" class="input" type="text" placeholder=" "/>
-                    <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
-                </div>
-                <button type="text" class="submit" onclick="postEvent()">Apagar user</button>
+    </div>
+    <div id="delDpt" style="display: none;">
+        <div class="form">
+            <div class="title">Apagar Departamento</div>
+            <div class="subtitle">Vamos apagar o Departamento!</div>
+            <div class="input-container ic1">
+                <input id="dptIdDel" class="input" type="text" placeholder=" " required/>
+                <div class="cut"></div>
+                <label for="dptIdDel" class="placeholder">ID do Departamento</label>
             </div>
+            <button type="text" class="submit" onclick="postEvent()">Apagar Departamento</button>
         </div>
-        <div id="userList" style="display: none;">
+    </div>
+    <div id="dptList" style="display: none;">
 
-        </div>
+    </div>
     </div>
     <div class="popup" id="popup" style="">
         <h3>Está prestes a fazer logout</h3>

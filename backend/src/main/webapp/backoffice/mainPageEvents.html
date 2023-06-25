@@ -48,10 +48,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageStats.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Estatísticas</span>
+                    <span class="links_name">Nucleos</span>
                 </a>
             </button>
         </li>
@@ -64,10 +64,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageFav.html'">
-                <a href="#fav">
-                    <i class='bx bx-heart' ></i>
-                    <span class="links_name">Favoritos</span>
+            <button onclick="window.location.href = '/backoffice/mainPageDepartamentos.html'">
+                <a href="#dpt">
+                    <i class='bx bx-buildings' ></i>
+                    <span class="links_name">Departamentos</span>
                 </a>
             </button>
         </li>
@@ -104,10 +104,11 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventMod', 'eventDel', 'eventList')" class="active">Adicionar Evento</button>
-            <button id="editBtn"  onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventAdd', 'eventDel', 'eventList')">Modificar Evento</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventAdd', 'eventMod', 'eventList')">Apagar Evento</button>
-            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventAdd', 'eventMod', 'eventDel')">Listar Eventos</button>
+            <button id="postBtn" onClick="changeWindow('postBtn', 'validateBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventValidate', 'eventMod', 'eventDel', 'eventList')" class="active">Adicionar Evento</button>
+            <button id="editBtn"  onClick="changeWindow('editBtn', 'validateBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventValidate', 'eventAdd', 'eventDel', 'eventList')">Modificar Evento</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList')">Apagar Evento</button>
+            <button id="validateBtn" onClick="changeWindow('validateBtn','queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventValidate', 'eventList', 'eventAdd', 'eventMod', 'eventDel')">Validar Evento</button>
+            <button id="queryBtn" onClick="changeWindow('queryBtn', 'validateBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventValidate', 'eventAdd', 'eventMod', 'eventDel')">Listar Eventos</button>
         </div>
         <br><br>
         <div id="eventAdd">
@@ -120,22 +121,22 @@
                     <label for="title" class="placeholder">Título do Evento</label>
                 </div>
                 <div class="input-container ic2">
-                    <input id="startDate" class="input" type="text" placeholder=" " />
+                    <input id="startDate" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="startDate" class="placeholder">Data de Inicio</label>
                 </div>
                 <div class="input-container ic2">
-                    <input id="endDate" class="input" type="text" placeholder=" " />
+                    <input id="endDate" class="input" type="text" placeholder=" "/>
                     <div class="cut cut"></div>
                     <label for="endDate" class="placeholder">Data de Fim</label>
                 </div>
                 <div class="input-container ic2">
-                    <input id="location" class="input" type="text" placeholder=" " />
+                    <input id="location" class="input" type="text" placeholder=" "/>
                     <div class="cut cut"></div>
                     <label for="location" class="placeholder">Localização</label>
                 </div>
                 <div class="input-container ic2">
-                    <input id="department" class="input" type="text" placeholder=" " />
+                    <input id="department" class="input" type="text" placeholder=" "/>
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
                 </div>
@@ -229,6 +230,18 @@
                 <button type="text" class="submit" onclick="deleteEvent()">Apagar Evento</button>
             </div>
         </div>
+        <div id="eventValidate" style="display: none;">
+            <div class="form">
+                <div class="title">Validar Evento</div>
+                <div class="subtitle">Vamos validar um evento especifico!</div>
+                <div class="input-container ic1">
+                    <input id="idEventValidate" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id do Evento</label>
+                </div>
+                <button type="text" class="submit" onclick="validateEvent()">Validar Evento</button>
+            </div>
+        </div>
         <div id="eventList" style="display: none;">
             <h1 style="text-align: center;">Listar Eventos</h1>
             <label for="listLimitId">Eventos por página</label>
@@ -272,24 +285,28 @@
            loading.classList.remove("openLoadingPopup");
       }
 
-      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+      function changeWindow(btn, btn1, btn2, btn3, btn4, div, div1, div2, div3, div4){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
         var gone3 = document.getElementById(div3);
+        var gone4 = document.getElementById(div4);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
         var button4 = document.getElementById(btn3);
+        var button5 = document.getElementById(btn4);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
         gone3.style.display = 'none';
+        gone4.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
         button4.classList.remove("active");
+        button5.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");

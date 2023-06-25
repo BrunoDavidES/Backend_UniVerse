@@ -47,10 +47,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageStats.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Estatísticas</span>
+                    <span class="links_name">Nucleos</span>
                 </a>
             </button>
         </li>
@@ -63,10 +63,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageFav.html'">
-                <a href="#fav">
-                    <i class='bx bx-heart' ></i>
-                    <span class="links_name">Favoritos</span>
+            <button onclick="window.location.href = '/backoffice/mainPageDepartamentos.html'">
+                <a href="#dpt">
+                    <i class='bx bx-buildings' ></i>
+                    <span class="links_name">Departamentos</span>
                 </a>
             </button>
         </li>
@@ -103,6 +103,34 @@
 
 
     <div class="home-content">
+        <div class="topnav" id="myTopnav">
+            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'resolve', 'unReport', 'reportAll')" class="active">Resolver Report</button>
+            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'unReport', 'resolve', 'reportAll')">Listar reports por resolver</button>
+            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'reportAll', 'resolve', 'unReport')">Listar todos os reports</button>
+        </div>
+        <br><br>
+        <div id="resolve">
+            <div class="form">
+                <div class="title">Resolver Conflito</div>
+                <div class="subtitle">Vamos confirmar que um report foi tratado!</div>
+                <div class="input-container ic1">
+                    <input id="idReportValidate" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="idReportValidate" class="placeholder">Id do Report</label>
+                </div>
+                <button type="text" class="submit" onclick="validateEvent()">Marcar como resolvido</button>
+            </div>
+        </div>
+        <div id="unReport" style="display: none;">
+            <div class="form">
+                <div class="title">Listar nao resolvidos</div>
+            </div>
+        </div>
+        <div id="reportAll" style="display: none;">
+            <div class="form">
+                <div class="title">Listar todos</div>
+            </div>
+        </div>
     </div>
     <div class="popup" id="popup" style="">
         <h3>Está prestes a fazer logout</h3>
@@ -114,6 +142,33 @@
 
 <script src="/js/functions.js"></script>
 <script>
+      let loading = document.getElementById("loadingPopup");
+
+      function loadingPopupOn(){
+           loading.classList.add("openLoadingPopup");
+      }
+
+      function loadingPopupOff(){
+           loading.classList.remove("openLoadingPopup");
+      }
+
+      function changeWindow(btn, btn1, btn2, div, div1, div2){
+        var appear = document.getElementById(div);
+        var gone = document.getElementById(div1);
+        var gone2 = document.getElementById(div2);
+        var button = document.getElementById(btn);
+        var button2 = document.getElementById(btn1);
+        var button3 = document.getElementById(btn2);
+
+        appear.style.display = 'block';
+        gone.style.display = 'none';
+        gone2.style.display = 'none';
+        button.classList.add("active");
+        button2.classList.remove("active");
+        button3.classList.remove("active");
+
+      }
+
       let popup = document.getElementById("popup");
 
       function openPopup(){
