@@ -88,6 +88,7 @@ public class ModifyUserResource {
                     Entity newUser = Entity.newBuilder(user)
                             .set("name", data.name)
                             .set("status", data.status)
+                            .set("license_plate", data.license_plate)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 
@@ -187,15 +188,30 @@ public class ModifyUserResource {
                     LOG.warning(PERMISSION_DENIED);
                     return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-                    Entity newUser = Entity.newBuilder(target)
-                            .set("role", data.newRole)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
+                Entity.Builder newUser = Entity.newBuilder(target);
 
-                    txn.update(newUser);
-                    LOG.info(data.target + " role has been updated successfully.");
-                    txn.commit();
-                    return Response.ok(target).build();
+                newUser.set("email", target.getString("email"))
+                        .set("name", target.getString("name"))
+                        .set("password", target.getString("password"))
+                        .set("role", data.newRole)
+                        .set("license_plate", target.getString("license_plate"))
+                        .set("status",  target.getString("status"))
+                        .set("job_list",  target.getString("job_list"))
+                        .set("personal_event_list", target.getString("personal_event_list"))  //#string%string%string%string#string%...
+                        .set("time_creation", target.getTimestamp("time_creation"))
+                        .set("time_lastupdate", Timestamp.now());
+
+                if(data.newRole.equals(D)){
+                    if(data.office == null)
+                        data.office = "";
+                    newUser.set("office", data.office);
+                }else
+                    newUser.set("office", "");
+                Entity u = newUser.build();
+                txn.put(u);
+                LOG.info(data.target + " role has been updated successfully.");
+                txn.commit();
+                return Response.ok(target).build();
             }
         } finally {
             if (txn.isActive()) {

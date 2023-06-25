@@ -56,6 +56,7 @@ public class RegisterResource {
     private static final String MISSING_PARAMETER = "Missing parameter.";
     private static final String TOKEN_NOT_FOUND = "Token not found.";
     private static final String USER_DOES_NOT_EXIST = "User does not exist.";
+    private static final String UNREGISTERED = "UNREGISTERED";
     private static final String USER_ALREADY_EXISTs = "User already exists.";
     private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
     private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
@@ -98,13 +99,18 @@ public class RegisterResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_ALREADY_EXISTs).build();
             } else {
 
+                if(data.license_plate == null)
+                    data.license_plate = UNREGISTERED;
+
                 user = Entity.newBuilder(userKey)
                         .set("email", data.email)
                         .set("name", data.name)
                         .set("password", DigestUtils.sha512Hex(data.password))
                         .set("role", data.getRole())
+                        .set("license_plate", data.license_plate)
                         .set("status", "ACTIVE")
                         .set("job_list", "")
+                        .set("personal_event_list", "")  //#string%string%string%string#string%...
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
