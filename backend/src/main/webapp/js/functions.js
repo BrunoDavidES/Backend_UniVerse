@@ -34,6 +34,7 @@ function logout(){
         }
         else{
           xmlhttp.responseText;
+          window.location.href = "/backoffice/index.html";
         }
       }
     }
@@ -172,20 +173,21 @@ function getEvent(){
                     isItPaid: entity.properties.isItPaid,
                     department: entity.properties.department
                     };
+                });
         entities.forEach(function(entity) {
-            document.getElementById("titleModeLbl").value = "Título do Evento: " + entity.title.value;
-            document.getElementById("startDateModLbl").value = "Data de Inicio: " + entity.startDate.value;
-            document.getElementById("endDateModLbl").value = "Data de Fim: " + entity.endDate.value;
-            document.getElementById("locationModLbl").value = "Localização: " + entity.location.value;
-            document.getElementById("departmentModLbl").value = "Departamento: " + entity.department.value;
-            document.getElementById("capacityLbl").value = "Capacidade máxima do Evento: " + entity.capacity.value;
-            document.getElementById("isPublicLbl").value = "Evento público: " + entity.isPublic.value;
-            document.getElementById("isItPaidLbl").value = "Evento a pagar: " + entity.isItPaid.value;
+            document.getElementById("titleModeLbl").innerHTML = "Título do Evento: " + entity.title.value;
+            document.getElementById("startDateModLbl").innerHTML = "Data de Inicio: " + entity.startDate.value;
+            document.getElementById("endDateModLbl").innerHTML = "Data de Fim: " + entity.endDate.value;
+            document.getElementById("locationModLbl").innerHTML = "Localização: " + entity.location.value;
+            document.getElementById("departmentModLbl").innerHTML = "Departamento: " + entity.department.value;
+            document.getElementById("capacityLbl").innerHTML = "Capacidade máxima do Evento: " + entity.capacity.value;
+            document.getElementById("isPublicLbl").innerHTML = "Evento público: " + entity.isPublic.value;
+            document.getElementById("isItPaidLbl").innerHTML = "Evento a pagar: " + entity.isItPaid.value;
         });
-    });
+    };
   }
 }
-}
+
 
     //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
