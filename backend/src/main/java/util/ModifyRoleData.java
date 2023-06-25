@@ -6,6 +6,8 @@ public class ModifyRoleData {
 
     public String newRole;
 
+    public String office;
+
     public boolean validatePermission(String modifierRole, String targetRole) {
         if(modifierRole.equals("BO") && !targetRole.equals("BO"))
             return true;

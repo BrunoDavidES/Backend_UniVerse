@@ -53,6 +53,7 @@ public class ProfileResource {
     private static final String STUDENTS_UNION = "Students Union";
     private static final String USER_CLAIM = "user";
     private static final String NAME_CLAIM = "name";
+    private static final String PERSONAL_EVENT_LIST = "personal_event_list";
     private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
     private static final String MISSING_PARAMETER = "Missing parameter.";
     private static final String TOKEN_NOT_FOUND = "Token not found.";
@@ -154,7 +155,7 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString("personal_event_list");
+            String list = user.getString(PERSONAL_EVENT_LIST);
             if(list.contains(data.title)) {
                 txn.rollback();
                 LOG.warning("Personal event name already used.");
@@ -201,7 +202,7 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString("personal_event_list");
+            String list = user.getString(PERSONAL_EVENT_LIST);
             if(!list.contains(oldTitle)) {
                 txn.rollback();
                 LOG.warning("Personal event does not exist.");
@@ -256,7 +257,7 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString("personal_event_list");
+            String list = user.getString(PERSONAL_EVENT_LIST);
             if(!list.contains(oldTitle)) {
                 txn.rollback();
                 LOG.warning("Personal event does not exist.");
