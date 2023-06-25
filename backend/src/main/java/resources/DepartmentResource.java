@@ -226,7 +226,7 @@ public class DepartmentResource {
                 Entity newUser;
                 for(String valuesOfMember : list.split("#")) {
                     if(!valuesOfMember.equals("")) {
-                        attributes = valuesOfMember.split("-");
+                        attributes = valuesOfMember.split("%");
 
                         memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                         memberEntity = txn.get(memberKey);
@@ -236,7 +236,7 @@ public class DepartmentResource {
                             return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                         }
                         userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
                         newUser = Entity.newBuilder(memberEntity)
                                 .set("job_list", userPersonalList)
                                 .set("time_lastupdate", Timestamp.now())
@@ -314,7 +314,7 @@ public class DepartmentResource {
 
     @POST
     @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel%username"
     public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to add members to the department.");
 
@@ -346,7 +346,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                 memberEntity = txn.get(memberKey);
@@ -357,7 +357,7 @@ public class DepartmentResource {
                 }
                 if (!list.contains(attributes[1])) {
                     userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "-" + attributes[0]);
+                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "%" + attributes[0]);
                     newUser = Entity.newBuilder(memberEntity)
                             .set("job_list", userPersonalList)
                             .set("time_lastupdate", Timestamp.now())
@@ -424,7 +424,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                 memberEntity = txn.get(memberKey);
@@ -434,7 +434,7 @@ public class DepartmentResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())
@@ -500,7 +500,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attribute = valuesOfMember.split("-");
+                attribute = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attribute[1]);
                 memberEntity = txn.get(memberKey);
@@ -514,14 +514,14 @@ public class DepartmentResource {
                 targetJob = null;
                 for (String job: jobs) {
                     if (job.contains(department.getString("id"))) {
-                        targetJob = job.split("-")[1];
+                        targetJob = job.split("%")[1];
                         break;
                     }
                 }
 
-                list = list.replace(targetJob +"-"+attribute[1], attribute[0]+"-"+attribute[1]);
+                list = list.replace(targetJob +"%"+attribute[1], attribute[0]+"%"+attribute[1]);
 
-                userPersonalList = userPersonalList.replace(department.getString("id") + "-" + targetJob, department.getString("id") + "-" + attribute[0]);
+                userPersonalList = userPersonalList.replace(department.getString("id") + "%" + targetJob, department.getString("id") + "%" + attribute[0]);
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())

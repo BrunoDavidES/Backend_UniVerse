@@ -308,7 +308,7 @@ public class NucleusResource {
                             return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                         }
                         userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
                         newUser = Entity.newBuilder(memberEntity)
                                 .set("job_list", userPersonalList)
                                 .set("time_lastupdate", Timestamp.now())
@@ -385,7 +385,7 @@ public class NucleusResource {
 
     @POST
     @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
 
@@ -430,7 +430,7 @@ public class NucleusResource {
                 }
                 if (!list.contains(member)){
                     userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "-" + "member");
+                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "%" + "member");
                     newUser = Entity.newBuilder(memberEntity)
                             .set("job_list", userPersonalList)
                             .set("time_lastupdate", Timestamp.now())
@@ -505,7 +505,7 @@ public class NucleusResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())
