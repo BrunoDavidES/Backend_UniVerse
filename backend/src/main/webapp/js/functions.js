@@ -1,5 +1,3 @@
-
-
 function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
@@ -169,7 +167,7 @@ function queryEvents(){
 
     if (firstQuery){
         firstQuery = false;
-        eventsQueryOffset -= limit;
+        eventsQueryOffset = 0-limit;
     }
 
     eventsQueryOffset += limit;
