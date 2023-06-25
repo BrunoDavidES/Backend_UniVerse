@@ -98,7 +98,7 @@
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
             <img src="img/logo.png" alt="">
-            <span class="admin_name" id="name" style="text-align: center;"></span>
+            <span class="admin_name" id="name"></span>
         </div>
     </nav>
 
@@ -168,6 +168,51 @@
                     <label for="title" class="placeholder">Id do Evento</label>
                 </div>
                 <button type="text" class="submit" onclick="deleteEvent()">Obter Evento</button>
+            </div>
+            <br>
+            <div class="form">
+                <div class="input-container ic1">
+                    <input id="titleMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Título do Evento</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="startDateMod" class="input" type="text" placeholder=" " />
+                    <div class="cut"></div>
+                    <label for="startDate" class="placeholder">Data de Inicio</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="endDateMod" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="endDate" class="placeholder">Data de Fim</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="locationMod" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="location" class="placeholder">Localização</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="departmentMod" class="input" type="text" placeholder=" " />
+                    <div class="cut cut"></div>
+                    <label for="department" class="placeholder">Departamento</label>
+                </div>
+                <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
+                    <label for="title">Capacidade máxima do Evento: &emsp;</label>
+                    <input type ="text" style="width: 50%; border-radius: 5px; text-align: center;" id = "capacityMod" name="eventCapacity" >
+                </div>
+                <div class="subtitle" style="margin-left: 10px; text-align: center;">
+                    <label for="isPublic">Evento público? &emsp;</label>
+                    <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isPublicMod">
+                        <option value="no">Não</option>
+                        <option value="yes">Sim</option>
+                    </select>&emsp;&emsp;
+                    <label for="isItPaid">Evento a pagar? &emsp;</label>
+                    <select style="height:30px; width: 100px; border-radius: 10px; text-align: center;" id="isItPaidMod">
+                        <option value="no">Não</option>
+                        <option value="yes">Sim</option>
+                    </select>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Mudar Evento</button>
             </div>
         </div>
         <div id="eventDel" style="display: none;">
