@@ -47,10 +47,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageStats.html'">
+            <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Estatísticas</span>
+                    <span class="links_name">Nucleos</span>
                 </a>
             </button>
         </li>
@@ -63,10 +63,10 @@
             </button>
         </li>
         <li>
-            <button onclick="window.location.href = '/backoffice/mainPageFav.html'">
-                <a href="#fav">
-                    <i class='bx bx-heart' ></i>
-                    <span class="links_name">Favoritos</span>
+            <button onclick="window.location.href = '/backoffice/mainPageDepartamentos.html'">
+                <a href="#dpt">
+                    <i class='bx bx-buildings' ></i>
+                    <span class="links_name">Departamentos</span>
                 </a>
             </button>
         </li>
@@ -140,7 +140,26 @@
                     <div class="cut"></div>
                     <label for="title" class="placeholder">Id do Evento</label>
                 </div>
-                <button type="text" class="submit" onclick="">Apagar</button>
+                <button type="text" class="submit" onclick="">Obter</button>
+            </div>
+            <br>
+            <div class="form">
+                <div class="input-container ic1">
+                    <input id="titleMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Título da Notícia</label>
+                </div>
+                <div class="input-container ic2">
+                    <input id="authorMod" class="input" type="text" placeholder=" " />
+                    <div class="cut"></div>
+                    <label for="author" class="placeholder">Autor da Notícia</label>
+                </div>
+                <div class="input-container2 ic2">
+                    <textarea id="textMod" class="input" cols="40" rows="5"></textarea>
+                    <div class="cut cut"></div>
+                    <label for="text" class="placeholder">Corpo da Notícia</label>
+                </div>
+                <button type="text" class="submit" onclick="postNews()">Modificar</button>
             </div>
         </div>
         <div id="newsDel" style="display: none;">

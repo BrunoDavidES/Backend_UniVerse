@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title> Users FCT NOVA</title>
+    <title>Nucleos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,7 +50,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Nucleos</span>
+                    <span class="links_name">Núcleos</span>
                 </a>
             </button>
         </li>
@@ -92,7 +92,7 @@
     <nav>
         <div class="sidebar-button">
             <i class='bx bx-menu sidebarBtn'></i>
-            <span class="home">Users</span>
+            <span class="home">Núcleos</span>
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
@@ -103,89 +103,115 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'userList')" class="active">Modificar role do User</button>
-            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'userList')">Obter peril do User</button>
-            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'userList')">Apagar User</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'userList', 'delUser', 'modRole', 'getProfile')">Listar Users</button>
+            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addNuc', 'modNuc', 'delNuc', 'nucList')" class="active">Criar Núcleo</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modNuc', 'addNuc', 'delNuc', 'nucList')">Mudar peril do Núcleo</button>
+            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delNuc', 'modNuc', 'addNuc', 'nucList')">Apagar Núcleo</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'nucList', 'delNuc', 'addNuc', 'modNuc')">Listar Núcleos</button>
         </div>
 
         <br><br>
-        <div id="modRole">
+        <div id="addNuc">
             <div class="form">
-                <div class="title">Modificar Role do User</div>
-                <div class="subtitle">Vamos modificar o estatuto de um user!</div>
+                <div class="title">Criar Núcleo</div>
+                <div class="subtitle">Vamos criar um novo Núcleo!</div>
                 <div class="input-container ic1">
-                    <input id="target" class="input" type="text" placeholder=" "/>
+                    <input id="idNuc" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
-                </div><br>
-                <div class="child">
-                    <select name="roles" class="select" id="newRole">
-                        <option selected>Novo estatuto do User</option>
-                        <option id="US" value="US">Estudante</option>
-                        <option id="TI" value="TI">Professor/Investigador</option>
-                        <option id="S" value="S">Funcionário</option>
-                        <option id="BO" value="BO">Operador BackOffice</option>
-                    </select>
+                    <label for="idNuc" class="placeholder" required>Nome/ID</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar estatuto do user</button>
+                <div class="input-container ic1">
+                    <input id="description" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="description" class="placeholder">Descrição (Opcional)</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="email" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="email" class="placeholder" required>Email do Núcleo</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="facebook" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="facebook" class="placeholder">Facebook (Opcional)</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="instagram" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="instagram" class="placeholder">Instagram (Opcional)</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="linkedin" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="linkedin" class="placeholder">LinkedIn (Opcional)</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="pres" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="pres" class="placeholder" required>Presidente do Núcleo</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Criar Núcleo</button>
             </div>
         </div>
-        <div id="getProfile" style="display: none;">
+        <div id="modNuc" style="display: none;">
             <div class="form">
-                <div class="title">Obter perfil do User</div>
-                <div class="subtitle">Vamos obter o perfil de um user!</div>
+                <div class="title">Núcleo</div>
+                <div class="subtitle">Vamos obter o Núcleo a alterar!</div>
                 <div class="input-container ic1">
-                    <input id="targetGetProfile" class="input" type="text" placeholder=" "/>
+                    <input id="nucId" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
+                    <label for="nucId" class="placeholder">ID do Núcleo</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Obter perfil do user</button>
+                <button type="text" class="submit" onclick="postEvent()">Obter Núcleo</button>
             </div>
             <br>
             <div class="form">
-                <div class="title" id="username">Username</div>
                 <div class="input-container ic1">
-                    <input id="nameMod" class="input" type="text" placeholder=""/>
+                    <input id="descriptionMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
+                    <label for="descriptionMod" class="placeholder">Descrição</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="emailMod" class="input" type="text" placeholder=""/>
+                    <input id="emailMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Email</label>
+                    <label for="emailMod" class="placeholder">Email do Núcleo</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="roleMod" class="input" type="text" readonly/>
+                    <input id="facebookMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Role</label>
+                    <label for="facebookMod" class="placeholder">Facebook</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="jobsMod" class="input" type="text"/>
+                    <input id="instagramMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Trabalho</label>
+                    <label for="instagramMod" class="placeholder">Instagram</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="matriculaMod" class="input" type="text"/>
+                    <input id="linkedinMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Matricula do carro</label>
+                    <label for="linkedinMod" class="placeholder">LinkedIn</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar perfil do user</button>
+                <div class="input-container ic1">
+                    <input id="presMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="presMod" class="placeholder">Presidente do Núcleo</label>
+                </div>
+                <button type="text" class="submit" onclick="postEvent()">Mudar Núcleo</button>
+            </div>
             </div>
         </div>
-        <div id="delUser" style="display: none;">
+        <div id="delNuc" style="display: none;">
             <div class="form">
-                <div class="title">Apagar User</div>
-                <div class="subtitle">Vamos apagar um user do sistema!</div>
+                <div class="title">Apagar Núcleo</div>
+                <div class="subtitle">Vamos apagar o Núcleo!</div>
                 <div class="input-container ic1">
-                    <input id="targetDelUser" class="input" type="text" placeholder=" "/>
+                    <input id="nucIdDel" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Username</label>
+                    <label for="nucIdDel" class="placeholder">ID do Núcleo</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Apagar user</button>
+                <button type="text" class="submit" onclick="postEvent()">Apagar Núcleo</button>
             </div>
         </div>
-        <div id="userList" style="display: none;">
+        <div id="nucList" style="display: none;">
 
         </div>
     </div>
