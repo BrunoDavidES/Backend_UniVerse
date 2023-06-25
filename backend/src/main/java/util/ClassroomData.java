@@ -5,7 +5,6 @@ public class ClassroomData {
     private String building;
     private String floor;
     private String location;
-    private String schedule; // TODO
 
     public ClassroomData() {
     }
@@ -40,14 +39,6 @@ public class ClassroomData {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
     }
 
 
