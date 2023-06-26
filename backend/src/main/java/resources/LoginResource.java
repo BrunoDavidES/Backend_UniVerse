@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 public class LoginResource {
 	private static final Logger LOG = Logger.getLogger(LoginResource.class.getName());
 
+	private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
 	public LoginResource() { }
 
 	@POST
@@ -33,10 +35,10 @@ public class LoginResource {
 		LOG.fine("Attempt to login user: ");
 
 		try {
-			FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(data.token);
+			FirebaseToken decodedToken = firebaseAuth.verifyIdToken(data.token);
 			String uid = decodedToken.getUid();
 
-			UserRecord userRecord = FirebaseAuth.getInstance().getUser(decodedToken.getUid());
+			UserRecord userRecord = firebaseAuth.getUser(decodedToken.getUid());
 
 			loginToken(response, userRecord.getDisplayName(), userRecord.getUid(), userRecord.getCustomClaims().get("role").toString());
 
