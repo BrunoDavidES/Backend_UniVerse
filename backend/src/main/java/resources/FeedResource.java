@@ -314,17 +314,14 @@ public class FeedResource {
         }
 
         Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
-                .setOrderBy(StructuredQuery.OrderBy.desc("time_creation"))
-                .build();
-
-        Query<Entity> newQuery = query.newEntityQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
                 .build();
 
-        queryResults = datastore.run(newQuery);
+
+        queryResults = datastore.run(query);
 
         List<Entity> results = new ArrayList<>();
 
