@@ -8,6 +8,7 @@ import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import org.apache.commons.codec.digest.DigestUtils;
 import util.UserData;
 
 import javax.ws.rs.*;
@@ -16,6 +17,8 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static util.Constants.*;
 
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -34,8 +37,8 @@ public class RegisterResource {
         LOG.fine("Attempt to register user: " + data.username);
 
         if (!data.validateRegister()) {
-            LOG.warning("Missing or wrong parameter");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
+            LOG.warning(MISSING_OR_WRONG_PARAMETER);
+            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
 
         try {
@@ -71,14 +74,19 @@ public class RegisterResource {
 
                 if( user != null ) {
                     txn.rollback();
-                    LOG.warning("User already exists");
-                    return Response.status(Response.Status.BAD_REQUEST).entity("User already exists").build();
+                    LOG.warning(USER_ALREADY_EXISTs);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(USER_ALREADY_EXISTs).build();
                 } else {
+
+                    if(data.license_plate == null)
+                        data.license_plate = UNREGISTERED;
 
                     user = Entity.newBuilder(userKey)
                             .set("email", data.email)
                             .set("name", data.name)
+                            .set("license_plate", data.license_plate)
                             .set("job_list", "")
+                            .set("personal_event_list", "")  //#string%string%string%string#string%...
                             .set("time_lastupdate", Timestamp.now())
                             .build();
                     txn.add(user);

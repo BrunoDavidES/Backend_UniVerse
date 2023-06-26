@@ -12,51 +12,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.logging.Logger;
 
+import static util.Constants.*;
+
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ModifyUserResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -86,7 +46,7 @@ public class ModifyUserResource {
             } else {
                 Entity newUser = Entity.newBuilder(user)
                         .set("name", data.name)
-                        .set("status", data.status)
+                        .set("license_plate", data.license_plate)
                         .set("time_lastupdate", Timestamp.now())
                         .build();
 
@@ -184,12 +144,25 @@ public class ModifyUserResource {
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-                Entity newUser = Entity.newBuilder(target)
-                        .set("role", data.newRole)
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
+                Entity.Builder newUser = Entity.newBuilder(target);
 
-                txn.update(newUser);
+                newUser.set("email", target.getString("email"))
+                        .set("name", target.getString("name"))
+                        .set("role", data.newRole)
+                        .set("license_plate", target.getString("license_plate"))
+                        .set("job_list",  target.getString("job_list"))
+                        .set("personal_event_list", target.getString("personal_event_list"))  //#string%string%string%string#string%...
+                        .set("time_creation", target.getTimestamp("time_creation"))
+                        .set("time_lastupdate", Timestamp.now());
+
+                if(data.newRole.equals(D)){
+                    if(data.office == null)
+                        data.office = "";
+                    newUser.set("office", data.office);
+                }else
+                    newUser.set("office", "");
+                Entity u = newUser.build();
+                txn.put(u);
                 LOG.info(data.target + " role has been updated successfully.");
                 txn.commit();
                 return Response.ok(target).build();

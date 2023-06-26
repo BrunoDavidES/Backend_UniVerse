@@ -1,9 +1,11 @@
 package resources;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 import util.AuthToken;
+import util.PersonalEventsData;
 import util.ProfileData;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,57 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static util.Constants.*;
+
 @Path("/profile")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ProfileResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String STUDENTS_UNION = "Students Union";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
-    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ProfileResource.class.getName());
 
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
@@ -126,6 +82,160 @@ public class ProfileResource {
     }
 
     @POST
+    @Path("/personalEvent/add")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    public Response addPersonalEvent(@Context HttpServletRequest request, PersonalEventsData data) {
+        LOG.fine("Attempt to add a personal event.");
+
+        Transaction txn = datastore.newTransaction();
+        try {
+            DecodedJWT token = AuthToken.validateToken(request);
+
+            if (token == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Entity user = txn.get(userKey);
+            if( user == null ) {
+                txn.rollback();
+                LOG.warning(USER_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+            }
+            String list = user.getString(PERSONAL_EVENT_LIST);
+            if(list.contains(data.title)) {
+                txn.rollback();
+                LOG.warning("Personal event name already used.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
+            }
+            list = list.concat("#" + data.title + "%" + data.beginningDate + "%" + data.finishDate + "%" + data.location);
+
+            Entity updatedUser = Entity.newBuilder(user)
+                    .set("personal_event_list", list)
+                    .set("time_lastupdate", Timestamp.now())
+                    .build();
+
+            txn.update(updatedUser);
+            LOG.info("Personal event added.");
+            txn.commit();
+            return Response.ok(updatedUser).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @PATCH
+    @Path("/personalEvent/edit/{oldTitle}")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    public Response editPersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle, PersonalEventsData data){
+        LOG.fine("Attempt to edit a personal event.");
+
+        Transaction txn = datastore.newTransaction();
+        try {
+            DecodedJWT token = AuthToken.validateToken(request);
+
+            if (token == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Entity user = txn.get(userKey);
+            if( user == null ) {
+                txn.rollback();
+                LOG.warning(USER_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+            }
+            String list = user.getString(PERSONAL_EVENT_LIST);
+            if(!list.contains(oldTitle)) {
+                txn.rollback();
+                LOG.warning("Personal event does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
+            }
+            String[] l = list.split("#");
+            String oldEvent = null;
+            for(String event: l){
+                if(event.contains(oldTitle)){
+                    oldEvent = event;
+                    break;
+                }
+            }
+            list = list.replace(oldEvent, data.title + "%" + data.beginningDate + "%" + data.finishDate + "%" + data.location);
+
+            Entity updatedUser = Entity.newBuilder(user)
+                    .set("personal_event_list", list)
+                    .set("time_lastupdate", Timestamp.now())
+                    .build();
+
+            txn.update(updatedUser);
+            LOG.info("Personal event edited.");
+            txn.commit();
+            return Response.ok(updatedUser).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @PATCH
+    @Path("/personalEvent/delete/{oldTitle}")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    public Response deletePersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle){
+        LOG.fine("Attempt to delete a personal event.");
+
+        Transaction txn = datastore.newTransaction();
+        try {
+            DecodedJWT token = AuthToken.validateToken(request);
+
+            if (token == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Entity user = txn.get(userKey);
+            if( user == null ) {
+                txn.rollback();
+                LOG.warning(USER_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+            }
+            String list = user.getString(PERSONAL_EVENT_LIST);
+            if(!list.contains(oldTitle)) {
+                txn.rollback();
+                LOG.warning("Personal event does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
+            }
+            String[] l = list.split("#");
+            String oldEvent = null;
+            for(String event: l){
+                if(event.contains(oldTitle)){
+                    oldEvent = event;
+                    break;
+                }
+            }
+            list = list.replace("#" + oldEvent, "");
+
+            Entity updatedUser = Entity.newBuilder(user)
+                    .set("personal_event_list", list)
+                    .set("time_lastupdate", Timestamp.now())
+                    .build();
+
+            txn.update(updatedUser);
+            LOG.info("Personal event deleted.");
+            txn.commit();
+            return Response.ok(updatedUser).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryUsers(@Context HttpServletRequest request,
@@ -180,3 +290,4 @@ public class ProfileResource {
     }
 
 }
+

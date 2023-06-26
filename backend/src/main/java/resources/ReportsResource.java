@@ -15,63 +15,11 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static util.Constants.*;
+
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ReportsResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String REPORT = "Report";
-    private static final String STATUS_UNSEEN = "UNSEEN";
-    private static final String STATUS_SEEN = "SEEN";
-    private static final String STATUS_RESOLVED = "RESOLVED";
-    private static final String STUDENTS_UNION = "Students Union";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String USER_ALREADY_EXISTs = "User already exists.";
-    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
-    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-    private static final String REPORT_DOES_NOT_EXIST = "Report does not exist.";
-
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ReportsResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 

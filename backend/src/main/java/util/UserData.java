@@ -11,6 +11,8 @@ public class UserData {
 
 	public String username;
 	public String[] multipleEmails;
+
+	public String license_plate;
 	public String email;
 	public String name;
 	public String password;
