@@ -40,7 +40,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
-                <a href="#users" class="active">
+                <a href="#users">
                     <i class='bx bx-user' ></i>
                     <span class="links_name">Users</span>
                 </a>
@@ -48,7 +48,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
-                <a href="#stats">
+                <a href="#stats" class="active">
                     <i class='bx bx-pie-chart-alt-2' ></i>
                     <span class="links_name">Núcleos</span>
                 </a>
@@ -104,9 +104,9 @@
     <div class="home-content">
         <div class="topnav" id="myTopnav">
             <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addNuc', 'modNuc', 'delNuc', 'nucList')" class="active">Criar Núcleo</button>
-            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modNuc', 'addNuc', 'delNuc', 'nucList')">Mudar peril do Núcleo</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modNuc', 'addNuc', 'delNuc', 'nucList')">Modificar peril do Núcleo</button>
             <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delNuc', 'modNuc', 'addNuc', 'nucList')">Apagar Núcleo</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'nucList', 'delNuc', 'addNuc', 'modNuc')">Listar Núcleos</button>
+            <button id="listBtn" onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'nucList', 'delNuc', 'addNuc', 'modNuc')">Listar Núcleos</button>
         </div>
 
         <br><br>
@@ -195,7 +195,7 @@
                     <div class="cut"></div>
                     <label for="presMod" class="placeholder">Presidente do Núcleo</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar Núcleo</button>
+                <button type="text" class="submit" onclick="postEvent()">Modificar Núcleo</button>
             </div>
             </div>
         </div>

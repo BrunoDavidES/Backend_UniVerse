@@ -243,9 +243,10 @@
             </div>
         </div>
         <div id="eventList" style="display: none;">
-            <h1 style="text-align: center;">Listar Eventos</h1>
-            <label for="listLimitId">Eventos por página</label>
-            <select id="listLimitId">
+            <h1 class="title" style="text-align: center;">Listar Eventos</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Eventos por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
                 <option value=5>5</option>
                 <option value=10>10</option>
                 <option value=15>15</option>
@@ -256,8 +257,6 @@
 
             <div id="details"></div>
             <button class="submit" onclick="loadingPopupOn();queryEvents();loadingPopupOff();">Listar</button>
-            <button class="submit" onclick="loadingPopupOn()" style="width: 50%;">Aparecer loading</button>
-            <button class="submit" onclick="loadingPopupOff()" style="width: 50%;">Desaparecer loading</button>
         </div>
         <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>

@@ -15,6 +15,9 @@ function loadLoggedUser() {
 	    if (xmlhttp.status == 200) {
 			var userLogged = JSON.parse(this.responseText);
 			document.getElementById("name").innerHTML = userLogged.name;
+			document.getElementById("usernameMail").innerHTML = userLogged.username;
+			document.getElementById("role").innerHTML = userLogged.role;
+			document.getElementById("jobs").innerHTML = userLogged.jobs;
 		}
 		else{
 		    window.location.href = "/backoffice/index.html";
@@ -378,14 +381,15 @@ function postNews(){
 
     request.open("POST", document.location.origin + "/rest/feed/post/News", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.setRequestHeader("Access-Control-Allow-Origin", "*");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
     if (request.readyState === 4 && request.status === 200) {
         var id = request.responseText;
 
+        request = new XMLHttpRequest();
         request.open("POST", "https://storage.googleapis.com/universe-fct.appspot.com/News_" + id + ".txt", true );
         request.setRequestHeader("Content-Type", "text/plain");
+        request.setRequestHeader('Access-Control-Allow-Origin', 'https://universe-fct.oa.r.appspot.com');
         request.send(document.getElementById("text").value);
 
         request.onreadystatechange  = function() {

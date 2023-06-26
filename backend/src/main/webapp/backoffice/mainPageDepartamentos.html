@@ -40,7 +40,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
-                <a href="#users" class="active">
+                <a href="#users">
                     <i class='bx bx-user' ></i>
                     <span class="links_name">Users</span>
                 </a>
@@ -64,7 +64,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageDepartamentos.html'">
-                <a href="#dpt">
+                <a href="#dpt" class="active">
                     <i class='bx bx-buildings' ></i>
                     <span class="links_name">Departamentos</span>
                 </a>
@@ -104,7 +104,7 @@
     <div class="home-content">
         <div class="topnav" id="myTopnav">
             <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addDpt', 'modDpt', 'delDpt', 'dptList')" class="active">Criar Departamento</button>
-            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modDpt', 'addDpt', 'delDpt', 'dptList')">Mudar perfil do Departamento</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modDpt', 'addDpt', 'delDpt', 'dptList')">Modificar perfil do Departamento</button>
             <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delDpt', 'modDpt', 'addDpt', 'dptList')">Apagar Departamento</button>
             <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'dptList', 'delDpt', 'addDpt', 'modDpt')">Listar Departamentos</button>
         </div>
@@ -195,7 +195,7 @@
                     <div class="cut"></div>
                     <label for="presDptMod" class="placeholder">Presidente do Departamento</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Mudar Departamento</button>
+                <button type="text" class="submit" onclick="postEvent()">Modificar Departamento</button>
             </div>
         </div>
     </div>
