@@ -292,7 +292,7 @@ public class ReportsResource {
     @GET
     @Path("/unresolved")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryReports(@Context HttpServletRequest request) {
+    public Response numberOfUnresolvedReports(@Context HttpServletRequest request) {
         LOG.fine("Trying to know how many unresolved reports exist");
 
         final ValToken validator = new ValToken();
