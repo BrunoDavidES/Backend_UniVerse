@@ -203,6 +203,7 @@ public class FeedResource {
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
+                            .set("validated_backoffice", data.validated_backoffice)
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
                     newEntry.set("title", data.title)

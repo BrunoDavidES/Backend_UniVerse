@@ -88,27 +88,49 @@ function postEvent(){
 }
 
 function editEvent(){
+    var id = document.getElementById("idEventMod").value;
+    var title = document.getElementById("titleMod").value;
+    var startDate = document.getElementById("startDateMod").value;
+    var endDate = document.getElementById("endDateMod").value;
+    var location = document.getElementById("locationMod").value;
+    var department = document.getElementById("departmentMod").value;
+    var capacity = document.getElementById("capacityMod").value;
+    var isPublic = document.getElementById("isPublicMod").value;
+    var isItPaid = document.getElementById("isItPaidMod").value;
 
-    var id = document.getElementById("eventID").value;
-    var title = document.getElementById("title").value;
-    var startDate = document.getElementById("startDate").value;
-    var endDate = document.getElementById("endDate").value;
-    var location = document.getElementById("location").value;
-    var department = document.getElementById("department").value;
-    var isPublic = document.getElementById("isPublic").value;
-    var capacity = document.getElementById("capacity").value;
-    var isItPaid = document.getElementById("isItPaid").value;
+  var data = {};
 
-  var data = {
-  "title": title,
-  "startDate": startDate,
-  "endDate": endDate,
-  "location": location,
-  "department": department,
-  "isPublic": isPublic,
-  "capacity": capacity,
-  "isItPaid": isItPaid
-  };
+  if (title !== "") {
+    data["title"] = title;
+  }
+
+  if (startDate !== "") {
+      data["startDate"] = startDate;
+  }
+
+  if (endDate !== "") {
+      data["endDate"] = endDate;
+  }
+
+  if (location !== "") {
+      data["location"] = location;
+  }
+
+  if (department !== "") {
+      data["department"] = department;
+  }
+
+  if (isPublic !== "") {
+      data["isPublic"] = isPublic;
+  }
+
+  if (capacity !== "") {
+      data["capacity"] = capacity;
+  }
+
+  if (isItPaid !== "") {
+      data["isItPaid"] = isItPaid;
+  }
 
   var request = new XMLHttpRequest();
 
@@ -192,24 +214,15 @@ function getEvent(){
     //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 var eventsQueryOffset = 0;
-var firstQuery = true;
 var eventsSelect = document.getElementById('listLimitId');
 
 
 function queryEvents(){
     //const buttonContainer = document.getElementById('button-container');
 
-
     var list = document.getElementById('listOfEvents');
 
     var limit = parseInt(document.getElementById("listLimitId").value);
-
-    if (firstQuery){
-        firstQuery = false;
-        eventsQueryOffset = 0-limit;
-    }
-
-    eventsQueryOffset += limit;
 
     var data = {};
 
@@ -320,10 +333,34 @@ function queryEvents(){
             list.appendChild(listItem);
 
         });
+        eventsQueryOffset += limit;
+        }
     }
 }
-}
 
+function validateEvent(){
+  var id = document.getElementById("idEventValidate").value;
+
+  var data = {
+    "validated_backoffice": "true"
+  };
+
+  var request = new XMLHttpRequest();
+
+  request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.send(JSON.stringify(data));
+  request.onreadystatechange  = function() {
+    if (request.readyState === 4 && request.status === 200) {
+        console.log(request.responseText);
+        console.log("SUCCESS");
+        alert(request.responseText);
+    } else if (request.readyState === 4) {
+        console.log(request.responseText);
+        console.log("FAIL");
+    }
+  };
+}
 
 
   //News
