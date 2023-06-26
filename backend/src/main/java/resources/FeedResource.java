@@ -118,16 +118,20 @@ public class FeedResource {
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
-                            .set("validated_backoffice", "true")
+                            .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
                 }else { //construtor de news
-
+                    // Caso se vá buscar uma notícia de outro site, por parte do backoffice,
+                    // e se queira por o author como "Jornal Expresso", por exemplo
+                    if (role.equals(BO) && data.authorNameByBO != null && !data.authorNameByBO.equals("")){
+                        name = data.authorNameByBO;
+                    }
                     builder.set("id", id)
                             .set("title", data.title)
                             .set("authorName", name)
                             .set("authorUsername", username)
-                            .set("validated_backoffice", "true")
+                            .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
                 }

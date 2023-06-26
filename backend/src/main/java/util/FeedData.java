@@ -24,6 +24,8 @@ public class FeedData {
 
     public String validated_backoffice;
 
+    public String authorNameByBO;
+
     public boolean validate(String kind) {
         if (title == null)
             return false;

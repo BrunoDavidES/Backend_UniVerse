@@ -16,6 +16,9 @@ function loadLoggedUser() {
 			var userLogged = JSON.parse(this.responseText);
 			document.getElementById("name").innerHTML = userLogged.name;
 		}
+		else{
+		    window.location.href = "/backoffice/index.html";
+		}
 	  }
     }
 }
@@ -366,22 +369,35 @@ function validateEvent(){
   //News
 function postNews(){
 
-    var title = document.getElementById("title").value;
-
     var data = {
-    "title": title
+    "title": document.getElementById("title").value,
+    "authorNameByBO": document.getElementById("author").value
     };
 
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/post/News", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Access-Control-Allow-Origin", "*");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
     if (request.readyState === 4 && request.status === 200) {
-        console.log(request.responseText);
-        console.log("SUCCESS");
-        alert(request.responseText);
+        var id = request.responseText;
+
+        request.open("POST", "https://storage.googleapis.com/universe-fct.appspot.com/News_" + id + ".txt", true );
+        request.setRequestHeader("Content-Type", "text/plain");
+        request.send(document.getElementById("text").value);
+
+        request.onreadystatechange  = function() {
+            if (request.status === 200) {
+                console.log("SUCCESS");
+                alert("SUCCESS");
+            }
+            else if (request.readyState ===4) {
+                console.log("News entity created but error uploading text body to bucket");
+                alert("News entity created but error uploading text body to bucket");
+            }
+        }
     } else if (request.readyState === 4) {
         console.log(request.responseText);
         console.log("FAIL");
