@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title> BackOffice FCT NOVA</title>
   <link rel="stylesheet" href="styleMainPage.css">
+  <link rel="stylesheet" href="stickyNote.css">
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -126,6 +127,17 @@
         <input readonly="readonly" class="input" type="text" placeholder="Número de reportes não resolvidos:"/>
       </div>
     </div>
+    <br>
+    <div id="toDoList">
+      <div id="myDIV" class="header" style="border-radius: 2px;">
+        <h2 style="margin:5px">Lembretes Diários</h2>
+        <input type="text" id="myInput" placeholder="Novo lembrete... (Máx. de 4)">
+        <span onclick="newElement()" class="addBtn">Add</span>
+      </div>
+
+      <ul id="myUL" style="border-radius: 6px;">
+      </ul>
+    </div>
   </div>
   <div class="popup" id="popup">
     <h3>Está prestes a fazer logout</h3>
@@ -172,6 +184,54 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
       }
+
+      var myNodelist = document.getElementsByTagName("LI");
+      var i;
+      for (i = 0; i < myNodelist.length; i++) {
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        myNodelist[i].appendChild(span);
+      }
+
+      // Click on a close button to hide the current list item
+      var close = document.getElementsByClassName("close");
+      var i;
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+          var div = this.parentElement;
+          div.remove();
+        }
+      }
+
+      // Create a new list item when clicking on the "Add" button
+      function newElement() {
+        var li = document.createElement("li");
+        var inputValue = document.getElementById("myInput").value;
+        var t = document.createTextNode(inputValue);
+        li.appendChild(t);
+        if (inputValue === '') {
+          alert(li.length);
+          alert("Lembrete vazio, e preciso escrever alguma coisa!");
+        } else {
+          document.getElementById("myUL").appendChild(li);
+        }
+        document.getElementById("myInput").value = "";
+
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        li.appendChild(span);
+
+        for (i = 0; i < close.length; i++) {
+          close[i].onclick = function() {
+          var div = this.parentElement;
+          div.style.display = "none";
+        }
+      }
+    }
 </script>
 
 </body>
