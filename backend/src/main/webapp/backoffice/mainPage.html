@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title> BackOffice FCT NOVA</title>
   <link rel="stylesheet" href="styleMainPage.css">
+  <link rel="stylesheet" href="stickyNote.css">
+  <link rel="stylesheet" href="clock.css">
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
 <div class="cardResize">
-  <div class="card" style="width: 300px;">
+  <div class="card" style="width: 250px;">
     <img src="../img/logo.png" alt="User Photo" style="width:100%">
     <h1 id="usercard"></h1>
     <p class="title" id="role">Roles do User</p>
@@ -19,6 +21,8 @@
   </div>
 </div>
 <button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<div id="clock"></div>
+<div id="data"></div>
 <div class="sidebar">
   <div class="logo-details">
     <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -172,6 +176,84 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
       }
+
+      var myNodelist = document.getElementsByTagName("LI");
+      var i;
+      for (i = 0; i < myNodelist.length; i++) {
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        myNodelist[i].appendChild(span);
+      }
+
+      // Click on a close button to hide the current list item
+      var close = document.getElementsByClassName("close");
+      var i;
+      for (i = 0; i < close.length; i++) {
+        close[i].onclick = function() {
+          var div = this.parentElement;
+          div.remove();
+        }
+      }
+
+      // Create a new list item when clicking on the "Add" button
+      function newElement() {
+        var li = document.createElement("li");
+        var inputValue = document.getElementById("myInput").value;
+        var t = document.createTextNode(inputValue);
+        li.appendChild(t);
+        if (inputValue === '') {
+          alert(li.length);
+          alert("Lembrete vazio, e preciso escrever alguma coisa!");
+        } else {
+          document.getElementById("myUL").appendChild(li);
+        }
+        document.getElementById("myInput").value = "";
+
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "close";
+        span.appendChild(txt);
+        li.appendChild(span);
+
+        for (i = 0; i < close.length; i++) {
+          close[i].onclick = function() {
+          var div = this.parentElement;
+          div.style.display = "none";
+        }
+      }
+    }
+
+    setInterval(showTime, 1000);
+        function showTime() {
+        	let time = new Date();
+        	let hour = time.getHours();
+        	let min = time.getMinutes();
+        	let sec = time.getSeconds();
+
+        	min = min < 10 ? "0" + min : min;
+        	sec = sec < 10 ? "0" + sec : sec;
+
+        	let currentTime = hour + ":"
+        		+ min + ":" + sec;
+
+        	document.getElementById("clock")
+        		.innerHTML = currentTime;
+        }
+
+        showTime();
+
+        const date = new Date();
+
+        const options = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        };
+
+        document.getElementById("data").innerHTML = date.toLocaleString('pt-PT', options);
 </script>
 
 </body>

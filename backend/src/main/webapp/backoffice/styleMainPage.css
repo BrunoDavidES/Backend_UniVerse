@@ -163,16 +163,15 @@
     .cardResize{
         position: fixed;
         top: 105px;
-        margin-left:82%;
+        margin-left:85%;
         z-index: 99;
     }
 
     .card {
-      border-style: solid;
-      border-width: 0.5px 0.5px 0.5px 0.5px;
+      border: 2px solid;
+      border-radius: 8px;
       border-color: rgba(10,37,88, 0.5);
       position: absolute;
-      max-width: 300px;
       text-align: center;
     }
 
@@ -569,7 +568,7 @@
     /* Responsive Media Query */
     @media (max-width: 1550px) {
         .cardResize{
-            margin-left: 75%;
+            margin-left: 80%;
         }
     }
 
@@ -604,23 +603,23 @@
 
     @media (max-width: 1700px) {
         .cardResize{
-            margin-left: 75%;
+            margin-left: 82%;
         }
     }
 
     @media (max-width: 1400px) {
         .cardResize{
-            margin-left: 68%;
+            margin-left: 80%;
         }
     }
 
     @media (max-width:  1050px) {
         .cardResize{
-            margin-left: 65%;
+            margin-left: 70%;
         }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 800px) {
         .cardResize{
             margin-left: 50%;
             visibility: hidden;
@@ -648,7 +647,6 @@
       }
 
       .cardResize{
-        margin-left: 25%;
         visibility: hidden;
       }
     }
@@ -683,6 +681,5 @@
 
       .cardResize{
         visibility: hidden;
-        margin-left: 5%;
       }
     }

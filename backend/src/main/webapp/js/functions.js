@@ -8,22 +8,26 @@ function loadLoggedUser() {
 
     xmlhttp.open("GET", document.location.origin + "/rest/profile/" + user, true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xmlhttp.send();
 
-	xmlhttp.onreadystatechange = function() {
-	  if (xmlhttp.readyState == 4) {
-	    if (xmlhttp.status == 200) {
-			var userLogged = JSON.parse(this.responseText);
-			document.getElementById("name").innerHTML = userLogged.name;
-			document.getElementById("usernameMail").innerHTML = userLogged.username;
-			document.getElementById("role").innerHTML = userLogged.role;
-			document.getElementById("jobs").innerHTML = userLogged.jobs;
-		}
-		else{
-		    window.location.href = "/backoffice/index.html";
-		}
-	  }
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4) {
+        if (xmlhttp.status == 200) {
+            var userLogged = JSON.parse(this.responseText);
+            document.getElementById("name").innerHTML = userLogged.name;
+            document.getElementById("usernameMail").innerHTML = userLogged.username;
+            document.getElementById("role").innerHTML = userLogged.role;
+            var str = userLogged.jobs;
+            str = str.replace(/^#/,'');
+            str = str.replace(/%/g, " - ");
+            document.getElementById("jobs").innerHTML = str + '<br>';
+        }
+        else{
+            window.location.href = "/backoffice/index.html";
+        }
+      }
     }
+
+    xmlhttp.send();
 }
 
 function logout(){
@@ -31,7 +35,7 @@ function logout(){
 
     xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xmlhttp.send();
+
     xmlhttp.onreadystatechange = function() {
       if(xmlhttp.readyState == 4) {
         if(xmlhttp.status == 200) {
@@ -45,39 +49,30 @@ function logout(){
       }
     }
 
+    xmlhttp.send();
 }
 
-  //FEEDS
+      //FEEDS
 
 
-    //Events
+        //Events
 function postEvent(){
-
-    var title = document.getElementById("title").value;
-    var startDate = document.getElementById("startDate").value;
-    var endDate = document.getElementById("endDate").value;
-    var location = document.getElementById("location").value;
-    var department = document.getElementById("department").value;
-    var isPublic = document.getElementById("isPublic").value;
-    var capacity = document.getElementById("capacity").value;
-    var isItPaid = document.getElementById("isItPaid").value;
-
     var data = {
-    "title": title,
-    "startDate": startDate,
-    "endDate": endDate,
-    "location": location,
-    "department": department,
-    "isPublic": isPublic,
-    "capacity": capacity,
-    "isItPaid": isItPaid
+        "title": document.getElementById("title").value;,
+        "startDate": document.getElementById("startDate").value,
+        "endDate": document.getElementById("endDate").value,
+        "location": document.getElementById("location").value,
+        "department": document.getElementById("department").value,
+        "isPublic": document.getElementById("isPublic").value,
+        "capacity": document.getElementById("capacity").value,
+        "isItPaid": document.getElementById("isItPaid").value
     };
 
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/post/Event", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(data));
+
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
@@ -90,6 +85,8 @@ function postEvent(){
           console.log("FAIL");
       }
     };
+
+    request.send(JSON.stringify(data));
 }
 
 function editEvent(){
@@ -103,93 +100,95 @@ function editEvent(){
     var isPublic = document.getElementById("isPublicMod").value;
     var isItPaid = document.getElementById("isItPaidMod").value;
 
-  var data = {};
+    var data = {};
 
-  if (title !== "") {
-    data["title"] = title;
-  }
-
-  if (startDate !== "") {
-      data["startDate"] = startDate;
-  }
-
-  if (endDate !== "") {
-      data["endDate"] = endDate;
-  }
-
-  if (location !== "") {
-      data["location"] = location;
-  }
-
-  if (department !== "") {
-      data["department"] = department;
-  }
-
-  if (isPublic !== "") {
-      data["isPublic"] = isPublic;
-  }
-
-  if (capacity !== "") {
-      data["capacity"] = capacity;
-  }
-
-  if (isItPaid !== "") {
-      data["isItPaid"] = isItPaid;
-  }
-
-  var request = new XMLHttpRequest();
-
-  request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
-  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  request.send(JSON.stringify(data));
-  request.onreadystatechange  = function() {
-    if (request.readyState === 4 && request.status === 200) {
-        console.log(request.responseText);
-        console.log("SUCCESS");
-        alert(request.responseText);
-    } else if (request.readyState === 4) {
-        console.log(request.responseText);
-        console.log("FAIL");
+    if (title !== "") {
+        data["title"] = title;
     }
-  };
-}
 
-function deleteEvent(){
-      var id = document.getElementById("idEventDelete").value;
+    if (startDate !== "") {
+          data["startDate"] = startDate;
+    }
 
-      var request = new XMLHttpRequest();
+    if (endDate !== "") {
+          data["endDate"] = endDate;
+    }
 
-      request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(null));
-      request.onreadystatechange  = function() {
+    if (location !== "") {
+          data["location"] = location;
+    }
+
+    if (department !== "") {
+          data["department"] = department;
+    }
+
+    if (isPublic !== "") {
+          data["isPublic"] = isPublic;
+    }
+
+    if (capacity !== "") {
+          data["capacity"] = capacity;
+    }
+
+    if (isItPaid !== "") {
+          data["isItPaid"] = isItPaid;
+    }
+
+    var request = new XMLHttpRequest();
+
+    request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(data));
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
+}
+
+function deleteEvent(){
+    var id = document.getElementById("idEventDelete").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(null));
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+    };
+}
 
 function getEvent(){
-  var id = document.getElementById("idEventMod").value;
+    var id = document.getElementById("idEventMod").value;
 
-  var idData = {
-    "id":id
-  };
+    var idData = {
+        "id":id
+    };
 
-  var request = new XMLHttpRequest();
+    var request = new XMLHttpRequest();
 
-  request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
-  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  request.send(JSON.stringify(idData));
-  request.onreadystatechange = function() {
-    if (request.readyState === 4 && request.status === 200) {
-    const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            const response = JSON.parse(request.responseText);
+            const entities = response.map(function(entity) {
                 return {
                     title: entity.properties.title,
                     startDate: entity.properties.startDate,
@@ -199,86 +198,41 @@ function getEvent(){
                     capacity: entity.properties.capacity,
                     isItPaid: entity.properties.isItPaid,
                     department: entity.properties.department
-                    };
-                });
-        entities.forEach(function(entity) {
-            document.getElementById("titleModeLbl").innerHTML = "Título do Evento: " + entity.title.value;
-            document.getElementById("startDateModLbl").innerHTML = "Data de Inicio: " + entity.startDate.value;
-            document.getElementById("endDateModLbl").innerHTML = "Data de Fim: " + entity.endDate.value;
-            document.getElementById("locationModLbl").innerHTML = "Localização: " + entity.location.value;
-            document.getElementById("departmentModLbl").innerHTML = "Departamento: " + entity.department.value;
-            document.getElementById("capacityLbl").innerHTML = "Capacidade máxima do Evento: " + entity.capacity.value;
-            document.getElementById("isPublicLbl").innerHTML = "Evento público: " + entity.isPublic.value;
-            document.getElementById("isItPaidLbl").innerHTML = "Evento a pagar: " + entity.isItPaid.value;
-        });
-    };
-  }
+                };
+            });
+
+            entities.forEach(function(entity) {
+                document.getElementById("titleModeLbl").innerHTML = "&emsp;Título do Evento: " + entity.title.value;
+                document.getElementById("startDateModLbl").innerHTML = "&emsp;Data de Inicio: " + entity.startDate.value;
+                document.getElementById("endDateModLbl").innerHTML = "&emsp;Data de Fim: " + entity.endDate.value;
+                document.getElementById("locationModLbl").innerHTML = "&emsp;Localização: " + entity.location.value;
+                document.getElementById("departmentModLbl").innerHTML = "&emsp;Departamento: " + entity.department.value;
+                document.getElementById("capacityLbl").innerHTML = "&emsp;Capacidade máxima do Evento: " + entity.capacity.value;
+                document.getElementById("isPublicLbl").innerHTML = "&emsp;Evento público: " + entity.isPublic.value;
+                document.getElementById("isItPaidLbl").innerHTML = "&emsp;Evento a pagar: " + entity.isItPaid.value;
+            });
+        };
+    }
+
+    request.send(JSON.stringify(idData));
 }
-
-
-    //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 var eventsQueryOffset = 0;
 var eventsSelect = document.getElementById('listLimitId');
 
 
 function queryEvents(){
-    //const buttonContainer = document.getElementById('button-container');
-
     var list = document.getElementById('listOfEvents');
-
     var limit = parseInt(document.getElementById("listLimitId").value);
-
     var data = {};
 
-/*
-    var id = document.getElementById("eventID").value;
-    if (id !== "") {
-          data["id"] = id;
-    }
-
-    var title = document.getElementById("title").value;
-    if (title !== "") {
-        data["title"] = title;
-    }
-
-    var startDate = document.getElementById("startDate").value;
-    if (startDate !== "") {
-        data["startDate"] = startDate;
-    }
-
-    var endDate = document.getElementById("endDate").value;
-    if (endDate !== "") {
-        data["endDate"] = endDate;
-    }
-    var location = document.getElementById("location").value;
-    if (location !== "") {
-        data["location"] = location;
-    }
-    var department = document.getElementById("department").value;
-    if (department !== "") {
-        data["department"] = department;
-    }
-    var isPublic = document.getElementById("isPublic").value;
-    if (isPublic !== "") {
-        data["isPublic"] = isPublic;
-    }
-    var capacity = document.getElementById("capacity").value;
-    if (capacity !== "") {
-        data["capacity"] = capacity;
-   }
-    var isItPaid = document.getElementById("isItPaid").value;
-    if (isItPaid !== "") {
-        data["isItPaid"] = isItPaid;
-    }
-*/
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + eventsQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
-         if (request.readyState === 4 && request.status === 200) {
+        if (request.readyState === 4 && request.status === 200) {
             const response = JSON.parse(request.responseText);
             const entities = response.map(function(entity) {
             return {
@@ -296,353 +250,437 @@ function queryEvents(){
                 department: entity.properties.department
                 };
             });
-        entities.forEach(function(entity) {
-            //const button = document.createElement('button');
-            //button.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
-            //buttonContainer.appendChild(button);
 
-            var listItem = document.createElement("li");
-            listItem.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
-            listItem.addEventListener('click', function() {
-                  var details = document.getElementById('details');
-                  details.innerHTML = '<br>';
+            entities.forEach(function(entity) {
+                var listItem = document.createElement("li");
+                listItem.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
+                listItem.addEventListener('click', function() {
+                      var details = document.getElementById('details');
+                      details.innerHTML = '';
 
-                  var title = document.createElement('h2');
-                  title.textContent = entity.title.value;
-                  details.appendChild(title);
+                      var title = document.createElement('h2');
+                      title.textContent = entity.title.value;
+                      details.appendChild(title);
 
-                  var description = document.createElement('p');
-                  description.innerHTML = " Nome do evento: " + entity.title.value +
-                                            "<br> ID do evento: " + entity.id.value +
-                                            "<br> Nome do criador do evento: " + entity.authorName.value +
-                                            "<br> Username do criador do evento: " + entity.authorUsername.value +
-                                            "<br> Localização: " + entity.location.value +
-                                            "<br> Evento público: " + entity.isPublic.value +
-                                            "<br> Evento pago: " + entity.isItPaid.value +
-                                            "<br> Capacidade: " + entity.capacity.value +
-                                            "<br> Início: " + entity.startDate.value +
-                                            "<br> Fim: " + entity.endDate.value +
-                                            "<br> Departamento organizador: " + entity.department.value +
-                                            "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+                      var description = document.createElement('p');
+                      description.innerHTML = " Nome do evento: " + entity.title.value +
+                                                "<br> ID do evento: " + entity.id.value +
+                                                "<br> Nome do criador do evento: " + entity.authorName.value +
+                                                "<br> Username do criador do evento: " + entity.authorUsername.value +
+                                                "<br> Localização: " + entity.location.value +
+                                                "<br> Evento público: " + entity.isPublic.value +
+                                                "<br> Evento pago: " + entity.isItPaid.value +
+                                                "<br> Capacidade: " + entity.capacity.value +
+                                                "<br> Início: " + entity.startDate.value +
+                                                "<br> Fim: " + entity.endDate.value +
+                                                "<br> Departamento organizador: " + entity.department.value +
+                                                "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
 
-                  details.appendChild(description);
+                      details.appendChild(description);
 
-                  var siblings = Array.from(listItem.parentNode.children);
-                  var currentIndex = siblings.indexOf(listItem);
-                  siblings.slice(currentIndex + 1).forEach(function(sibling) {
-                      sibling.classList.toggle('closed');
-                  });
+                      var siblings = Array.from(listItem.parentNode.children);
+                      var currentIndex = siblings.indexOf(listItem);
+                      siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                          sibling.classList.toggle('closed');
+                      });
+
+                      bottomFunction();
 
                 });
 
-            list.appendChild(listItem);
+                list.appendChild(listItem);
 
-        });
-        eventsQueryOffset += limit;
+            });
+            eventsQueryOffset += limit;
         }
     }
 }
 
 function validateEvent(){
-  var id = document.getElementById("idEventValidate").value;
+    var id = document.getElementById("idEventValidate").value;
 
-  var data = {
-    "validated_backoffice": "true"
-  };
+    var data = {
+        "validated_backoffice": "true"
+    };
 
-  var request = new XMLHttpRequest();
+    var request = new XMLHttpRequest();
 
-  request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
-  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  request.send(JSON.stringify(data));
-  request.onreadystatechange  = function() {
-    if (request.readyState === 4 && request.status === 200) {
-        console.log(request.responseText);
-        console.log("SUCCESS");
-        alert(request.responseText);
-    } else if (request.readyState === 4) {
-        console.log(request.responseText);
-        console.log("FAIL");
-    }
-  };
+    request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(data));
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+    };
 }
 
 
-  //News
+      //News
 function postNews(){
 
     var data = {
-    "title": document.getElementById("title").value,
-    "authorNameByBO": document.getElementById("author").value
+        "title": document.getElementById("title").value,
+        "authorNameByBO": document.getElementById("author").value
     };
 
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/post/News", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(data));
+
     request.onreadystatechange  = function() {
-    if (request.readyState === 4 && request.status === 200) {
-        var id = request.responseText;
+        if (request.readyState === 4 ) {
+            if (request.status === 200){
+                var id = request.responseText;
+                var bucketRequest = new XMLHttpRequest();
 
-        request = new XMLHttpRequest();
-        request.open("POST", "https://storage.googleapis.com/universe-fct.appspot.com/News_" + id + ".txt", true );
-        request.setRequestHeader("Content-Type", "text/plain");
-        request.setRequestHeader('Access-Control-Allow-Origin', 'https://universe-fct.oa.r.appspot.com');
-        request.send(document.getElementById("text").value);
+                bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true );
+                bucketRequest.setRequestHeader("Content-Type", "text/plain");
 
-        request.onreadystatechange  = function() {
-            if (request.status === 200) {
-                console.log("SUCCESS");
-                alert("SUCCESS");
+                bucketRequest.onreadystatechange  = function() {
+                    if (bucketRequest.readyState === 4 ) {
+                        if (bucketRequest.status === 200 ){
+                            console.log("SUCCESS");
+                            alert("SUCCESS");
+                        }
+                        else  {
+                            console.log("News entity created but error uploading text body to bucket");
+                            alert("News entity created but error uploading text body to bucket");
+                        }
+                    }
+                };
+
+                bucketRequest.send(document.getElementById("text").value);
             }
-            else if (request.readyState ===4) {
-                console.log("News entity created but error uploading text body to bucket");
-                alert("News entity created but error uploading text body to bucket");
+            else {
+                console.log(request.responseText);
+                console.log("FAIL");
             }
-        }
-    } else if (request.readyState === 4) {
-        console.log(request.responseText);
-        console.log("FAIL");
+        };
     }
-    };
+    request.send(JSON.stringify(data));
 }
 
 function editNews(){
 
     var id = document.getElementById("newsID").value;
     var title = document.getElementById("title").value;
+    var authorName = document.getElementById("author").value;
+    var text = document.getElementById("textMod").value;
+
+    var data = {};
+
+    if (title !== "") {
+        data["title"] = title;
+    }
+
+    if (authorName !== ""){
+        data["authorNameByBO"] = authorName;
+    }
+
+    var request = new XMLHttpRequest();
+    request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if ( request.readyState === 4 ){
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
+
+                bucketGETRequest.onreadystatechange = function(){
+                    if (bucketGETRequest.readyState == 4){
+                        if (bucketGETRequest.status == 200 ){
+                            var fileContent = bucketGETRequest.responseText;
+
+                            if (fileContent.equals(text)){
+                                console.log("SUCCESS");
+                                alert("SUCCESS");
+                            }
+                            else {
+                                var bucketPOSTRequest = new XMLHttpRequest();
+                                bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                                bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
+
+                                if (bucketPOSTRequest.readyState == 4){
+                                    if (bucketPOSTRequest.status == 200){
+                                        console.log("SUCCESS");
+                                        alert("SUCCESS");
+                                    }
+                                    else{
+                                        console.log("News entity edited but error uploading text body to bucket");
+                                        alert("News entity edited but error uploading text body to bucket");
+                                    }
+                                }
+                                bucketPOSTRequest.send(text);
+                            }
+                        }
+                        else {
+                            console.log("Failed retrieving txt file from bucket");
+                            alert("Failed retrieving txt file from bucket");
+                        }
+                    }
+                }
+                bucketGETRequest.send();
+            }
+            else if (request.readyState === 4) {
+                console.log(request.responseText);
+                console.log("FAIL");
+            }
+        }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
+function deleteNews(){
+    var id = document.getElementById("newsID").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("DELETE", document.location.origin + "/rest/feed/delete/News/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+    };
+
+    request.send();
+}
+
+/*
+function getNews(){
+    var id = document.getElementById("idEventMod").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+}
+
+ */           //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+            //USERS
+function modifyUserRole(){
+    var target = document.getElementById("target").value;
+    var newRole = document.getElementById("newRole").value;
 
     var data = {
-    "title": title
+        "target": target,
+        "newRole": newRole
     };
 
     var request = new XMLHttpRequest();
 
-    request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
+    request.open("POST", document.location.origin + "/rest/modify/role", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(data));
+
     request.onreadystatechange  = function() {
-    if (request.readyState === 4 && request.status === 200) {
-        console.log(request.responseText);
-        console.log("SUCCESS");
-        alert(request.responseText);
-    } else if (request.readyState === 4) {
-        console.log(request.responseText);
-        console.log("FAIL");
-    }
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
     };
+    request.send(JSON.stringify(data));
 }
 
-function deleteNews(){
-
-      var id = document.getElementById("newsID").value;
-
-      var request = new XMLHttpRequest();
-
-      request.open("DELETE", document.location.origin + "/rest/feed/delete/News/" + id, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(null));
-      request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        } else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-      };
-    }
-
-        //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-        //USERS
-function modifyUserRole(){
-
-      var target = document.getElementById("target").value;
-      var newRole = document.getElementById("newRole").value;
-
-      var data = {
-            "target": target,
-            "newRole": newRole
-            };
-
-      var request = new XMLHttpRequest();
-
-      request.open("POST", document.location.origin + "/rest/modify/role", true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(data));
-      request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        } else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-      };
-    }
-
 function deleteUser(){
+    var target = document.getElementById("target").value;
 
-      var target = document.getElementById("target").value;
+    var data = {
+        "target": target
+    };
 
-      var data = {
-            "target": target
-            };
+    var request = new XMLHttpRequest();
 
-      var request = new XMLHttpRequest();
+    request.open("DELETE", document.location.origin + "/rest/modify/delete", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-      request.open("DELETE", document.location.origin + "/rest/modify/delete", true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(data));
-      request.onreadystatechange  = function() {
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
+
+    request.send(JSON.stringify(data));
+}
 
 function queryUsers(){
+    var limit = document.getElementById("limit").value;
+    var offset = document.getElementById("offset").value;
 
-      var limit = document.getElementById("limit").value;
-      var offset = document.getElementById("offset").value;
+    var data = {};
 
-      var data = {};
+    var email = document.getElementById("email").value;
+    if (email !== "") {
+        data["email"] = email;
+    }
 
-      var email = document.getElementById("email").value;
-      if (email !== "") {
-          data.email = email;
-      }
+    var name = document.getElementById("name").value;
+    if (name !== "") {
+        data["name"] = name;
+    }
 
-      var name = document.getElementById("name").value;
-      if (name !== "") {
-          data.name = name;
-      }
+    var role = document.getElementById("role").value;
+    if (role !== "") {
+        data["role"] = role;
+    }
 
-      var role = document.getElementById("role").value;
-      if (role !== "") {
-          data.role = role;
-      }
+    var status = document.getElementById("status").value;
+    if (status !== "") {
+        data["status"] = status;
+    }
 
-      var status = document.getElementById("status").value;
-      if (status !== "") {
-          data.status = status;
-      }
+    var request = new XMLHttpRequest();
 
-      var request = new XMLHttpRequest();
+    request.open("POST", document.location.origin + "/rest/modify/profile/query?limit="+limit+"&offset="+offset, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-      request.open("POST", document.location.origin + "/rest/modify/profile/query?limit="+limit+"&offset="+offset, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(data));
-      request.onreadystatechange  = function() {
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
+
+    request.send(JSON.stringify(data));
+}
 
 function getUser(){
+    var target = document.getElementById("target").value;
 
-      var target = document.getElementById("target").value;
+    var request = new XMLHttpRequest();
 
-      var request = new XMLHttpRequest();
+    request.open("GET", document.location.origin + "/rest/profile/" + target, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-      request.open("GET", document.location.origin + "/rest/profile/" + target, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(null));
-      request.onreadystatechange  = function() {
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
 
-    //REPORTS
+    request.send();
+}
+        //REPORTS
 
 function queryReports(){
+    var limit = document.getElementById("limit").value;
+    var offset = document.getElementById("offset").value;
 
-      var limit = document.getElementById("limit").value;
-      var offset = document.getElementById("offset").value;
+    var data = {};
 
-      var data = {};
+    var title = document.getElementById("title").value;
+    if (title !== "") {
+        data.title = title;
+    }
 
-      var title = document.getElementById("title").value;
-      if (title !== "") {
-          data.title = title;
-      }
-      var id = document.getElementById("id").value;
-        if (id !== "") {
-            data.id = id;
-        }
-      var reporter = document.getElementById("reporter").value;
-        if (reporter !== "") {
-            data.reporter = reporter;
-        }
-      var location = document.getElementById("location").value;
-        if (location !== "") {
+    var id = document.getElementById("id").value;
+    if (id !== "") {
+        data.id = id;
+    }
+
+    var reporter = document.getElementById("reporter").value;
+    if (reporter !== "") {
+        data.reporter = reporter;
+    }
+
+    var location = document.getElementById("location").value;
+    if (location !== "") {
             data.location = location;
-        }
-      var status = document.getElementById("status").value;
-        if (status !== "") {
-            data.status = status;
-        }
+    }
 
-      var request = new XMLHttpRequest();
+    var status = document.getElementById("status").value;
+    if (status !== "") {
+        data.status = status;
+    }
 
-      request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+offset, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(data));
-      request.onreadystatechange  = function() {
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+offset, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
+
+    request.send(JSON.stringify(data));
+}
 
 function reportStatus(){
+    var target = document.getElementById("target").value;
+    var status = document.getElementById("status").value;
 
-      var target = document.getElementById("target").value;
-      var status = document.getElementById("status").value;
+    var request = new XMLHttpRequest();
 
-      var request = new XMLHttpRequest();
+    request.open("GET", document.location.origin + "/rest/reports/status/" + target + "/" + status, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-      request.open("GET", document.location.origin + "/rest/reports/status/" + target + "/" + status, true);
-      request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      request.send(JSON.stringify(null));
-      request.onreadystatechange  = function() {
+    request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
             alert(request.responseText);
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
-      };
-    }
+    };
+
+    request.send();
+}
+
+function bottomFunction() {
+    window.scrollTo(0,document.body.scrollHeight);
+    bottomPage.style.display = 'none';
+    topPage.style.display = '';
+}
 
 window.addEventListener('load', loadLoggedUser);
