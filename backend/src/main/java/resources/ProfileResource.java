@@ -125,6 +125,7 @@ public class ProfileResource {
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         data.username = username;
         data.name = user.getString("name");
+        data.email = user.getString("email");
         data.role = user.getString("role");
         data.jobs = user.getString("job_list");
 
