@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
+<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -187,6 +188,22 @@
         sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
       }else
         sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+      }
+
+      let mybutton = document.getElementById("myBtn");
+      window.onscroll = function() {scrollFunction()};
+
+      function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+      }
+
+      function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
       }
 </script>
 

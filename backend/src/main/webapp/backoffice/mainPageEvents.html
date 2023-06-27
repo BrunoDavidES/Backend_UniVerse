@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
+<button onclick="queryEvents();" id="moreList">Mais <i class='bx bx-list-plus'></i></button>
+<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -104,11 +107,11 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="postBtn" onClick="changeWindow('postBtn', 'validateBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventValidate', 'eventMod', 'eventDel', 'eventList')" class="active">Adicionar Evento</button>
-            <button id="editBtn"  onClick="changeWindow('editBtn', 'validateBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventValidate', 'eventAdd', 'eventDel', 'eventList')">Modificar Evento</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList')">Apagar Evento</button>
-            <button id="validateBtn" onClick="changeWindow('validateBtn','queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventValidate', 'eventList', 'eventAdd', 'eventMod', 'eventDel')">Validar Evento</button>
-            <button id="queryBtn" onClick="changeWindow('queryBtn', 'validateBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventValidate', 'eventAdd', 'eventMod', 'eventDel')">Listar Eventos</button>
+            <button id="postBtn" onClick="changeWindow('postBtn', 'validateBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventValidate', 'eventMod', 'eventDel', 'eventList'); auxListMore(0);" class="active">Adicionar Evento</button>
+            <button id="editBtn"  onClick="changeWindow('editBtn', 'validateBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventValidate', 'eventAdd', 'eventDel', 'eventList'); auxListMore(0);">Modificar Evento</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList'); auxListMore(0);">Apagar Evento</button>
+            <button id="validateBtn" onClick="changeWindow('validateBtn','queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventValidate', 'eventList', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(0);">Validar Evento</button>
+            <button id="queryBtn" onClick="changeWindow('queryBtn', 'validateBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventValidate', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(1);">Listar Eventos</button>
         </div>
         <br><br>
         <div id="eventAdd">
@@ -158,6 +161,7 @@
                 </div>
                 <button type="text" class="submit" onclick="postEvent()">Adiciona Evento</button>
             </div>
+            <br><br><br><br>
         </div>
         <div id="eventMod" style="display: none;">
             <div class="form">
@@ -217,6 +221,7 @@
                 </div>
                 <button type="text" class="submit" onclick="editEvent()">Mudar Evento</button>
             </div>
+            <br><br><br><br>
         </div>
         <div id="eventDel" style="display: none;">
             <div class="form">
@@ -254,8 +259,10 @@
             </select>
 
             <ul id="listOfEvents"></ul>
-
+            <hr class="rounded">
+            <br>
             <div id="details"></div>
+            <br>
             <button class="submit" onclick="loadingPopupOn();queryEvents();loadingPopupOff();">Listar</button>
         </div>
         <div class="popup" id="popup">
@@ -326,6 +333,41 @@
         sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
       }else
         sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+      }
+
+      let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let varAux = 0;
+      window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
+
+      function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
+        } else {
+            mybutton.style.display = "none";
+            myList.style.display = "none";
+            mybuttondwn.style.display = "none";
+        }
+      }
+
+      function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        bottomPage.style.display = 'none';
+        topPage.style.display = '';
       }
 </script>
 

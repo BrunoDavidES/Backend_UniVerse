@@ -8,6 +8,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
+<div class="cardResize">
+  <div class="card" style="width: 300px;">
+    <img src="../img/logo.png" alt="User Photo" style="width:100%">
+    <h1 id="usercard"></h1>
+    <p class="title" id="role">Roles do User</p>
+    <p class="title" id="usernameMail">@fct.unl.pt</p>
+    <p class="title" id="jobs"></p>
+    <p class="title2">FCT NOVA</p>
+  </div>
+</div>
+<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
 <div class="sidebar">
   <div class="logo-details">
     <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -102,16 +113,6 @@
   </nav>
 
   <div class="home-content">
-    <div class="cardResize">
-        <div class="card" style="width: 300px;">
-          <img src="../img/logo.png" alt="User Photo" style="width:100%">
-          <h1 id="usercard"></h1>
-          <p class="title" id="role">Roles do User</p>
-          <p class="title" id="usernameMail">@fct.unl.pt</p>
-          <p class="title" id="jobs"></p>
-          <p class="title2">FCT NOVA</p>
-        </div>
-    </div>
     <div class="form" style="width: 420px; margin-left: 5%;">
       <div class="title">Pessoas na Aplicação</div>
       <div class="input-container ic1">
@@ -154,6 +155,22 @@
         sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
       }else
         sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+      }
+
+      let mybutton = document.getElementById("myBtn");
+      window.onscroll = function() {scrollFunction()};
+
+      function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+      }
+
+      function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
       }
 </script>
 

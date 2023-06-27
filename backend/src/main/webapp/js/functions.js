@@ -45,7 +45,6 @@ function logout(){
       }
     }
 
-
 }
 
   //FEEDS
@@ -306,7 +305,7 @@ function queryEvents(){
             listItem.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
             listItem.addEventListener('click', function() {
                   var details = document.getElementById('details');
-                  details.innerHTML = '';
+                  details.innerHTML = '<br>';
 
                   var title = document.createElement('h2');
                   title.textContent = entity.title.value;
