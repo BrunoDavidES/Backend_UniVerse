@@ -13,7 +13,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.logging.Logger;
 
-@Path("/subject")
+@Path("/library")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LibraryResource {
     private static final Logger LOG = Logger.getLogger(LibraryResource.class.getName());
