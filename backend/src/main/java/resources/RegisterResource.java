@@ -1,5 +1,6 @@
 package resources;
 
+import com.google.appengine.api.mail.*;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseAuth;
@@ -9,16 +10,11 @@ import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import util.UserData;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import static util.Constants.*;
@@ -36,10 +32,8 @@ public class RegisterResource {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(UserData data) throws FirebaseAuthException, MessagingException {
+    public Response register(UserData data) throws FirebaseAuthException {
         LOG.fine("Attempt to register user: " + data.username);
-
-        FirebaseAuth.getInstance().getUser(data.username).isEmailVerified();
 
         if (!data.validateRegister()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -63,28 +57,23 @@ public class RegisterResource {
         return response;
     }
 
-    public void emailVerification(String email) throws FirebaseAuthException, MessagingException {
+    public void emailVerification(String email) throws FirebaseAuthException {
         String link = firebaseAuth.generateEmailVerificationLink(email);
 
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "capi.crew.gmail.com");
-        props.put("mail.smtp.port", "587");
+        try {
+            MailService.Message message = new MailService.Message();
+            message.setSender("from@example.com");
+            message.setTo(email);
+            message.setSubject("Example email");
+            message.setTextBody("Click the following link to verify your email:\n\n" + link);
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("capi.crew.gmail.com", "pe2doManelExplodiu");
-            }
-        });
+            MailService mailService = MailServiceFactory.getMailService();
+            mailService.send(message);
 
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress("capi.crew.gmail.com"));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
-        message.setSubject("Email Verification");
-        message.setText("Click the following link to verify your email:\n\n" + link);
-
-        Transport.send(message);
+            LOG.info("Verification email sent to: " + email);
+        } catch (Exception e) {
+            LOG.warning("Failed to send verification email to: " + email);
+        }
     }
 
     private Response firebaseRegister(String username, String email, String password, String name, String role) {
