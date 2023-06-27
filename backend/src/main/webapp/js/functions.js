@@ -184,7 +184,7 @@ function getEvent(){
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(idData));
+
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
             const response = JSON.parse(request.responseText);
@@ -213,6 +213,8 @@ function getEvent(){
             });
         };
     }
+
+    request.send(JSON.stringify(idData));
 }
 
 var eventsQueryOffset = 0;
@@ -371,7 +373,7 @@ function editNews(){
     var id = document.getElementById("newsID").value;
     var title = document.getElementById("title").value;
     var authorName = document.getElementById("author").value;
-    var text = document.getElementById("").value;
+    var text = document.getElementById("textMod").value;
 
     var data = {};
 
@@ -399,7 +401,7 @@ function editNews(){
                         if (bucketGETRequest.status == 200 ){
                             var fileContent = bucketGETRequest.responseText;
 
-                            if (fileContent.equals(document.getElementById("").value)){
+                            if (fileContent.equals(text)){
                                 console.log("SUCCESS");
                                 alert("SUCCESS");
                             }
@@ -418,7 +420,7 @@ function editNews(){
                                         alert("News entity edited but error uploading text body to bucket");
                                     }
                                 }
-                                bucketPOSTRequest.send(document.getElementById(""));
+                                bucketPOSTRequest.send(text);
                             }
                         }
                         else {
@@ -461,7 +463,17 @@ function deleteNews(){
     request.send();
 }
 
-            //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/*
+function getNews(){
+    var id = document.getElementById("idEventMod").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+}
+
+ */           //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
             //USERS
