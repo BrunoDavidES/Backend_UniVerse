@@ -333,5 +333,63 @@ public class FeedResource {
 
     }
 
+    @POST
+    @Path("/numberOf/{kind}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryEntriesNum(@Context HttpServletRequest request, @PathParam("kind") String kind, Map<String, String> filters) {
+        LOG.fine("Attempt to count the query feed " + kind);
 
+        // Verificar, caso for evento privado, se o token é valido
+        if (kind.equals(EVENT)) {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.info(TOKEN_NOT_FOUND);
+                if (filters == null)
+                    filters = new HashMap<>(1);
+                filters.put("isPublic", "yes");
+            }
+        }
+
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
+        if (filters == null) {
+            filters = new HashMap<>(1);
+        }
+        StructuredQuery.PropertyFilter propFilter;
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+
+            if (attributeFilter == null)
+                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
+            else
+                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(kind)
+                .setFilter(attributeFilter)
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        //queryResults.forEachRemaining(results::add);
+
+        LOG.info("Received a query!");
+        int count = 0;
+        // Get the total number of entities
+        while (queryResults.hasNext()) {
+            results.add(queryResults.next());
+            count++;
+        }
+        // Convert the response object to JSON
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(count);
+
+        return Response.ok(jsonResponse).build();
+    }
 }
