@@ -1,4 +1,4 @@
-package resources;
+/*package resources;
 
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
@@ -24,4 +24,4 @@ public class FoodResource {
         // TODO
         return Response.ok().build();
     }
-}
+}*/
