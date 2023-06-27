@@ -1,8 +1,3 @@
-function print(arr, separator) {
-	var text = arr.join(separator)
-    document.getElementById("jobs").innerHTML = text;
-}
-
 function loadLoggedUser() {
         var xmlhttp = new XMLHttpRequest();
         var user = localStorage.getItem("userLogged");
