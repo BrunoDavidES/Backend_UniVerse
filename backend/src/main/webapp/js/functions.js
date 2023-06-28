@@ -430,7 +430,7 @@ function editNews(){
 }
 
 function deleteNews(){
-    var id = document.getElementById("newsID").value;
+    var id = document.getElementById("idNewsDelete").value;
 
     var request = new XMLHttpRequest();
 
@@ -438,16 +438,32 @@ function deleteNews(){
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        } else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-    };
+        if ( request.status === 200  ) {
+            if ( request.readyState === 4 ) {
+                var bucketDELETERequest = new XMLHttpRequest();
 
+                bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
+                bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
+
+                bucketDELETERequest.onreadystatechange = function() {
+                    if (bucketDELETERequest.status === 200) {
+                        if (bucketDELETERequest.readyState === 4) {
+                            console.log("SUCCESS");
+                            alert("SUCCESS");
+                        }
+                        else{
+                            console.log("Problems erasing News txt file content from bucket");
+                            alert("Problems erasing News txt file content from bucket");
+                        }
+                    }
+                }
+                bucketDELETERequest.send("");
+            } else {
+                console.log("FAIL");
+                console.log("FAIL");
+            }
+        };
+    }
     request.send();
 }
 
@@ -615,21 +631,28 @@ function queryUsers(){
     request.send(JSON.stringify(data));
 }
 
-function getUser(){
-    var target = document.getElementById("target").value;
+function getUser() {
+    var target = document.getElementById("targetGetProfile").value;
 
     var request = new XMLHttpRequest();
 
     request.open("GET", document.location.origin + "/rest/profile/" + target, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
-    request.onreadystatechange  = function() {
+    request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        }
-        else if (request.readyState === 4) {
+           console.log(request.responseText);
+           console.log("SUCCESS");
+           alert(request.responseText);
+           const response = JSON.parse(request.responseText);
+
+           document.getElementById("usernameInfo").value = response.username;
+           document.getElementById("nameInfo").value = response.name;
+           document.getElementById("roleInfo").value = response.role;
+           document.getElementById("jobsInfo").value = response.jobs;  //TRATAR DA LISTA DE JOBS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+           document.getElementById("emailInfo").value = response.email;
+
+        } else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
         }
