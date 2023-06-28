@@ -70,4 +70,8 @@
         <listener-class>services.BlacklistToken</listener-class>
     </listener>
 
+    <listener>
+        <listener-class>services.GmailInitializer</listener-class>
+    </listener>
+
 </web-app>

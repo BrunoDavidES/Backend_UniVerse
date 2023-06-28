@@ -23,4 +23,12 @@
     <include path="/**.cur" expiration="1m" />  <!-- 1 minute, normal is 12h or more -->
   </static-files>
 
+  <system-properties>
+    <property name="mail.transport.protocol" value="smtp" />
+    <property name="mail.smtp.host" value="smtp.gmail.com" />
+    <property name="mail.smtp.port" value="587" />
+    <property name="mail.smtp.auth" value="true" />
+    <property name="mail.smtp.starttls.enable" value="true" />
+  </system-properties>
+
 </appengine-web-app>
