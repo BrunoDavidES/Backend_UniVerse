@@ -7,10 +7,10 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
-import util.AuthToken;
 import util.NucleusData;
-
+import util.AuthToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -23,71 +23,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static util.AuthToken.*;
 import static util.Constants.*;
 
 @Path("/nucleus")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class NucleusResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String STUDENTS_UNION = "Students Union";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
-    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(NucleusResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public NucleusResource() { }
 
-
-
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(@Context HttpServletRequest request, NucleusData data) {
+    public Response register(@HeaderParam("Authorization") String token, NucleusData data) {
         LOG.fine("Attempt to create a nucleus by: " + data.president);
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if( !data.validateRegister() ) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -96,13 +52,6 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
             Entity president = txn.get(presidentKey);
 
@@ -112,9 +61,9 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
             }
 
-            String creatorUsername = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+            String creatorUsername = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
 
-            String creatorRole = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+            String creatorRole = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
 
 
             if (!creatorRole.equals(BO)) {
@@ -182,8 +131,13 @@ public class NucleusResource {
     @POST
     @Path("/modify")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyNucleus(@Context HttpServletRequest request, NucleusData data){
+    public Response modifyNucleus(@HeaderParam("Authorization") String token, NucleusData data){
         LOG.fine("Attempt to modify nucleus.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if( !data.validateModify()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -192,13 +146,6 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
             Entity nucleus = txn.get(nucleusKey);
 
@@ -208,8 +155,8 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
             }
 
-            String modifierUsername = String.valueOf(token.getClaim(USER)).replaceAll("\"", "");
-            String modifierRole = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+            String modifierUsername = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
+            String modifierRole = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
 
             if (!modifierRole.equals(BO)) {
                 if (modifierRole.equals(A)) {
@@ -265,23 +212,20 @@ public class NucleusResource {
 
     @DELETE
     @Path("/delete")
-    public Response deleteNucleus(@Context HttpServletRequest request, @QueryParam("id") String id){
+    public Response deleteNucleus(@HeaderParam("Authorization") String token, @QueryParam("id") String id){
         LOG.fine("Attempt to delete nucleus.");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
-
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -332,17 +276,15 @@ public class NucleusResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryNucleus(@Context HttpServletRequest request,
+    public Response queryNucleus(@HeaderParam("Authorization") String token,
                                  @QueryParam("limit") String limit,
                                  @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query nucleus.");
 
         //Verificar, caso for evento privado, se o token é valido
-        DecodedJWT token = AuthToken.validateToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
         QueryResults<Entity> queryResults;
@@ -383,18 +325,16 @@ public class NucleusResource {
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
+    public Response addMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
@@ -403,7 +343,7 @@ public class NucleusResource {
                 LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
             }
-            else if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))){
+            else if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))){
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -457,8 +397,13 @@ public class NucleusResource {
     @PATCH
     @Path("/delete/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
+    public Response deleteMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if (data.validateList()) {
             LOG.warning("List is empty.");
@@ -467,16 +412,9 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
-            if (!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))) {
+            if (!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
