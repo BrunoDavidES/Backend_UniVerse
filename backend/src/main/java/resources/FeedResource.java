@@ -1,6 +1,5 @@
 package resources;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
@@ -8,17 +7,14 @@ import util.FeedData;
 
 import com.google.gson.Gson;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static util.AuthToken.*;
+import static util.FirebaseAuth.*;
 import static util.Constants.*;
 
 @Path("/feed")

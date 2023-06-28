@@ -63,7 +63,8 @@ public class RegisterResource {
             );
 
             Map<String, Object> customClaims = new HashMap<>();
-            customClaims.put("role", role);
+            customClaims.put(ROLE, role);
+            customClaims.put(LAST_UPDATE, Timestamp.now());
             firebaseAuth.setCustomUserClaims(userRecord.getUid(), customClaims);
 
             LOG.info("User registered in Firebase: " + userRecord.getUid());

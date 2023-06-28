@@ -1,19 +1,15 @@
 package resources;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.AuthToken.*;
+import static util.FirebaseAuth.*;
 import static util.Constants.*;
 
 @Path("/entity")

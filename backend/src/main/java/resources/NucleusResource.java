@@ -1,6 +1,5 @@
 package resources;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 
@@ -10,11 +9,8 @@ import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import util.NucleusData;
-import util.AuthToken;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -23,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.AuthToken.*;
+import static util.FirebaseAuth.*;
 import static util.Constants.*;
 
 @Path("/nucleus")
