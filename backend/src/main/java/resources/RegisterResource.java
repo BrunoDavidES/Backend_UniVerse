@@ -17,9 +17,7 @@ import javax.mail.internet.MimeMessage;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -89,6 +87,12 @@ public class RegisterResource {
         /* Load pre-authorized user credentials from the environment.
            TODO(developer) - See https://developers.google.com/identity for
             guides on implementing OAuth2 for your application.*/
+
+        File credentialsFile = new File("./credentials.json");
+        if (!credentialsFile.exists()) {
+            throw new FileNotFoundException("Credentials file not found.");
+        }
+
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("./credentials.json"))
                 .createScoped(GmailScopes.GMAIL_SEND);
         HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
@@ -99,6 +103,8 @@ public class RegisterResource {
                 requestInitializer)
                 .setApplicationName("magikarp-fct")
                 .build();
+
+        LOG.fine("Gmail service created");
 
         // Create the email content
         String messageSubject = "Test message";
