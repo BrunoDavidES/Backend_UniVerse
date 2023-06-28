@@ -161,7 +161,7 @@
                 </div>
                 <button type="text" class="submit" onclick="postEvent()">Adiciona Evento</button>
             </div>
-            <br><br><br><br>
+            <br><br>
         </div>
         <div id="eventMod" style="display: none;">
             <div class="form">
@@ -221,7 +221,7 @@
                 </div>
                 <button type="text" class="submit" onclick="editEvent()">Mudar Evento</button>
             </div>
-            <br><br><br><br>
+            <br><br>
         </div>
         <div id="eventDel" style="display: none;">
             <div class="form">
@@ -234,6 +234,7 @@
                 </div>
                 <button type="text" class="submit" onclick="deleteEvent()">Apagar Evento</button>
             </div>
+            <br><br>
         </div>
         <div id="eventValidate" style="display: none;">
             <div class="form">
@@ -246,8 +247,9 @@
                 </div>
                 <button type="text" class="submit" onclick="validateEvent()">Validar Evento</button>
             </div>
+            <br><br>
         </div>
-        <div id="eventList" style="display: none;">
+        <div id="eventList" class="list" style="display: none;">
             <h1 class="title" style="text-align: center;">Listar Eventos</h1>
             <br>
             <h2 class="subtitle" for="listLimitId" style="display: inline;">Eventos por listagem: &emsp;</h2>
@@ -264,6 +266,7 @@
             <div id="details"></div>
             <br>
             <button class="submit" onclick="loadingPopupOn();queryEvents();loadingPopupOff();">Listar</button>
+            <br><br>
         </div>
         <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>

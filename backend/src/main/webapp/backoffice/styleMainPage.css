@@ -451,7 +451,7 @@
        color: #23b499;
     }
 
-    #eventList{
+    .list{
         box-sizing: border-box;
         border: #0A2558;
         border-width:4px;
@@ -464,7 +464,7 @@
         width: 75%;
     }
 
-    #eventList .title {
+    .list .title {
         color: #eee;
         background-color: #0A2558;
         border-radius: 10px;
@@ -472,31 +472,31 @@
         font-weight: 550;
     }
 
-    #eventList .subtitle {
+    .list .subtitle {
         color: #0A2558;
         font-size: 16px;
         font-weight: 600;
         margin-top: 10px;
     }
 
-    #eventList ul {
+    .list ul {
         padding: 20px;
     }
 
-    #eventList ul li {
+    .list ul li {
       background: #cce5ff;
       color: darkblue;
       margin: 5px;
       height: 30px;
     }
 
-    #eventList ul li p{
+    .list ul li p{
         background: #cce5ff;
         color: darkblue;
         margin: 5px;
     }
 
-    #eventList ul li p:hover {
+    .list ul li p:hover {
         color: white;
         background: #0A2558;
     }
