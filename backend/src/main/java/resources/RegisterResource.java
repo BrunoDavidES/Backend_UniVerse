@@ -1,6 +1,13 @@
 package resources;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.util.Base64;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseAuth;
@@ -12,15 +19,19 @@ import util.UserData;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.api.services.gmail.model.Message;
@@ -34,6 +45,7 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 
+import static javax.mail.Message.RecipientType.TO;
 import static util.Constants.*;
 
 @Path("/register")
@@ -43,13 +55,14 @@ public class RegisterResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private static final String EMAIL_ADDRESS = "magikarpfct@gmail.com";
 
     public RegisterResource() {}
 
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(UserData data) throws FirebaseAuthException, MessagingException, IOException {
+    public Response register(UserData data) throws Exception {
         LOG.fine("Attempt to register user: " + data.username);
 
         if (!data.validateRegister()) {
@@ -74,49 +87,28 @@ public class RegisterResource {
         return response;
     }
 
-    public void emailVerification(String email) throws FirebaseAuthException, MessagingException, IOException {
+    public void emailVerification(String email) throws Exception {
         String link = firebaseAuth.generateEmailVerificationLink(email);
 
-        String fromEmailAddress = "uni.capi.crew@gmail.com";
-
-        sendEmail(email, fromEmailAddress);
+        sendEmail(email, EMAIL_ADDRESS, link);
 
     }
 
-    public static Message sendEmail(String fromEmailAddress, String toEmailAddress) throws MessagingException, IOException {
-        /* Load pre-authorized user credentials from the environment.
-           TODO(developer) - See https://developers.google.com/identity for
-            guides on implementing OAuth2 for your application.*/
-
-        File credentialsFile = new File("./credentials.json");
-        if (!credentialsFile.exists()) {
-            throw new FileNotFoundException("Credentials file not found.");
-        }
-
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("./credentials.json"))
-                .createScoped(GmailScopes.GMAIL_SEND);
-        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
-
-        // Create the gmail API client
-        Gmail service = new Gmail.Builder(new NetHttpTransport(),
-                GsonFactory.getDefaultInstance(),
-                requestInitializer)
-                .setApplicationName("magikarp-fct")
+    public static void sendEmail(String fromEmailAddress, String toEmailAddress, String link) throws Exception {
+        NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        Gmail service = new Gmail.Builder(httpTransport, GsonFactory.getDefaultInstance(), getCredentials(httpTransport))
+                .setApplicationName("Test Mail")
                 .build();
-
-        LOG.fine("Gmail service created");
 
         // Create the email content
         String messageSubject = "Test message";
         String bodyText = "lorem ipsum.";
 
-        // Encode as MIME message
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(fromEmailAddress));
-        email.addRecipient(javax.mail.Message.RecipientType.TO,
-                new InternetAddress(toEmailAddress));
+        email.setFrom(new InternetAddress(EMAIL_ADDRESS));
+        email.addRecipient(TO, new InternetAddress(toEmailAddress));
         email.setSubject(messageSubject);
         email.setText(bodyText);
 
@@ -131,20 +123,37 @@ public class RegisterResource {
         try {
             // Create send message
             message = service.users().messages().send("me", message).execute();
-            LOG.info("Message id: " + message.getId());
-            LOG.info(message.toPrettyString());
-            return message;
+            System.out.println("Message id: " + message.getId());
+            System.out.println(message.toPrettyString());
         } catch (GoogleJsonResponseException e) {
-            // TODO(developer) - handle error appropriately
             GoogleJsonError error = e.getDetails();
             if (error.getCode() == 403) {
-                LOG.warning("Unable to send message: " + e.getDetails());
+                System.err.println("Unable to send message: " + e.getDetails());
             } else {
                 throw e;
             }
         }
-        return null;
+
     }
+
+    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+            throws IOException {
+
+        GoogleClientSecrets clientSecrets =
+                GoogleClientSecrets.load(GsonFactory.getDefaultInstance(),
+                        new InputStreamReader(RegisterResource.class.getResourceAsStream("./client_secret_1069096740543-rk1murspfco841697namfq4e0r75invb.apps.googleusercontent.com.json")));
+
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                HTTP_TRANSPORT, GsonFactory.getDefaultInstance(), clientSecrets, Set.of(GmailScopes.GMAIL_SEND))
+                .setDataStoreFactory(new FileDataStoreFactory(Paths.get("tokens").toFile()))
+                .setAccessType("offline")
+                .build();
+
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+    }
+
 
     private Response firebaseRegister(String username, String email, String password, String name, String role) {
         try {
