@@ -162,7 +162,7 @@ public class ProfileResource {
                 LOG.warning("Personal event name already used.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
             }
-            list = list.concat("#" + data.title + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+            list = list.concat("#" + data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
@@ -210,14 +210,14 @@ public class ProfileResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
             }
             String[] l = list.split("#");
-            String oldEvent = null;
+            String oldEvent = "";
             for(String event: l){
                 if(event.contains(oldTitle)){
                     oldEvent = event;
                     break;
                 }
             }
-            list = list.replace(oldEvent, data.title + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+            list = list.replace(oldEvent, data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
@@ -289,6 +289,7 @@ public class ProfileResource {
             }
         }
     }
+    //FAZER GETPERSONALEVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     @POST
     @Path("/query")
