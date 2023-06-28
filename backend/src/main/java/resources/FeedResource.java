@@ -3,10 +3,10 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseToken;
 import util.FeedData;
 
 import com.google.gson.Gson;
-import util.ValToken;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -18,54 +18,25 @@ import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static util.AuthToken.*;
+import static util.Constants.*;
+
 @Path("/feed")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class FeedResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(FeedResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
 
     @POST
     @Path("/post/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, FeedData data){
+    public Response postEntry(@HeaderParam("Authorization") String token, @PathParam("kind") String kind, FeedData data){
         LOG.fine("Attempt to post entry to feed.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if((!kind.equals(NEWS) && !kind.equals(EVENT)) || !data.validate(kind)) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -73,17 +44,9 @@ public class FeedResource {
         }
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
-            String name = String.valueOf(token.getClaim(NAME_CLAIM)).replaceAll("\"", "");
-            String username = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+            String role = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
+            String name = String.valueOf(decodedToken.getName()).replaceAll("\"", "");
+            String username = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
 
 
             // Para já, só docentes é q fazem eventos
@@ -155,8 +118,13 @@ public class FeedResource {
     @PATCH
     @Path("/edit/{kind}/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
+    public Response editEntry(@HeaderParam("Authorization") String token, @PathParam("kind") String kind, @PathParam("id") String id, FeedData data){
         LOG.fine("Attempt to edit feed entry.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if(!kind.equals(NEWS) && !kind.equals(EVENT)) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -166,20 +134,11 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
-            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
-            String username = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+            String role = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
+            String username = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
 
             if( entry == null ) {
                 txn.rollback();
@@ -230,8 +189,13 @@ public class FeedResource {
 
     @DELETE
     @Path("/delete/{kind}/{id}")
-    public Response deleteEntry(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("id") String id){
+    public Response deleteEntry(@HeaderParam("Authorization") String token, @PathParam("kind") String kind, @PathParam("id") String id){
         LOG.fine("Attempt to delete event.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if((!kind.equals(NEWS) && !kind.equals(EVENT))) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -241,19 +205,11 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key eventKey = datastore.newKeyFactory().setKind(kind).newKey(id);
             Entity entry = txn.get(eventKey);
 
-            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
-            String username = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+            String role = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
+            String username = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
 
             if( entry == null ) {
                 txn.rollback();
@@ -279,17 +235,16 @@ public class FeedResource {
     @POST
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
+    public Response queryEntries(@HeaderParam("Authorization") String token, @PathParam("kind") String kind,
                                 @QueryParam("limit") String limit,
                                 @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
         //Verificar, caso for evento privado, se o token é valido
         if(kind.equals(EVENT)) {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            FirebaseToken decodedToken = authenticateToken(token);
 
-            if (token == null) {
+            if (decodedToken == null) {
                 LOG.info(TOKEN_NOT_FOUND);
                 if (filters == null)
                     filters = new HashMap<>(1);
@@ -336,15 +291,14 @@ public class FeedResource {
     @POST
     @Path("/numberOf/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntriesNum(@Context HttpServletRequest request, @PathParam("kind") String kind, Map<String, String> filters) {
+    public Response queryEntriesNum(@HeaderParam("Authorization") String token, @PathParam("kind") String kind, Map<String, String> filters) {
         LOG.fine("Attempt to count the query feed " + kind);
 
         // Verificar, caso for evento privado, se o token é valido
         if (kind.equals(EVENT)) {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+            FirebaseToken decodedToken = authenticateToken(token);
 
-            if (token == null) {
+            if (decodedToken == null) {
                 LOG.info(TOKEN_NOT_FOUND);
                 if (filters == null)
                     filters = new HashMap<>(1);
