@@ -139,9 +139,12 @@ public class RegisterResource {
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {
 
+        InputStream in = RegisterResource.class.getResourceAsStream("/tokens/client_secret.json");
+        if (in == null) {
+            throw new FileNotFoundException("Resource not found: " + "/tokens/client_secret.json");
+        }
         GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(GsonFactory.getDefaultInstance(),
-                        new InputStreamReader(RegisterResource.class.getResourceAsStream("./client_secret_1069096740543-rk1murspfco841697namfq4e0r75invb.apps.googleusercontent.com.json")));
+                GoogleClientSecrets.load(GsonFactory.getDefaultInstance(), new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
