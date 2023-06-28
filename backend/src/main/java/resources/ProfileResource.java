@@ -180,6 +180,54 @@ public class ProfileResource {
         }
     }
 
+    @GET
+    @Path("/personalEvent/get/{title}")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    public Response getPersonalEvent(@Context HttpServletRequest request,@PathParam("title") String title){
+        LOG.fine("Attempt to edit a personal event.");
+
+        Transaction txn = datastore.newTransaction();
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Entity user = txn.get(userKey);
+            if( user == null ) {
+                txn.rollback();
+                LOG.warning(USER_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+            }
+            String list = user.getString(PERSONAL_EVENT_LIST);
+            if(!list.contains(title)) {
+                txn.rollback();
+                LOG.warning("Personal event does not exist.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
+            }
+            String[] l = list.split("#");
+            String[] oldEvent = new String[5];
+            for(String event: l){
+                if(event.contains(title)){
+                    oldEvent = event.replace("#", "").split("%");
+                    break;
+                }
+            }
+        PersonalEventsData data = new PersonalEventsData();
+        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
+        data.title = oldEvent[0];
+        data.username = oldEvent[1];
+        data.beginningDate = oldEvent[2];
+        data.hours = oldEvent[3];
+        data.location = oldEvent[4];
+
+        LOG.fine("Personal event successfully gotten");
+        return Response.ok(g.toJson(data)).build();
+    }
+
     @PATCH
     @Path("/personalEvent/edit/{oldTitle}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
