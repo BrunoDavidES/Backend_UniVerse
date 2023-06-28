@@ -6,9 +6,9 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import util.DepartmentData;
-import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -21,49 +21,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static util.AuthToken.*;
+import static util.Constants.*;
+
 @Path("/department")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class DepartmentResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter";
-    private static final String TOKEN_NOT_FOUND = "Token not found";
-    private static final String BO = "BO";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String USER_CLAIM = "user";
-    private static final String NICE_TRY = "Nice try but your not a capi person";
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(DepartmentResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
 
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerDepartment(@Context HttpServletRequest request, DepartmentData data) {
+    public Response registerDepartment(@HeaderParam("Authorization") String token, DepartmentData data) {
         LOG.fine("Attempt to register department: " + data.id);
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if( !data.validateRegister() ) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -72,14 +48,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -129,8 +98,13 @@ public class DepartmentResource {
     @POST
     @Path("/modify")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyDepartment(@Context HttpServletRequest request, DepartmentData data){
+    public Response modifyDepartment(@HeaderParam("Authorization") String token, DepartmentData data){
         LOG.fine("Attempt to modify department.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if( !data.validateModify()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -139,13 +113,6 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
             Entity department = txn.get(departmentKey);
 
@@ -158,7 +125,7 @@ public class DepartmentResource {
             data.fillGaps(department);
             Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
             Entity president = txn.get(presidentKey);
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -192,24 +159,20 @@ public class DepartmentResource {
 
     @DELETE
     @Path("/delete/{id}")
-    public Response deleteDepartment(@Context HttpServletRequest request, @PathParam("id") String id){
+    public Response deleteDepartment(@HeaderParam("Authorization") String token, @PathParam("id") String id){
         LOG.fine("Attempt to delete department.");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
-
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
             Entity department = txn.get(departmentKey);
 
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -260,20 +223,18 @@ public class DepartmentResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryDepartment(@Context HttpServletRequest request,
+    public Response queryDepartment(@HeaderParam("Authorization") String token,
                                @QueryParam("limit") String limit,
                                @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query departments.");
 
         //Verificar, caso for evento privado, se o token é valido
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
-        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
@@ -315,22 +276,19 @@ public class DepartmentResource {
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel%username"
-    public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
+    public Response addMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to add members to the department.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -387,7 +345,7 @@ public class DepartmentResource {
     @PATCH
     @Path("/delete/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
+    public Response deleteMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to remove members from the department.");
 
         if(data.validateList()){
@@ -395,19 +353,16 @@ public class DepartmentResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
         }
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -462,26 +417,23 @@ public class DepartmentResource {
     @PATCH
     @Path("/edit/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
+    public Response editMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to edit members of the department.");
         if(data.validateList()){
             LOG.warning("List is empty.");
             return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
         }
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
             Entity department = txn.get(departmentKey);
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !department.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
