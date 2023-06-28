@@ -3,9 +3,9 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import util.ReportData;
-import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -15,73 +15,25 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static util.AuthToken.*;
+import static util.Constants.*;
+
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ReportsResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String REPORT = "Report";
-    private static final String STATUS_UNSEEN = "UNSEEN";
-    private static final String STATUS_SEEN = "SEEN";
-    private static final String STATUS_RESOLVED = "RESOLVED";
-    private static final String STUDENTS_UNION = "Students Union";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String USER_ALREADY_EXISTs = "User already exists.";
-    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
-    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-    private static final String REPORT_DOES_NOT_EXIST = "Report does not exist.";
-
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ReportsResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     @POST
     @Path("/post")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postReports(@Context HttpServletRequest request,  ReportData data){
+    public Response postReports(@HeaderParam("Authorization") String token,  ReportData data){
         LOG.fine("Attempt to post report.");
 
-
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if(!data.validate()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -91,15 +43,6 @@ public class ReportsResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key reportKey;
             Entity entry;
             String id;
@@ -113,7 +56,7 @@ public class ReportsResource {
 
             builder.set("title", data.title)
                     .set("id", id)
-                    .set("reporter", String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))
+                    .set("reporter", String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))
                     .set("location", data.location)
                     .set("status", STATUS_UNSEEN)
                     .set("time_creation", Timestamp.now());
@@ -135,21 +78,16 @@ public class ReportsResource {
 
     @POST
     @Path("/edit/{id}")
-    public Response editReport(@Context HttpServletRequest request, @PathParam("id") String id){
+    public Response editReport(@HeaderParam("Authorization") String token, @PathParam("id") String id){
         LOG.fine("Attempt to edit report");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
-
         try {
-
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key eventKey = datastore.newKeyFactory().setKind(REPORT).newKey(id);
             Entity entry = txn.get(eventKey);
 
@@ -157,7 +95,7 @@ public class ReportsResource {
                 txn.rollback();
                 LOG.warning(REPORT_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(REPORT_DOES_NOT_EXIST).build();
-            } else if(!entry.getString("reporter").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))) {
+            } else if(!entry.getString("reporter").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))) {
                 txn.rollback();
                 LOG.warning("Wrong author.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Wrong author.").build();
@@ -182,20 +120,16 @@ public class ReportsResource {
 
     @POST
     @Path("/status/{id}/{status}")
-    public Response statusReport(@Context HttpServletRequest request, @PathParam("id") String id, @PathParam("status") String status){
+    public Response statusReport(@HeaderParam("Authorization") String token, @PathParam("id") String id, @PathParam("status") String status){
         LOG.fine("Attempt to edit report");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
-
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
             Key eventKey = datastore.newKeyFactory().setKind(REPORT).newKey(id);
             Entity entry = txn.get(eventKey);
 
@@ -203,7 +137,7 @@ public class ReportsResource {
                 txn.rollback();
                 LOG.warning(REPORT_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(REPORT_DOES_NOT_EXIST).build();
-            } else if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            } else if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
             }else {
@@ -234,18 +168,16 @@ public class ReportsResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryReports(@Context HttpServletRequest request, @QueryParam("limit") int limit,
+    public Response queryReports(@HeaderParam("Authorization") String token, @QueryParam("limit") int limit,
                                  @QueryParam("offset") int offset, Map<String, String> filters) {
         LOG.fine("Attempt to query reports.");
 
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
-        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
         if(!user.getString(ROLE).equals(BO)){
             LOG.warning(NICE_TRY);
@@ -292,17 +224,15 @@ public class ReportsResource {
     @GET
     @Path("/unresolved")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response numberOfUnresolvedReports(@Context HttpServletRequest request) {
+    public Response numberOfUnresolvedReports(@HeaderParam("Authorization") String token) {
         LOG.fine("Trying to know how many unresolved reports exist");
 
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
-        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
         if(!user.getString(ROLE).equals(BO)){
             LOG.warning(NICE_TRY);
