@@ -3,11 +3,11 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import util.DepartmentData;
 import util.PersonalEventsData;
 import util.ProfileData;
-import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -20,60 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static util.AuthToken.*;
+import static util.Constants.*;
+
 @Path("/profile")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ProfileResource {
-
-    private static final String CAPI = "Your not one of us\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
-            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
-            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
-            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
-            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
-            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
-
-
-    private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
-    private static final String ROLE = "role";
-    private static final String USER = "User";
-    private static final String EVENT = "Event";
-    private static final String NEWS = "News";
-    private static final String STUDENTS_UNION = "Students Union";
-    private static final String USER_CLAIM = "user";
-    private static final String NAME_CLAIM = "name";
-    private static final String PERSONAL_EVENT_LIST = "personal_event_list";
-    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
-    private static final String MISSING_PARAMETER = "Missing parameter.";
-    private static final String TOKEN_NOT_FOUND = "Token not found.";
-    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
-    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
-    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
-    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
-    private static final String PASSWORD_INCORRECT = "Password incorrect.";
-    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
-    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
-    private static final String NICE_TRY = "Nice try but your not a capi person.";
-    private static final String PERMISSION_DENIED = "Permission denied.";
-
-    private static final String DEPARTMENT = "Department";
-    private static final String WRONG_PRESIDENT = "President doesn't exists.";
-    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
-    private static final String WRONG_DEPARTMENT = "Department does not exist.";
-    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ProfileResource.class.getName());
-
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public Gson g = new Gson();
@@ -83,24 +36,20 @@ public class ProfileResource {
     @GET
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getProfile(@Context HttpServletRequest request, @PathParam("username") String username){
+    public Response getProfile(@HeaderParam("Authorization") String token, @PathParam("username") String username){
         LOG.fine("Attempt to get profile by " + username);
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         if(username == null){
             LOG.warning("username field is null");
             return Response.status(Response.Status.BAD_REQUEST).entity("Empty param").build();
         }
 
-
-
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-        String requester = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+        String requester = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(requester);
         Entity user = datastore.get(userKey);
 
@@ -136,20 +85,17 @@ public class ProfileResource {
     @POST
     @Path("/personalEvent/add")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response addPersonalEvent(@Context HttpServletRequest request, PersonalEventsData data) {
+    public Response addPersonalEvent(@HeaderParam("Authorization") String token, PersonalEventsData data) {
         LOG.fine("Attempt to add a personal event.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             if( user == null ) {
                 txn.rollback();
@@ -162,7 +108,7 @@ public class ProfileResource {
                 LOG.warning("Personal event name already used.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
             }
-            list = list.concat("#" + data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+            list = list.concat("#" + data.title + "%" + String.valueOf(decodedToken.getUid()).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
@@ -183,19 +129,16 @@ public class ProfileResource {
     @GET
     @Path("/personalEvent/get/{title}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response getPersonalEvent(@Context HttpServletRequest request,@PathParam("title") String title){
+    public Response getPersonalEvent(@HeaderParam("Authorization") String token, @PathParam("title") String title){
         LOG.fine("Attempt to edit a personal event.");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
+
         Transaction txn = datastore.newTransaction();
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             if( user == null ) {
                 txn.rollback();
@@ -231,20 +174,17 @@ public class ProfileResource {
     @PATCH
     @Path("/personalEvent/edit/{oldTitle}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response editPersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle, PersonalEventsData data){
+    public Response editPersonalEvent(@HeaderParam("Authorization") String token, @PathParam("oldTitle") String oldTitle, PersonalEventsData data){
         LOG.fine("Attempt to edit a personal event.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             if( user == null ) {
                 txn.rollback();
@@ -265,7 +205,7 @@ public class ProfileResource {
                     break;
                 }
             }
-            list = list.replace(oldEvent, data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+            list = list.replace(oldEvent, data.title + "%" + String.valueOf(decodedToken.getUid()).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
@@ -286,20 +226,17 @@ public class ProfileResource {
     @PATCH
     @Path("/personalEvent/delete/{oldTitle}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response deletePersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle){
+    public Response deletePersonalEvent(@HeaderParam("Authorization") String token, @PathParam("oldTitle") String oldTitle){
         LOG.fine("Attempt to delete a personal event.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             if( user == null ) {
                 txn.rollback();
@@ -342,20 +279,18 @@ public class ProfileResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryUsers(@Context HttpServletRequest request,
+    public Response queryUsers(@HeaderParam("Authorization") String token,
                                  @QueryParam("limit") String limit,
                                  @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query users.");
 
         //Verificar, caso for evento privado, se o token é valido
-        final ValToken validator = new ValToken();
-        DecodedJWT token = validator.checkToken(request);
-
-        if (token == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
-        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        if(!String.valueOf(decodedToken.getUid()).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
@@ -397,20 +332,14 @@ public class ProfileResource {
     @POST
     @Path("/numberOfUsers")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryUsersNum(@Context HttpServletRequest request, Map<String, String> filters) {
+    public Response queryUsersNum(@HeaderParam("Authorization") String token, Map<String, String> filters) {
         LOG.fine("Attempt to count the query users");
 
         // Verificar, caso for evento privado, se o token é valido
-
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.info(TOKEN_NOT_FOUND);
-                if (filters == null)
-                    filters = new HashMap<>(1);
-            }
-
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+        }
 
         QueryResults<Entity> queryResults;
 
