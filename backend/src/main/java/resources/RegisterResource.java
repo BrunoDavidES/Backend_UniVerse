@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.database.FirebaseDatabase;
-import services.GmailInitializer;
 import util.UserData;
 
 import javax.mail.MessagingException;
@@ -19,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,6 @@ public class RegisterResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private static final FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private static final Gmail gmailService = GmailInitializer.getGmailService();
 
     public RegisterResource() {}
 
@@ -87,6 +86,20 @@ public class RegisterResource {
     }
 
     public static Message sendEmail(String fromEmailAddress, String toEmailAddress) throws MessagingException, IOException {
+        /* Load pre-authorized user credentials from the environment.
+           TODO(developer) - See https://developers.google.com/identity for
+            guides on implementing OAuth2 for your application.*/
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("./credentials.json"))
+                .createScoped(GmailScopes.GMAIL_SEND);
+        HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
+
+        // Create the gmail API client
+        Gmail service = new Gmail.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                requestInitializer)
+                .setApplicationName("magikarp-fct")
+                .build();
+
         // Create the email content
         String messageSubject = "Test message";
         String bodyText = "lorem ipsum.";
@@ -111,7 +124,7 @@ public class RegisterResource {
 
         try {
             // Create send message
-            message = gmailService.users().messages().send("me", message).execute();
+            message = service.users().messages().send("me", message).execute();
             LOG.info("Message id: " + message.getId());
             LOG.info(message.toPrettyString());
             return message;
