@@ -438,16 +438,16 @@ function deleteNews(){
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
-        if ( request.status === 200  ) {
-            if ( request.readyState === 4 ) {
+        if ( request.readyState === 4 ) {
+            if ( request.status === 200 ) {
                 var bucketDELETERequest = new XMLHttpRequest();
 
                 bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
                 bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
 
                 bucketDELETERequest.onreadystatechange = function() {
-                    if (bucketDELETERequest.status === 200) {
-                        if (bucketDELETERequest.readyState === 4) {
+                    if ( bucketDELETERequest.readyState === 4 ) {
+                        if ( bucketDELETERequest.status === 200 ) {
                             console.log("SUCCESS");
                             alert("SUCCESS");
                         }
