@@ -2,6 +2,8 @@ package resources;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import org.apache.commons.codec.digest.DigestUtils;
 import util.*;
@@ -21,6 +23,7 @@ import static util.Constants.*;
 public class ModifyUserResource {
     private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @POST
     @Path("/attributes")
@@ -74,42 +77,11 @@ public class ModifyUserResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
-        if( !data.validatePwd()) {
-            LOG.warning(MISSING_OR_WRONG_PARAMETER);
-            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }
-
-        Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
-            Entity user = txn.get(userKey);
-
-            if( user == null ) {
-                txn.rollback();
-                LOG.warning(USER_OR_PASSWORD_INCORRECT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
-            } else {
-                if(user.getString("password").equals(DigestUtils.sha512Hex(data.password)) ) {
-
-                    Entity newUser = Entity.newBuilder(user)
-                            .set("password", DigestUtils.sha512Hex(data.newPwd))
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
-
-                    txn.update(newUser);
-                    LOG.info(decodedToken.getUid().toString() + " pwd edited.");
-                    txn.commit();
-                    return Response.ok(user).build();
-                } else {
-                    txn.rollback();
-                    LOG.warning(USER_OR_PASSWORD_INCORRECT);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
-                }
-            }
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
+            String link = firebaseAuth.generatePasswordResetLink(decodedToken.getEmail());
+            return Response.ok(link).build();
+        } catch (FirebaseAuthException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error generating reset link").build();
         }
     }
 
