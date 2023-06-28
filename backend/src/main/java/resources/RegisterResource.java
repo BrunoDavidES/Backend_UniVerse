@@ -59,7 +59,7 @@ public class RegisterResource {
                     .setEmailVerified(false)
                     .setPassword(password)
                     .setDisplayName(name)
-                    .setDisabled(true)
+                    .setDisabled(false)
             );
 
             Map<String, Object> customClaims = new HashMap<>();
