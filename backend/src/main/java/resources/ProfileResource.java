@@ -162,7 +162,7 @@ public class ProfileResource {
                 LOG.warning("Personal event name already used.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
             }
-            list = list.concat("#" + data.title + "%" + data.beginningDate + "%" + data.finishDate + "%" + data.location);
+            list = list.concat("#" + data.title + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
@@ -217,7 +217,7 @@ public class ProfileResource {
                     break;
                 }
             }
-            list = list.replace(oldEvent, data.title + "%" + data.beginningDate + "%" + data.finishDate + "%" + data.location);
+            list = list.replace(oldEvent, data.title + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
