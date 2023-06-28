@@ -368,6 +368,32 @@ function postNews(){
     request.send(JSON.stringify(data));
 }
 
+function validateEvent(){
+    var id = document.getElementById("idNewsValidate").value;
+
+    var data = {
+        "validated_backoffice": "true"
+    };
+
+    var request = new XMLHttpRequest();
+
+    request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(data));
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+            alert(request.responseText);
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+        }
+    };
+}
+
+
 function editNews(){
 
     var id = document.getElementById("idEventMod").value;
@@ -528,6 +554,68 @@ function getNews(){
 
 //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+var newsQueryOffset = 0;
+
+function queryNews(){
+    var list = document.getElementById('listOfNews');
+    var limit = parseInt(document.getElementById("listLimitId").value);
+    var data = {};
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + newsQueryOffset, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(data));
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            const response = JSON.parse(request.responseText);
+            const entities = response.map(function(entity) {
+            return {
+                authorUsername: entity.properties.authorUsername,
+                authorName: entity.properties.authorName,
+                title: entity.properties.title,
+                id: entity.properties.id,
+                validated_backoffice: entity.properties.validated_backoffice,
+                };
+            });
+
+            entities.forEach(function(entity) {
+                var listItem = document.createElement("li");
+                listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                listItem.addEventListener('click', function() {
+                      var details = document.getElementById('details');
+                      details.innerHTML = '';
+
+                      var title = document.createElement('h2');
+                      title.textContent = entity.title.value;
+                      details.appendChild(title);
+
+                      var description = document.createElement('p');
+                      description.innerHTML = " Título da notícia: " + entity.title.value +
+                                                "<br> ID da notícia: " + entity.id.value +
+                                                "<br> Nome do criador da notícia: " + entity.authorName.value +
+                                                "<br> Username do utilizador que postou a notícia: " + entity.authorUsername.value +
+                                                "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+
+                      details.appendChild(description);
+
+                      var siblings = Array.from(listItem.parentNode.children);
+                      var currentIndex = siblings.indexOf(listItem);
+                      siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                          sibling.classList.toggle('closed');
+                      });
+
+                      bottomFunction();
+
+                });
+
+                list.appendChild(listItem);
+
+            });
+            newsQueryOffset += limit;
+        }
+    }
+}
 
             //USERS
 function modifyUserRole(){
