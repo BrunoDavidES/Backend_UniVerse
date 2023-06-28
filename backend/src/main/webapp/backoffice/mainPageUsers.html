@@ -8,7 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
-<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="queryEvents();" id="moreList">Mais <i class='bx bx-list-plus'></i></button>
+<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -104,10 +106,10 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'userList')" class="active">Modificar role do User</button>
-            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'userList')">Obter peril do User</button>
-            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'userList')">Apagar User</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'userList', 'delUser', 'modRole', 'getProfile')">Listar Users</button>
+            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'usersList'); auxListMore(0);" class="active">Modificar role do User</button>
+            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'usersList'); auxListMore(0);">Obter peril do User</button>
+            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'usersList'); auxListMore(0);">Apagar User</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'usersList', 'delUser', 'modRole', 'getProfile'); auxListMore(1);">Listar Users</button>
         </div>
 
         <br><br>
@@ -130,7 +132,7 @@
                     </select>
                 </div>
                 <button type="text" class="submit" onclick="modifyUserRole()">Mudar estatuto do user</button>
-            </div>
+            </div><br><br>
         </div>
         <div id="getProfile" style="display: none;">
             <div class="form">
@@ -171,7 +173,7 @@
                     <div class="cut"></div>
                     <label for="target" class="placeholder">Email</label>
                 </div>
-            </div>
+            </div><br><br>
         </div>
         <div id="delUser" style="display: none;">
             <div class="form">
@@ -183,11 +185,27 @@
                     <label for="target" class="placeholder">Username</label>
                 </div>
                 <button type="text" class="submit" onclick="postEvent()">Apagar user</button>
-            </div>
+            </div><br><br>
         </div>
-        <div id="userList" style="display: none;">
+        <div id="usersList" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar Users</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Users por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
 
+            <ul id="listOfUsers"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="details"></div>
+            <br>
+            <button class="submit" onclick="queryEvents();">Listar</button>
         </div>
+        <br><br>
     </div>
     <div class="popup" id="popup" style="">
         <h3>Está prestes a fazer logout</h3>
@@ -242,19 +260,38 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
       function topFunction() {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        bottomPage.style.display = 'none';
+        topPage.style.display = '';
       }
 </script>
 

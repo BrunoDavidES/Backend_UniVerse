@@ -14,7 +14,7 @@ function loadLoggedUser() {
         if (xmlhttp.status == 200) {
             var userLogged = JSON.parse(this.responseText);
             document.getElementById("name").innerHTML = userLogged.name;
-            document.getElementById("usernameMail").innerHTML = userLogged.username;
+            document.getElementById("usernameMail").innerHTML = userLogged.email;
             document.getElementById("role").innerHTML = userLogged.role;
             var str = userLogged.jobs;
             str = str.replace(/^#/,'');
