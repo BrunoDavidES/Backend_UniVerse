@@ -6,7 +6,7 @@ import com.google.cloud.datastore.*;
 import util.FeedData;
 
 import com.google.gson.Gson;
-import util.AuthToken;
+import util.ValToken;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -18,11 +18,45 @@ import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static util.Constants.*;
-
 @Path("/feed")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class FeedResource {
+
+    private static final String CAPI = "Your not one of us\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+
+    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
+    private static final String TOKEN_NOT_FOUND = "Token not found.";
+    private static final String BO = "BO";
+    private static final String D = "D";
+    private static final String ROLE = "role";
+    private static final String USER = "User";
+    private static final String EVENT = "Event";
+    private static final String NEWS = "News";
+    private static final String USER_CLAIM = "user";
+    private static final String NAME_CLAIM = "name";
+    private static final String NICE_TRY = "Nice try but your not a capi person.";
+    private static final String PERMISSION_DENIED = "Permission denied.";
+    private static final String DEPARTMENT = "Department";
+    private static final String WRONG_PRESIDENT = "President doesn't exists.";
+    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
+    private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(FeedResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -39,7 +73,8 @@ public class FeedResource {
         }
 
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -83,16 +118,20 @@ public class FeedResource {
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
-                            .set("validated_backoffice", "true")
+                            .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
                 }else { //construtor de news
-
+                    // Caso se vá buscar uma notícia de outro site, por parte do backoffice,
+                    // e se queira por o author como "Jornal Expresso", por exemplo
+                    if (role.equals(BO) && data.authorNameByBO != null && !data.authorNameByBO.equals("")){
+                        name = data.authorNameByBO;
+                    }
                     builder.set("id", id)
                             .set("title", data.title)
                             .set("authorName", name)
                             .set("authorUsername", username)
-                            .set("validated_backoffice", "true")
+                            .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
                 }
@@ -127,7 +166,8 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -167,6 +207,7 @@ public class FeedResource {
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
+                            .set("validated_backoffice", data.validated_backoffice)
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
                     newEntry.set("title", data.title)
@@ -200,7 +241,8 @@ public class FeedResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -238,13 +280,14 @@ public class FeedResource {
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
-                                 @QueryParam("limit") String limit,
-                                 @QueryParam("offset") String offset, Map<String, String> filters){
+                                @QueryParam("limit") String limit,
+                                @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
         //Verificar, caso for evento privado, se o token é valido
         if(kind.equals(EVENT)) {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.info(TOKEN_NOT_FOUND);
@@ -253,9 +296,6 @@ public class FeedResource {
                 filters.put("isPublic", "yes");
             }
         }
-
-
-
 
         QueryResults<Entity> queryResults;
 
@@ -273,12 +313,13 @@ public class FeedResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
                 .setKind(kind)
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
                 .build();
+
 
         queryResults = datastore.run(query);
 
@@ -292,5 +333,63 @@ public class FeedResource {
 
     }
 
+    @POST
+    @Path("/numberOf/{kind}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryEntriesNum(@Context HttpServletRequest request, @PathParam("kind") String kind, Map<String, String> filters) {
+        LOG.fine("Attempt to count the query feed " + kind);
 
+        // Verificar, caso for evento privado, se o token é valido
+        if (kind.equals(EVENT)) {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.info(TOKEN_NOT_FOUND);
+                if (filters == null)
+                    filters = new HashMap<>(1);
+                filters.put("isPublic", "yes");
+            }
+        }
+
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
+        if (filters == null) {
+            filters = new HashMap<>(1);
+        }
+        StructuredQuery.PropertyFilter propFilter;
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+
+            if (attributeFilter == null)
+                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
+            else
+                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(kind)
+                .setFilter(attributeFilter)
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        //queryResults.forEachRemaining(results::add);
+
+        LOG.info("Received a query!");
+        int count = 0;
+        // Get the total number of entities
+        while (queryResults.hasNext()) {
+            results.add(queryResults.next());
+            count++;
+        }
+        // Convert the response object to JSON
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(count);
+
+        return Response.ok(jsonResponse).build();
+    }
 }

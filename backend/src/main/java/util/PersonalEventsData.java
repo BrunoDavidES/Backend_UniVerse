@@ -3,8 +3,9 @@ package util;
 public class PersonalEventsData {
 
     public String title;
+    public String username;
     public String beginningDate;
-    public String finishDate;
+    public String hours;
     public String location;
 
 }

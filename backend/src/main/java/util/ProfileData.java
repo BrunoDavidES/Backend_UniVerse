@@ -9,5 +9,7 @@ public class ProfileData {
     public String role;
 
     public String jobs;
+    public String email;
+
     public ProfileData(){}
 }

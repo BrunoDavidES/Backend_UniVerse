@@ -28,6 +28,54 @@ import static util.Constants.*;
 @Path("/nucleus")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class NucleusResource {
+
+    private static final String CAPI = "Your not one of us\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+
+
+    private static final String BO = "BO";
+    private static final String D = "D";
+    private static final String A = "A";
+    private static final String ROLE = "role";
+    private static final String USER = "User";
+    private static final String EVENT = "Event";
+    private static final String NEWS = "News";
+    private static final String STUDENTS_UNION = "Students Union";
+    private static final String USER_CLAIM = "user";
+    private static final String NAME_CLAIM = "name";
+    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
+    private static final String MISSING_PARAMETER = "Missing parameter.";
+    private static final String TOKEN_NOT_FOUND = "Token not found.";
+    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
+    private static final String ENTITY_DOES_NOT_EXIST = "Entity does not exist.";
+    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
+    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
+    private static final String PASSWORD_INCORRECT = "Password incorrect.";
+    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
+    private static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
+    private static final String NICE_TRY = "Nice try but your not a capi person.";
+    private static final String PERMISSION_DENIED = "Permission denied.";
+
+    private static final String DEPARTMENT = "Department";
+    private static final String WRONG_PRESIDENT = "President doesn't exists.";
+    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
+    private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(NucleusResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -258,7 +306,7 @@ public class NucleusResource {
                             return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                         }
                         userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
                         newUser = Entity.newBuilder(memberEntity)
                                 .set("job_list", userPersonalList)
                                 .set("time_lastupdate", Timestamp.now())
@@ -334,7 +382,7 @@ public class NucleusResource {
 
     @POST
     @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
 
@@ -378,7 +426,7 @@ public class NucleusResource {
                 }
                 if (!list.contains(member)){
                     userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "-" + "member");
+                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "%" + "member");
                     newUser = Entity.newBuilder(memberEntity)
                             .set("job_list", userPersonalList)
                             .set("time_lastupdate", Timestamp.now())
@@ -452,7 +500,7 @@ public class NucleusResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "-member", "");
+                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())

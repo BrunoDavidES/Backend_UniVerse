@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 document.getElementById("password").value = null;
                 localStorage.setItem("userLogged", user);
-                window.location.href = "/pages/mainPage.html";
+                window.location.href = "/backoffice/mainPage.html";
             } else if (xhr.readyState === 4) {
                 alert(xhr.responseText);
             }

@@ -8,7 +8,7 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
 import com.google.gson.Gson;
 import util.DepartmentData;
-import util.AuthToken;
+import util.ValToken;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -21,11 +21,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.Constants.*;
-
 @Path("/department")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class DepartmentResource {
+
+    private static final String CAPI = "Your not one of us\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+
+    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter";
+    private static final String TOKEN_NOT_FOUND = "Token not found";
+    private static final String BO = "BO";
+    private static final String ROLE = "role";
+    private static final String USER = "User";
+    private static final String USER_CLAIM = "user";
+    private static final String NICE_TRY = "Nice try but your not a capi person";
+    private static final String DEPARTMENT = "Department";
+    private static final String WRONG_PRESIDENT = "President doesn't exists.";
+    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
+    private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(DepartmentResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -43,7 +72,8 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -109,7 +139,8 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -167,7 +198,8 @@ public class DepartmentResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -194,7 +226,7 @@ public class DepartmentResource {
                 Entity newUser;
                 for(String valuesOfMember : list.split("#")) {
                     if(!valuesOfMember.equals("")) {
-                        attributes = valuesOfMember.split("-");
+                        attributes = valuesOfMember.split("%");
 
                         memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                         memberEntity = txn.get(memberKey);
@@ -204,7 +236,7 @@ public class DepartmentResource {
                             return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                         }
                         userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
                         newUser = Entity.newBuilder(memberEntity)
                                 .set("job_list", userPersonalList)
                                 .set("time_lastupdate", Timestamp.now())
@@ -229,12 +261,13 @@ public class DepartmentResource {
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryDepartment(@Context HttpServletRequest request,
-                                    @QueryParam("limit") String limit,
-                                    @QueryParam("offset") String offset, Map<String, String> filters){
+                               @QueryParam("limit") String limit,
+                               @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query departments.");
 
         //Verificar, caso for evento privado, se o token é valido
-        DecodedJWT token = AuthToken.validateToken(request);
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
 
         if (token == null) {
             LOG.warning(TOKEN_NOT_FOUND);
@@ -281,13 +314,14 @@ public class DepartmentResource {
 
     @POST
     @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel%username"
     public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, DepartmentData data) {
         LOG.fine("Attempt to add members to the department.");
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -312,7 +346,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                 memberEntity = txn.get(memberKey);
@@ -323,7 +357,7 @@ public class DepartmentResource {
                 }
                 if (!list.contains(attributes[1])) {
                     userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "-" + attributes[0]);
+                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "%" + attributes[0]);
                     newUser = Entity.newBuilder(memberEntity)
                             .set("job_list", userPersonalList)
                             .set("time_lastupdate", Timestamp.now())
@@ -363,7 +397,8 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -389,7 +424,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("-");
+                attributes = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
                 memberEntity = txn.get(memberKey);
@@ -399,7 +434,7 @@ public class DepartmentResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
                 userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "-" + attributes[0], "");
+                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())
@@ -436,7 +471,8 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            DecodedJWT token = AuthToken.validateToken(request);
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -464,7 +500,7 @@ public class DepartmentResource {
             Entity memberEntity;
             Entity newUser;
             for(String valuesOfMember : data.members) {
-                attribute = valuesOfMember.split("-");
+                attribute = valuesOfMember.split("%");
 
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attribute[1]);
                 memberEntity = txn.get(memberKey);
@@ -478,14 +514,14 @@ public class DepartmentResource {
                 targetJob = null;
                 for (String job: jobs) {
                     if (job.contains(department.getString("id"))) {
-                        targetJob = job.split("-")[1];
+                        targetJob = job.split("%")[1];
                         break;
                     }
                 }
 
-                list = list.replace(targetJob +"-"+attribute[1], attribute[0]+"-"+attribute[1]);
+                list = list.replace(targetJob +"%"+attribute[1], attribute[0]+"%"+attribute[1]);
 
-                userPersonalList = userPersonalList.replace(department.getString("id") + "-" + targetJob, department.getString("id") + "-" + attribute[0]);
+                userPersonalList = userPersonalList.replace(department.getString("id") + "%" + targetJob, department.getString("id") + "%" + attribute[0]);
                 newUser = Entity.newBuilder(memberEntity)
                         .set("job_list", userPersonalList)
                         .set("time_lastupdate", Timestamp.now())

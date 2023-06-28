@@ -22,6 +22,11 @@ public class FeedData {
 
     public String isItPaid;
 
+    public String validated_backoffice;
+
+    // News only attributes
+    public String authorNameByBO;
+
     public boolean validate(String kind) {
         if (title == null)
             return false;
@@ -47,6 +52,10 @@ public class FeedData {
             title = entry.getString("title");
         }
         else if (title.equals("")) return false;
+
+        if(authorNameByBO == null){
+            authorNameByBO = entry.getString("authorName");
+        } else if (authorNameByBO.equals("")) return false;
 
         if (kind.equals("News"))
             return true;
@@ -75,18 +84,26 @@ public class FeedData {
 
         if (isPublic == null){
             isPublic = entry.getString("isPublic");
-        } else if (!isPublic.equals("No") && !isPublic.equals("Yes")) return false;
+        }
+        else if (!isPublic.equals("yes") && !isPublic.equals("no")) return false;
 
         if (capacity == null){
             capacity = entry.getString("capacity");
         }
         else if (Integer.parseInt(capacity) < 2) return false;
 
+        if (validated_backoffice == null){
+            validated_backoffice = entry.getString("isItPaid");
+        }
+        else if (!validated_backoffice.equals("true") && !validated_backoffice.equals("false")) return false;
+
+
         if (isItPaid == null){
             isItPaid = entry.getString("isItPaid");
             return true;
         }
-        return isItPaid.equals("No") || isItPaid.equals("Yes");
+
+        return isItPaid.equals("no") || isItPaid.equals("yes");
 
     }
 
