@@ -11,7 +11,6 @@ import util.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -118,28 +117,25 @@ public class ModifyUserResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            UserRecord target = firebaseAuth.getUser(data.target);
             Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
-            Entity user = txn.get(userKey);
-            Entity target = txn.get(targetKey);
 
-            //Falta criar token novo e apagar o antigo
-
-            if(user == null || target == null) {
-                txn.rollback();
-                LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
-                return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else
-            if( !data.validateDelete(String.valueOf(getRole(decodedToken)).replaceAll("\"", ""), target.getString(ROLE))) {
+            if( !data.validateDelete(getRole(decodedToken), getRole(target)) ) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
-            } else {
-                txn.delete(targetKey);
-                LOG.info("Target deleted.");
-                txn.commit();
-                return Response.ok(target).build();
             }
+
+            firebaseAuth.deleteUser(target.getUid());
+
+            txn.delete(targetKey);
+            txn.commit();
+
+            LOG.info("Target deleted.");
+            return Response.ok(target).build();
+        } catch (FirebaseAuthException e) {
+            txn.rollback();
+            throw new RuntimeException(e);
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
