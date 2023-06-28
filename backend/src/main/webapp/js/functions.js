@@ -647,7 +647,7 @@ function modifyUserRole(){
 }
 
 function deleteUser(){
-    var target = document.getElementById("target").value;
+    var target = document.getElementById("targetDelUser").value;
 
     var data = {
         "target": target

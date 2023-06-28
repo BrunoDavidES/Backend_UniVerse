@@ -246,7 +246,7 @@ public class ModifyUserResource {
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
             } else
-            if( !data.validateDelete(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE))) {
+            if( !data.validateDelete(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE)) && !String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "").equals(data.target)) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
