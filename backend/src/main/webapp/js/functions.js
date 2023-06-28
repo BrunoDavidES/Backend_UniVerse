@@ -58,7 +58,7 @@ function logout(){
         //Events
 function postEvent(){
     var data = {
-        "title": document.getElementById("title").value;,
+        "title": document.getElementById("title").value,
         "startDate": document.getElementById("startDate").value,
         "endDate": document.getElementById("endDate").value,
         "location": document.getElementById("location").value,
@@ -363,16 +363,16 @@ function postNews(){
                 console.log(request.responseText);
                 console.log("FAIL");
             }
-        };
-    }
+        }
+    };
     request.send(JSON.stringify(data));
 }
 
 function editNews(){
 
-    var id = document.getElementById("newsID").value;
-    var title = document.getElementById("title").value;
-    var authorName = document.getElementById("author").value;
+    var id = document.getElementById("idEventMod").value;
+    var title = document.getElementById("titleMod").value;
+    var authorName = document.getElementById("authorMod").value;
     var text = document.getElementById("textMod").value;
 
     var data = {};
@@ -392,48 +392,36 @@ function editNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ){
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
-                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
-                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
 
-                bucketGETRequest.onreadystatechange = function(){
-                    if (bucketGETRequest.readyState == 4){
-                        if (bucketGETRequest.status == 200 ){
-                            var fileContent = bucketGETRequest.responseText;
+                if ( text !== localStorage.getItem(id) ){
 
-                            if (fileContent.equals(text)){
+                    var bucketPOSTRequest = new XMLHttpRequest();
+                    bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                    bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
+
+                    bucketPOSTRequest.onreadystatechange  = function() {
+                        if (bucketPOSTRequest.readyState == 4){
+                            if (bucketPOSTRequest.status == 200){
                                 console.log("SUCCESS");
                                 alert("SUCCESS");
+                                localStorage.removeItem(id);
                             }
                             else {
-                                var bucketPOSTRequest = new XMLHttpRequest();
-                                bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
-                                bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
-
-                                if (bucketPOSTRequest.readyState == 4){
-                                    if (bucketPOSTRequest.status == 200){
-                                        console.log("SUCCESS");
-                                        alert("SUCCESS");
-                                    }
-                                    else{
-                                        console.log("News entity edited but error uploading text body to bucket");
-                                        alert("News entity edited but error uploading text body to bucket");
-                                    }
-                                }
-                                bucketPOSTRequest.send(text);
+                                console.log("News entity edited but error uploading text body to bucket");
+                                alert("News entity edited but error uploading text body to bucket");
                             }
                         }
-                        else {
-                            console.log("Failed retrieving txt file from bucket");
-                            alert("Failed retrieving txt file from bucket");
-                        }
                     }
+                    bucketPOSTRequest.send(text);
                 }
-                bucketGETRequest.send();
+                else {
+                    console.log("SUCCESS");
+                    alert("SUCCESS");
+                }
             }
-            else if (request.readyState === 4) {
+            else {
                 console.log(request.responseText);
-                console.log("FAIL");
+                alert("DEU ERRO");
             }
         }
     };
@@ -463,17 +451,66 @@ function deleteNews(){
     request.send();
 }
 
-/*
+
 function getNews(){
     var id = document.getElementById("idEventMod").value;
+
+    var data = {
+        "id":id
+    };
 
     var request = new XMLHttpRequest();
 
     request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=0", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if ( request.readyState === 4 ) {
+            if ( request.status === 200 ) {
+                const response = JSON.parse(request.responseText);
+                const entities = response.map( function(entity) {
+                    return {
+                        title: entity.properties.title,
+                        authorName: entity.properties.authorName
+                    }
+                });
+
+                entities.forEach(function(entity) {
+                    document.getElementById("titleModLbl").innerHTML = "&emsp;Título da Notícia: " + entity.title.value;
+                    document.getElementById("authorModLbl").innerHTML = "&emsp;Autor da Notícia: " + entity.authorName.value;
+                });
+
+                var bucketGETRequest = new XMLHttpRequest();
+
+                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
+
+                bucketGETRequest.onreadystatechange = function() {
+                    if ( bucketGETRequest.readyState === 4 ) {
+                        if ( bucketGETRequest.status === 200 ) {
+                            localStorage.setItem( id , bucketGETRequest.responseText );
+                            document.getElementById("textMod").value = bucketGETRequest.responseText;
+                        }
+                        else {
+                            console.log(request.responseText);
+                            alert.log("Wrong ID for News");
+                        }
+                    }
+                }
+
+                bucketGETRequest.send();
+            }
+            else {
+                console.log(request.responseText);
+                alert.log("FAIL");
+            }
+        }
+    }
+
+    request.send(JSON.stringify(data));
 }
 
- */           //FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
             //USERS

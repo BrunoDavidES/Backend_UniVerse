@@ -24,6 +24,7 @@ public class FeedData {
 
     public String validated_backoffice;
 
+    // News only attributes
     public String authorNameByBO;
 
     public boolean validate(String kind) {
@@ -51,6 +52,10 @@ public class FeedData {
             title = entry.getString("title");
         }
         else if (title.equals("")) return false;
+
+        if(authorNameByBO == null){
+            authorNameByBO = entry.getString("authorName");
+        } else if (authorNameByBO.equals("")) return false;
 
         if (kind.equals("News"))
             return true;
@@ -91,6 +96,7 @@ public class FeedData {
             validated_backoffice = entry.getString("isItPaid");
         }
         else if (!validated_backoffice.equals("true") && !validated_backoffice.equals("false")) return false;
+
 
         if (isItPaid == null){
             isItPaid = entry.getString("isItPaid");
