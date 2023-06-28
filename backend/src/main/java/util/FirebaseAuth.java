@@ -1,13 +1,15 @@
 package util;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.auth.UserRecord;
 
-public class AuthToken {
-    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+import static util.Constants.*;
 
-    public AuthToken() {}
+public class FirebaseAuth {
+    private static final com.google.firebase.auth.FirebaseAuth firebaseAuth = com.google.firebase.auth.FirebaseAuth.getInstance();
+
+    public FirebaseAuth() {}
 
     public static FirebaseToken authenticateToken(String token) {
         try {
@@ -22,7 +24,9 @@ public class AuthToken {
         }
     }
 
+    public static String getRole(UserRecord user) { return String.valueOf(user.getCustomClaims().get(ROLE));}
+
     public static String getRole(FirebaseToken token) {
-        return (String) token.getClaims().get("role");
+        return String.valueOf(token.getClaims().get(ROLE));
     }
 }

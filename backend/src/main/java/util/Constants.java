@@ -24,6 +24,7 @@ public class Constants {
     public static final String D = "D";
     public static final String A = "A";
     public static final String ROLE = "role";
+    public static final String LAST_UPDATE = "time_lastupdate";
     public static final String USER = "User";
     public static final String EVENT = "Event";
     public static final String NEWS = "News";
