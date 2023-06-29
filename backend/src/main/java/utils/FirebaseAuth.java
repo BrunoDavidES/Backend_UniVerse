@@ -1,10 +1,10 @@
-package util;
+package utils;
 
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 
-import static util.Constants.*;
+import static utils.Constants.*;
 
 public class FirebaseAuth {
     private static final com.google.firebase.auth.FirebaseAuth firebaseAuth = com.google.firebase.auth.FirebaseAuth.getInstance();

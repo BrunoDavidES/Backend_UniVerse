@@ -1,4 +1,4 @@
-package util;
+package models;
 
 import com.google.cloud.datastore.Entity;
 

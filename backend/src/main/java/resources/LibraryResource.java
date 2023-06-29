@@ -2,8 +2,8 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
-import util.BookData;
-import util.LibraryRoomData;
+import models.BookData;
+import models.LibraryRoomData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

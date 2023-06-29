@@ -1,4 +1,4 @@
-package util;
+package models;
 
 public class LibraryRoomData {
     private String id;

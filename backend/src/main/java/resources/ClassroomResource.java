@@ -1,8 +1,8 @@
 package resources;
 
 import com.google.cloud.datastore.*;
-import util.ClassroomData;
-import util.ScheduleSlotData;
+import models.ClassroomData;
+import models.ScheduleSlotData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

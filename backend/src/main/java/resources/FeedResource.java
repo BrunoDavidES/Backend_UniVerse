@@ -2,8 +2,9 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.cloud.datastore.StructuredQuery.*;
 import com.google.firebase.auth.FirebaseToken;
-import util.FeedData;
+import models.FeedData;
 
 import com.google.gson.Gson;
 
@@ -13,8 +14,9 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static util.FirebaseAuth.*;
-import static util.Constants.*;
+import static utils.FirebaseAuth.*;
+import static utils.Constants.*;
+import static utils.Query.*;
 
 @Path("/feed")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -218,34 +220,17 @@ public class FeedResource {
     @POST
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntries(@HeaderParam("Authorization") String token, @PathParam("kind") String kind,
-                                @QueryParam("limit") String limit,
-                                @QueryParam("offset") String offset, Map<String, String> filters) {
+    public Response queryEntries(@HeaderParam("Authorization") String token,
+                                 @PathParam("kind") String kind,
+                                 @QueryParam("limit") String limit,
+                                 @QueryParam("offset") String offset,
+                                 Map<String, String> filters) {
 
         LOG.fine("Attempt to query feed " + kind);
 
-        if (filters == null)
-            filters = new HashMap<>(1);
+        filterPublicEvents(token, kind, filters);
 
-        if(kind.equals(EVENT)) {
-            FirebaseToken decodedToken = authenticateToken(token);
-            if (decodedToken == null) {
-                LOG.info(TOKEN_NOT_FOUND);
-                filters.put("isPublic", "yes");
-            }
-        }
-
-        StructuredQuery.CompositeFilter attributeFilter = null;
-
-        StructuredQuery.PropertyFilter propFilter;
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
-
-            if(attributeFilter == null)
-                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
-            else
-                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
-        }
+        CompositeFilter attributeFilter = CompositeFilterAnd(filters);
 
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(kind)
@@ -254,12 +239,9 @@ public class FeedResource {
                 .setOffset(Integer.parseInt(offset))
                 .build();
         QueryResults<Entity> queryResults = datastore.run(query);
-        List<Entity> results = new ArrayList<>();
-        queryResults.forEachRemaining(results::add);
 
         LOG.info("Ides receber um query ó filho!");
-        Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
+        return Response.ok(toJson(queryResults)).build();
     }
 
     @POST
@@ -271,9 +253,25 @@ public class FeedResource {
 
         LOG.fine("Attempt to count the query feed " + kind);
 
-        if (filters == null)
-            filters = new HashMap<>(1);
+        filterPublicEvents(token, kind, filters);
 
+        CompositeFilter attributeFilter = CompositeFilterAnd(filters);
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(kind)
+                .setFilter(attributeFilter)
+                .build();
+        QueryResults<Entity> queryResults = datastore.run(query);
+
+        LOG.info("Received a query!");
+
+        int count = count(queryResults);
+
+        LOG.info("Query feed counted");
+        return Response.ok(count).build();
+    }
+
+    private void filterPublicEvents(String token, String kind, Map<String, String> filters) {
         if(kind.equals(EVENT)) {
             FirebaseToken decodedToken = authenticateToken(token);
             if (decodedToken == null) {
@@ -281,33 +279,7 @@ public class FeedResource {
                 filters.put("isPublic", "yes");
             }
         }
-
-        StructuredQuery.CompositeFilter attributeFilter = null;
-
-        StructuredQuery.PropertyFilter propFilter;
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
-
-            if(attributeFilter == null)
-                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
-            else
-                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
-        }
-
-        Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind(kind)
-                .setFilter(attributeFilter)
-                .build();
-        QueryResults<Entity> queryResults = datastore.run(query);
-        LOG.info("Received a query!");
-
-        int count = 0;
-        while (queryResults.hasNext()) {
-            queryResults.next();
-            count++;
-        }
-
-        LOG.info("Query feed counted");
-        return Response.ok(count).build();
     }
+
+
 }

@@ -1,6 +1,4 @@
-package util;
-
-import resources.SubjectResource;
+package models;
 
 public class SubjectData {
     private String id;

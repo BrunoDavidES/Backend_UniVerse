@@ -1,4 +1,4 @@
-package util;
+package models;
 
 public class ModifyPwdData {
     public String password;

@@ -4,7 +4,7 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
-import util.ReportData;
+import models.ReportData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -12,8 +12,8 @@ import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static util.FirebaseAuth.*;
-import static util.Constants.*;
+import static utils.FirebaseAuth.*;
+import static utils.Constants.*;
 
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -181,9 +181,7 @@ public class ReportsResource {
 
         }
 
-        if( filters == null){
-            filters = new HashMap<>(1);
-        }
+
         StructuredQuery.CompositeFilter attributeFilter = null;
         StructuredQuery.PropertyFilter propFilter;
 

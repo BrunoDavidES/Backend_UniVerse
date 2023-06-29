@@ -1,8 +1,8 @@
 package resources;
 
 import com.google.cloud.datastore.*;
-import util.EnrollData;
-import util.SubjectData;
+import models.EnrollData;
+import models.SubjectData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

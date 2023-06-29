@@ -1,4 +1,4 @@
-package util;
+package models;
 
 public class BookData {
     private String id;

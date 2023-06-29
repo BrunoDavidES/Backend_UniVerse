@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.*;
-import util.*;
+import models.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.FirebaseAuth.*;
-import static util.Constants.*;
+import static utils.FirebaseAuth.*;
+import static utils.Constants.*;
 
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

@@ -1,4 +1,4 @@
-package util;
+package models;
 
 public class EnrollData {
     private String year;

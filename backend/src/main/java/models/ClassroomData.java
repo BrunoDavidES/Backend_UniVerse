@@ -1,4 +1,4 @@
-package util;
+package models;
 
 public class ClassroomData {
     private String id;

@@ -8,7 +8,7 @@ import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
-import util.NucleusData;
+import models.NucleusData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.FirebaseAuth.*;
-import static util.Constants.*;
+import static utils.FirebaseAuth.*;
+import static utils.Constants.*;
 
 @Path("/nucleus")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

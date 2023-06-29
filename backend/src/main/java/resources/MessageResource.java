@@ -3,14 +3,12 @@ package resources;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.database.*;
-import util.MessageData;
+import models.MessageData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Path("/message")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

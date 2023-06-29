@@ -9,8 +9,8 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static util.FirebaseAuth.*;
-import static util.Constants.*;
+import static utils.FirebaseAuth.*;
+import static utils.Constants.*;
 
 @Path("/entity")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

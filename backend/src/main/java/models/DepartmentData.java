@@ -1,9 +1,8 @@
-package util;
+package models;
 
 import com.google.cloud.datastore.Entity;
 
 import java.util.List;
-import java.util.Map;
 
 public class DepartmentData {
 

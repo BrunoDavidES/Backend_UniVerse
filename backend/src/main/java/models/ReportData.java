@@ -1,6 +1,4 @@
-package util;
-
-import java.util.List;
+package models;
 
 public class ReportData {
     public String title;

@@ -1,4 +1,4 @@
-package util;
+package utils;
 
 public class Constants {
     public static final String CAPI = "Your not one of us\n" +

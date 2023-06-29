@@ -1,9 +1,4 @@
-package util;
-
-import com.google.cloud.datastore.Entity;
-
-import java.util.HashMap;
-import java.util.Map;
+package models;
 
 public class UserData {
 	private static final String ALUNO = "A";
