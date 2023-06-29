@@ -2,6 +2,7 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.cloud.datastore.StructuredQuery.*;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.ReportData;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 
 import static utils.FirebaseAuth.*;
 import static utils.Constants.*;
+import static utils.Query.*;
 
 @Path("/reports")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -28,6 +30,7 @@ public class ReportsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postReports(@HeaderParam("Authorization") String token,
                                 ReportData data) {
+
         LOG.fine("Attempt to post report.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -75,6 +78,7 @@ public class ReportsResource {
     @Path("/edit/{id}")
     public Response editReport(@HeaderParam("Authorization") String token,
                                @PathParam("id") String id) {
+
         LOG.fine("Attempt to edit report");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -117,7 +121,8 @@ public class ReportsResource {
     @Path("/status/{id}/{status}")
     public Response statusReport(@HeaderParam("Authorization") String token,
                                  @PathParam("id") String id,
-                                 @PathParam("status") String status){
+                                 @PathParam("status") String status) {
+
         LOG.fine("Attempt to edit report");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -168,6 +173,7 @@ public class ReportsResource {
                                  @QueryParam("limit") int limit,
                                  @QueryParam("offset") int offset,
                                  Map<String, String> filters) {
+
         LOG.fine("Attempt to query reports.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -181,19 +187,7 @@ public class ReportsResource {
 
         }
 
-
-        StructuredQuery.CompositeFilter attributeFilter = null;
-        StructuredQuery.PropertyFilter propFilter;
-
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
-
-            if(attributeFilter == null) {
-                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
-            } else {
-                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
-            }
-        }
+        CompositeFilter attributeFilter = CompositeFilterAnd(filters);
 
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(REPORT)
@@ -203,12 +197,8 @@ public class ReportsResource {
                 .build();
         QueryResults<Entity> queryResults = datastore.run(query);
 
-        List<Entity> results = new ArrayList<>();
-        queryResults.forEachRemaining(results::add);
-
         LOG.info("Ides receber um query ó filho!");
-        Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
+        return Response.ok(toJson(queryResults)).build();
 
     }
 
@@ -216,6 +206,7 @@ public class ReportsResource {
     @Path("/unresolved")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response numberOfUnresolvedReports(@HeaderParam("Authorization") String token) {
+
         LOG.fine("Trying to know how many unresolved reports exist");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -225,7 +216,8 @@ public class ReportsResource {
 
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO)){
+
+        if(!user.getString(ROLE).equals(BO)) {
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
 
@@ -237,11 +229,7 @@ public class ReportsResource {
                 .build();
         QueryResults<Entity> queryResults = datastore.run(query);
 
-        int count = 0;
-        while (queryResults.hasNext()){
-            queryResults.next();
-            count++;
-        }
+        int count = count(queryResults);
 
         return Response.ok(count).build();
 

@@ -30,7 +30,8 @@ public class FeedResource {
     @Path("/post/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postEntry(@HeaderParam("Authorization") String token,
-                              @PathParam("kind") String kind, FeedData data) {
+                              @PathParam("kind") String kind,
+                              FeedData data) {
 
         LOG.fine("Attempt to post entry to feed.");
 
@@ -103,7 +104,8 @@ public class FeedResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editEntry(@HeaderParam("Authorization") String token,
                               @PathParam("kind") String kind,
-                              @PathParam("id") String id, FeedData data) {
+                              @PathParam("id") String id,
+                              FeedData data) {
 
         LOG.fine("Attempt to edit feed entry.");
 
