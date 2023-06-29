@@ -40,27 +40,27 @@ public class ModifyUserResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
-            data.fillGaps(user);
+
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
                 return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + decodedToken.getUid().toString()).build();
-            } else {
-                    Entity newUser = Entity.newBuilder(user)
-                            .set("name", data.name)
-                            .set("status", data.status)
-                            .set("license_plate", data.license_plate)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
-
-                    txn.update(newUser);
-                    LOG.info(decodedToken.getUid().toString() + " edited.");
-                    txn.commit();
-                    return Response.ok(user).build();
-
             }
+
+            data.fillGaps(user);
+            Entity newUser = Entity.newBuilder(user)
+                    .set("name", data.name)
+                    .set("status", data.status)
+                    .set("license_plate", data.license_plate)
+                    .set("time_lastupdate", Timestamp.now())
+                    .build();
+            txn.update(newUser);
+            txn.commit();
+
+            LOG.info(decodedToken.getUid() + " edited.");
+            return Response.ok(user).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
