@@ -184,7 +184,7 @@ public class ProfileResource {
     @Path("/personalEvent/get/{title}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
     public Response getPersonalEvent(@Context HttpServletRequest request,@PathParam("title") String title){
-        LOG.fine("Attempt to edit a personal event.");
+        LOG.fine("Attempt to get a personal event.");
 
         Transaction txn = datastore.newTransaction();
             final ValToken validator = new ValToken();
@@ -211,8 +211,8 @@ public class ProfileResource {
             String[] l = list.split("#");
             String[] oldEvent = new String[5];
             for(String event: l){
-                if(event.contains(title)){
-                    oldEvent = event.replace("#", "").split("%");
+                oldEvent = event.split("%");
+                if(oldEvent[0].equals(title)){
                     break;
                 }
             }
@@ -226,6 +226,53 @@ public class ProfileResource {
 
         LOG.fine("Personal event successfully gotten");
         return Response.ok(g.toJson(data)).build();
+    }
+
+
+    @GET
+    @Path("/personalEvent/monthly/{monthAndYear}")
+    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    public Response getPersonalEventByMonth(@Context HttpServletRequest request,@PathParam("monthAndYear") String monthAndYear){
+        LOG.fine("Attempt to get a personal event.");
+
+        Transaction txn = datastore.newTransaction();
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+        Entity user = txn.get(userKey);
+        if( user == null ) {
+            txn.rollback();
+            LOG.warning(USER_DOES_NOT_EXIST);
+            return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+        }
+        String list = user.getString(PERSONAL_EVENT_LIST);
+        String[] l = list.split("#");
+        String[] oldEvent;
+        List<PersonalEventsData> result = new ArrayList<>();
+
+        for(String event: l){
+            oldEvent = event.split("%");
+            if(!oldEvent[0].equals("") && oldEvent[2].contains("-" + monthAndYear)){
+                PersonalEventsData data = new PersonalEventsData();
+                data.title = oldEvent[0];
+                data.username = oldEvent[1];
+                data.beginningDate = oldEvent[2];
+                data.hours = oldEvent[3];
+                data.location = oldEvent[4];
+                result.add(data);
+            }
+        }
+        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
+
+
+        LOG.fine("Personal events successfully gotten");
+        return Response.ok(g.toJson(result)).build();
     }
 
     @PATCH
