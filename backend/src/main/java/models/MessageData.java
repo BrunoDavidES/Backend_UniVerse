@@ -6,15 +6,13 @@ import java.util.List;
 public class MessageData {
     private String chatId;
     private String senderId;
-    private List<String> recipientIds = new ArrayList<>();
+    private String recipientId;
     private String message;
 
-    public MessageData() {
-
-    }
+    public MessageData() {}
 
     public boolean validate() {
-        return senderId != null && message != null && (recipientIds.size() == 1 || (recipientIds.size() > 1 && chatId != null));
+        return senderId != null && recipientId != null && message != null;
     }
 
     public String getSenderId() {
@@ -25,12 +23,12 @@ public class MessageData {
         this.senderId = senderId;
     }
 
-    public List<String> getRecipientIds() {
-        return recipientIds;
+    public String getRecipientId() {
+        return recipientId;
     }
 
-    public void setRecipientIds(List<String> recipientIds) {
-        this.recipientIds = recipientIds;
+    public void setRecipientIds(String recipientId) {
+        this.recipientId = recipientId;
     }
 
     public String getMessage() {
