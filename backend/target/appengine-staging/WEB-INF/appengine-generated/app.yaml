@@ -5,7 +5,7 @@ inbound_services:
 - warmup
 auto_id_policy: default
 beta_settings:
-  'source_reference': 'https://github.com/BrunoDavidES/Backend_UniVerse.git#fae1f298f4a77e6b058a24eb02fcf84c552ef1d5'
+  'source_reference': 'https://github.com/BrunoDavidES/Backend_UniVerse.git#4bb316d33644a0086f0439146bc335e57f15dc8a'
 handlers:
 - url: (/.*/)
   static_files: __static__\1index.html
