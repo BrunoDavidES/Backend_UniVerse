@@ -952,7 +952,7 @@ function getDepartment() {
     var id = document.getElementById("dptIdMod").value;
 
     var data = {
-        "id":id
+        "id": id
     }
 
     var request = new XMLHttpRequest();
@@ -966,12 +966,25 @@ function getDepartment() {
            console.log("SUCCESS");
            const response = JSON.parse(request.responseText);
 
-           document.getElementById("addressMod").value = response.address.value;
-           document.getElementById("emailMod").value = response.email.value;
-           document.getElementById("faxMod").value = response.fax.value;
-           document.getElementById("nameDptMod").value = response.name.value;
-           document.getElementById("phoneNumberMod").value = response.phoneNumber.value;
-           document.getElementById("presDptMod").value = response.president.value;
+           const entities = response.map(function(entity) {
+               return {
+                   address: entity.properties.address,
+                   email: entity.properties.email,
+                   fax: entity.properties.fax,
+                   name: entity.properties.name,
+                   phoneNumber: entity.properties.phone_number,
+                   president: entity.properties.president
+               };
+           });
+
+           entities.forEach(function(entity) {
+               document.getElementById("addressMod").value = entity.address.value;
+               document.getElementById("emailMod").value = entity.email.value;
+               document.getElementById("faxMod").value = entity.fax.value;
+               document.getElementById("nameDptMod").value = entity.name.value;
+               document.getElementById("phoneNumberMod").value = entity.phoneNumber.value;
+               document.getElementById("presDptMod").value = entity.president.value;
+           });
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
