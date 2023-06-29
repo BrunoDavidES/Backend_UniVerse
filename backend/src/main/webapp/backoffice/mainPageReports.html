@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title> Reports FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
+    <link rel="stylesheet" href="details.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -106,9 +107,9 @@
     <div class="home-content">
         <div class="topnav" id="myTopnav">
             <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll')" class="active">Obter Report</button>
-            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport')">Resolver Report</button>
-            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport')">Listar reports por resolver</button>
-            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport')">Listar todos os reports</button>
+            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport')">Estado do Report</button>
+            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport')">Listar Reports por resolver</button>
+            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport')">Listar todos os Reports</button>
         </div>
         <br><br>
         <div id="getReport">
@@ -118,9 +119,9 @@
                 <div class="input-container ic1">
                     <input id="idReport" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="idReportValidate" class="placeholder">Id do Report</label>
+                    <label for="idReport" class="placeholder">Id do Report</label>
                 </div>
-                <button type="text" class="submit" onclick="">Obter Report</button>
+                <button type="text" class="submit" onclick="getReport()">Obter Report</button>
             </div>
             <br>
             <div class="form">
@@ -164,25 +165,57 @@
         </div>
         <div id="resolve" style="display: none;">
             <div class="form">
-                <div class="title">Resolver Conflito</div>
-                <div class="subtitle">Vamos confirmar que um report foi tratado!</div>
+                <div class="title">Estado do Report</div>
+                <div class="subtitle">Mudar o estado do Report</div>
                 <div class="input-container ic1">
-                    <input id="idReportValidate" class="input" type="text" placeholder=" "/>
+                    <input id="idReportStatus" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="idReportValidate" class="placeholder">Id do Report</label>
-                </div>
-                <button type="text" class="submit" onclick="validateEvent()">Marcar como resolvido</button>
+                    <label for="idReportStatus" class="placeholder">Id do Report</label>
+                </div><br>
+                <label class="subtitle" for="newStatus">&emsp;Novo estado &emsp; </label>
+                <select style="height:25px; width: 120px; border-radius: 10px; text-align: center;" id="newStatus">
+                    <option value="UNSEEN">Unseen</option>
+                    <option value="SEEN">Seen</option>
+                    <option value="RESOLVED">Resolved</option>
+                </select>
+                <button type="text" class="submit" onclick="reportStatus()">Mudar estado</button>
             </div>
         </div>
-        <div id="unReport" style="display: none;">
-            <div class="form">
-                <div class="title">Listar nao resolvidos</div>
-            </div>
+        <div id="unReport" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar os Reports não resolvidos</h1>
+            <br>
+            <h2 class="subtitle" for="unResListLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
+            <select id="unResListLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
+
+            <ul id="listOfUnresReports"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="unresDetails"></div>
+            <br>
+            <button class="submit" onclick="loadingPopupOn();queryUnresolvedReports();loadingPopupOff();">Listar</button>
         </div>
-        <div id="reportAll" style="display: none;">
-            <div class="form">
-                <div class="title">Listar todos</div>
-            </div>
+        <div id="reportAll" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar todos os Reports</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
+
+            <ul id="listOfReports"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="details"></div>
+            <br>
+            <button class="submit" onclick="loadingPopupOn();queryReports();loadingPopupOff();">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">

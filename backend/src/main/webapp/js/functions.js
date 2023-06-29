@@ -759,7 +759,7 @@ function getUser() {
 
 //REPORTS
 
-function getRequest(){
+function getReport(){
 var id = document.getElementById("idReport").value;
 
     var data = {
@@ -825,11 +825,11 @@ var id = document.getElementById("idReport").value;
 
 var reportsQueryOffset = 0;
 function queryReports(){
-    var limit = document.getElementById("limit").value;
+    var limit = document.getElementById("listLimitId").value;
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+reportsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/reports/query?limit="+limit+"&offset="+reportsQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
@@ -882,35 +882,111 @@ function queryReports(){
                     });
                     list.appendChild(listItem);
                 });
-                newsQueryOffset += limit;
+                reportsQueryOffset += limit;
             }
             else {
                 console.log(request.responseText);
-                alert.log("Wrong ID for News");
+                alert.log("FAIL");
             }
         }
     }
     request.send();
 }
 
-function reportStatus(){
-    var target = document.getElementById("target").value;
-    var status = document.getElementById("status").value;
+
+var unresReportsQueryOffset = 0;
+function queryUnresolvedReports(){
+    var limit = document.getElementById("listOfUnresReports").value;
 
     var request = new XMLHttpRequest();
 
-    request.open("GET", document.location.origin + "/rest/reports/status/" + target + "/" + status, true);
+    request.open("POST", document.location.origin + "/rest/reports/query/unresolved?limit="+limit+"&offset=" + unresReportsQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        title: entity.properties.title,
+                        reporter: entity.properties.reporter,
+                        location: entity.properties.location,
+                        id: entity.properties.id,
+                        time_creation: entity.properties.time_creation,
+                        time_lastUpdated: entity.properties.time_lastUpdated,
+                        status: entity.properties.status
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('unresDetails');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = entity.title.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Título do Report: " + entity.title.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
+                                                "<br> &emsp;Localização: " + entity.location.value +
+                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
+                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated +
+                                                "<br> &emsp;Estado do Report: " + entity.status.value;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                unresReportsQueryOffset += limit;
+            }
+            else {
+                console.log(request.responseText);
+                alert.log("FAIL");
+            }
         }
-        else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
+    }
+    request.send();
+}
+
+
+
+
+function reportStatus(){
+    var id = document.getElementById("idReportStatus").value;
+    var status = document.getElementById("newStatus").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/reports/status/" + id + "/" + status, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4){
+            if (request.status === 200) {
+                console.log("SUCCESS");
+                alert("SUCCESS");
+            }
+            else {
+                console.log(request.responseText);
+                console.log("FAIL");
+                alert.log("FAIL");
+            }
         }
     };
 
@@ -1090,13 +1166,191 @@ function editDepartment(){
 }
 
 //Nucleos
+function postNucleus(){
+var data = {
+        "id": document.getElementById("idNuc").value,
+        "name": document.getElementById("nameNuc").value,
+        "nucleusEmail": document.getElementById("email").value,
+        "president": document.getElementById("pres").value
+
+    };
+
+    if (document.getElementById("description").value !== "") {
+                data["description"] = document.getElementById("description").value;
+    }
+
+    if (document.getElementById("facebook").value !== "") {
+                data["facebook"] = document.getElementById("facebook").value;
+    }
+
+    if (document.getElementById("instagram").value !== "") {
+                data["instagram"] = document.getElementById("instagram").value;
+    }
+
+    if (document.getElementById("linkedin").value !== "") {
+                data["linkedIn"] = document.getElementById("linkedin").value;
+    }
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/nucleus/register", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+      if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          console.log("SUCCESS");
+      } else if (request.readyState === 4) {
+          console.log(request.responseText);
+          alert(request.responseText);
+          console.log("FAIL");
+      }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
+function getNucleus() {
+    var id = document.getElementById("nucId").value;
+
+    var data = {
+        "id": id
+    }
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+           console.log(request.responseText);
+           console.log("SUCCESS");
+           const response = JSON.parse(request.responseText);
+
+           const entities = response.map(function(entity) {
+               return {
+                   name: entity.properties.name,
+                   email: entity.properties.email,
+                   president: entity.properties.president,
+                   description: entity.properties.description,
+                   facebook: entity.properties.facebook,
+                   instagram: entity.properties.instagram,
+                   linkedin: entity.properties.linkedIn,
+                   website: entity.properties.website,
+                   twitter: entity.properties.twitter,
+                   youtube: entity.properties.youtube
+               };
+           });
+
+           entities.forEach(function(entity) {
+               document.getElementById("nameMod").value = entity.name.value;
+               document.getElementById("emailMod").value = entity.email.value;
+               document.getElementById("presMod").value = entity.president.value;
+               document.getElementById("descriptionMod").value = entity.description.value;
+               document.getElementById("facebookMod").value = entity.facebook.value;
+               document.getElementById("instagramMod").value = entity.instagram.value;
+               document.getElementById("linkedinMod").value = entity.linkedin.value;
+               document.getElementById("website").value = entity.website.value;
+               document.getElementById("twitter").value = entity.twitter.value;
+               document.getElementById("youtube").value = entity.youtube.value;
+           });
+
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert(request.responseText);
+            console.log("FAIL");
+        }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
+function editNucleus(){
+
+    var id = document.getElementById("nucId").value;
+    var email = document.getElementById("emailMod").value;
+    var name = document.getElementById("nameMod").value;
+    var president = document.getElementById("presMod").value;
+    var description = document.getElementById("descriptionMod").value;
+    var facebook = document.getElementById("facebookMod").value;
+    var instagram = document.getElementById("instagramMod").value;
+    var linkedin = document.getElementById("linkedinMod").value;
+    var website = document.getElementById("website").value;
+    var twitter = document.getElementById("twitter").value;
+    var youtube = document.getElementById("youtube").value;
+
+    var data = {
+            "id": id
+        };
+
+    if (email !== "") {
+            data["nucleusEmail"] = email;
+    }
+
+    if (name !== "") {
+            data["name"] = name;
+    }
+
+    if (president !== "") {
+            data["president"] = president;
+    }
+
+    if (description !== "") {
+            data["description"] = description;
+    }
+
+    if (facebook !== "") {
+            data["facebook"] = facebook;
+    }
+
+    if (instagram !== "") {
+            data["instagram"] = instagram;
+    }
+
+    if (linkedin !== "") {
+            data["linkedIn"] = linkedin;
+    }
+
+    if (website !== "") {
+                data["website"] = website;
+    }
+
+    if (twitter !== "") {
+                data["twitter"] = twitter;
+    }
+
+    if (youtube !== "") {
+                data["youtube"] = youtube;
+    }
+
+
+
+    var request = new XMLHttpRequest();
+    request.open("POST", document.location.origin + "/rest/nucleus/modify", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+                  console.log(request.responseText);
+                  console.log("SUCCESS");
+              } else if (request.readyState === 4) {
+                  console.log(request.responseText);
+                  alert(request.responseText);
+                  console.log("FAIL");
+              }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
 function deleteNucleus(){
     var id = document.getElementById("nucIdDel").value;
 
 
     var request = new XMLHttpRequest();
 
-    request.open("DELETE", document.location.origin + "/rest/nucleus/delete/" + id, true);
+    request.open("DELETE", document.location.origin + "/rest/nucleus/delete?id=" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {

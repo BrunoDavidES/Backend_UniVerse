@@ -509,6 +509,14 @@
         border-radius: 10px;
     }
 
+    #unresDetails {
+        box-sizing: border-box;
+        border: #0A2558;
+        border-width:2px;
+        border-style:solid;
+        border-radius: 10px;
+    }
+
     hr.rounded {
       border-top: 5px solid #0A2558;
       border-radius: 5px;

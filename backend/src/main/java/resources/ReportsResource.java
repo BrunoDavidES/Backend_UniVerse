@@ -52,6 +52,7 @@ public class ReportsResource {
     private static final String STUDENTS_UNION = "Students Union";
     private static final String USER_CLAIM = "user";
     private static final String NAME_CLAIM = "name";
+    private static final String STATUS_CLAIM = "status";
     private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
     private static final String MISSING_PARAMETER = "Missing parameter.";
     private static final String TOKEN_NOT_FOUND = "Token not found.";
@@ -268,6 +269,63 @@ public class ReportsResource {
             } else {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
             }
+        }
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind(REPORT)
+                .setFilter(attributeFilter)
+                .setLimit(limit)
+                .setOffset(offset)
+                .build();
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(results::add);
+
+        LOG.info("Ides receber um query ó filho!");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(results)).build();
+
+    }
+
+    @POST
+    @Path("/query/unresolved")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryUnresolvedReports(@Context HttpServletRequest request, @QueryParam("limit") int limit,
+                                 @QueryParam("offset") int offset, Map<String, String> filters) {
+        LOG.fine("Attempt to query reports.");
+
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        }
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+        Entity user = datastore.get(userKey);
+        if(!user.getString(ROLE).equals(BO)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+
+        }
+
+        QueryResults<Entity> queryResults;
+
+        StructuredQuery.CompositeFilter attributeFilter =
+                StructuredQuery.CompositeFilter.and( StructuredQuery.PropertyFilter.neq( STATUS_CLAIM, STATUS_SEEN ) );
+        if( filters == null){
+            filters = new HashMap<>(1);
+        }
+
+        StructuredQuery.PropertyFilter propFilter;
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
+
+            attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+
         }
 
         Query<Entity> query = Query.newEntityQueryBuilder()
