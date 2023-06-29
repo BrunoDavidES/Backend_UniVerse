@@ -105,12 +105,64 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'resolve', 'unReport', 'reportAll')" class="active">Resolver Report</button>
-            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'unReport', 'resolve', 'reportAll')">Listar reports por resolver</button>
-            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'reportAll', 'resolve', 'unReport')">Listar todos os reports</button>
+            <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll')" class="active">Obter Report</button>
+            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport')">Resolver Report</button>
+            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport')">Listar reports por resolver</button>
+            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport')">Listar todos os reports</button>
         </div>
         <br><br>
-        <div id="resolve">
+        <div id="getReport">
+            <div class="form">
+                <div class="title">Obter Report</div>
+                <div class="subtitle">Vamos ver os dados de um report!</div>
+                <div class="input-container ic1">
+                    <input id="idReport" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="idReportValidate" class="placeholder">Id do Report</label>
+                </div>
+                <button type="text" class="submit" onclick="">Obter Report</button>
+            </div>
+            <br>
+            <div class="form">
+                <div class="title" id="username">Report</div>
+                <div class="input-container ic1">
+                    <input id="repTitle" class="input" readonly="readonly" type="text" placeholder=""/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Título do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="location" class="input" readonly="readonly" type="text" placeholder=""/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Localização</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="statusRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Status do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="authorRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Autor do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="creationRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Criação do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="lastUpdatedRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Última atualização do Report</label>
+                </div>
+                <div class="input-container2 ic2">
+                    <textarea id="textRep" class="input" cols="40" rows="5" readonly="readonly"></textarea>
+                    <div class="cut cut"></div>
+                    <label class="placeholder">Corpo do Report</label>
+                </div>
+            </div><br><br>
+        </div>
+        <div id="resolve" style="display: none;">
             <div class="form">
                 <div class="title">Resolver Conflito</div>
                 <div class="subtitle">Vamos confirmar que um report foi tratado!</div>
@@ -153,21 +205,24 @@
            loading.classList.remove("openLoadingPopup");
       }
 
-      function changeWindow(btn, btn1, btn2, div, div1, div2){
+      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
+        var gone3 = document.getElementById(div3);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
+        var button4 = document.getElementById(btn3);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
+        gone3.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
-
+        button4.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");

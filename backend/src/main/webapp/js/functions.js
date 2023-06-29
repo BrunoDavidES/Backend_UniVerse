@@ -759,6 +759,70 @@ function getUser() {
 
 //REPORTS
 
+function getRequest(){
+var id = document.getElementById("idReport").value;
+
+    var data = {
+        "id":id
+    };
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if ( request.readyState === 4 ) {
+            if ( request.status === 200 ) {
+                const response = JSON.parse(request.responseText);
+                const entities = response.map( function(entity) {
+                    return {
+                        title: entity.properties.title,
+                        reporter: entity.properties.reporter,
+                        location: entity.properties.location,
+                        time_creation: entity.properties.time_creation,
+                        time_lastUpdated: entity.properties.time_lastUpdated,
+                        status: entity.properties.status
+                    }
+                });
+
+                entities.forEach(function(entity) {
+                    document.getElementById("repTitle").value = entity.title.value;
+                    document.getElementById("location").value = entity.location.value;
+                    document.getElementById("authorRep").value = entity.reporter.value;
+                    document.getElementById("statusRep").value = entity.status.value;
+                    document.getElementById("creationRep").value = entity.time_creation.value;
+                    document.getElementById("lastUpdatedRep").value = entity.time_lastUpdated.value;
+                });
+
+                var bucketGETRequest = new XMLHttpRequest();
+
+                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/Report-" + id + ".txt");
+                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
+
+                bucketGETRequest.onreadystatechange = function() {
+                    if ( bucketGETRequest.readyState === 4 ) {
+                        if ( bucketGETRequest.status === 200 ) {
+                            localStorage.setItem( id , bucketGETRequest.responseText );
+                            document.getElementById("textRep").value = bucketGETRequest.responseText;
+                        }
+                        else {
+                            console.log(request.responseText);
+                            alert.log("Wrong ID for News");
+                        }
+                    }
+                }
+                bucketGETRequest.send();
+            }
+            else {
+                console.log(request.responseText);
+                alert.log("ALGUMA COISA FALHOU");
+            }
+        }
+    }
+    request.send(JSON.stringify(data));
+}
+
 var reportsQueryOffset = 0;
 function queryReports(){
     var limit = document.getElementById("limit").value;
