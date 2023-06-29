@@ -1,6 +1,7 @@
 function verifyLogin() {
+  var user = localStorage.getItem("userLogged");
   if(user === ""){
-          window.location.href = "/backoffice/index.html";
+        window.location.href = "/backoffice/index.html";
   }
 }
 

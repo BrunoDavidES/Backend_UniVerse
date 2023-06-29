@@ -31,34 +31,34 @@
   <ul class="nav-links">
     <li>
       <button onclick="window.location.href = '/backoffice/mainPage.html'">
-      <a href="#" class="active">
-        <i class='bx bx-grid-alt' ></i>
-        <span class="links_name">Home</span>
-      </a>
+        <a href="#" class="active">
+          <i class='bx bx-grid-alt' ></i>
+          <span class="links_name">Home</span>
+        </a>
       </button>
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
-      <a href="#news">
-        <i class='bx bx-message'></i>
-        <span class="links_name">Noticias</span>
-      </a>
+        <a href="#news">
+          <i class='bx bx-message'></i>
+          <span class="links_name">Noticias</span>
+        </a>
       </button>
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageEvents.html'">
-      <a href="#events">
-        <i class='bx bx-list-ul' ></i>
-        <span class="links_name">Eventos</span>
-      </a>
+        <a href="#events">
+          <i class='bx bx-list-ul' ></i>
+          <span class="links_name">Eventos</span>
+        </a>
       </button>
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
-      <a href="#users">
-        <i class='bx bx-user' ></i>
-        <span class="links_name">Users</span>
-      </a>
+        <a href="#users">
+          <i class='bx bx-user' ></i>
+          <span class="links_name">Users</span>
+        </a>
       </button>
     </li>
     <li>
@@ -71,10 +71,10 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
-      <a href="#reposts">
-        <i class='bx bx-book-alt' ></i>
-        <span class="links_name">Reports</span>
-      </a>
+        <a href="#reposts">
+          <i class='bx bx-book-alt' ></i>
+          <span class="links_name">Reports</span>
+        </a>
       </button>
     </li>
     <li>
@@ -87,18 +87,18 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-      <a href="#settings">
-        <i class='bx bx-cog' ></i>
-        <span class="links_name">Definições</span>
-      </a>
+        <a href="#settings">
+          <i class='bx bx-cog' ></i>
+          <span class="links_name">Definições</span>
+        </a>
       </button>
     </li>
     <li class="log_out">
       <button onclick="openPopup()">
-      <a href="#logout">
-        <i class='bx bx-log-out'></i>
-        <span class="links_name">Log out</span>
-      </a>
+        <a href="#logout">
+          <i class='bx bx-log-out'></i>
+          <span class="links_name">Log out</span>
+        </a>
       </button>
     </li>
   </ul>
@@ -119,26 +119,26 @@
   <div class="home-content">
     <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
       <div class="title" style="text-align: center">Users na Aplicação</div>
-      <div id="registered" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: red; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
+      <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div style="color: #0f0; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
     <br>
     <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
       <div class="title" style="text-align: center">Users Registados</div>
-      <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div id="registered" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
     <br>
     <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
       <div class="title" style="text-align: center">Reports por Resolver</div>
       <div id="unresolvedRep" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bxs-comment-error'></i></div>
+      <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bxs-comment-error'></i></div>
     </div>
   </div>
   <div class="popup" id="popup">
     <h3>Está prestes a fazer logout</h3>
     <p>Tem a certeza?</p>
-    <button type="button" onclick="logout()">Sim</button> &ensp;
+    <button type="button" onclick="logout()">Sim</button> &ensp
     <button type="button" onclick="closePopup()">Não</button>
   </div>
 </section>
@@ -192,7 +192,7 @@
         	min = min < 10 ? "0" + min : min;
         	sec = sec < 10 ? "0" + sec : sec;
 
-        	hAux = hour < 10 ? "0" : hour;
+        	hAux = hour < 10 ? "0" : 0;
 
         	let currentTime = hAux + hour + ":"
         		+ min + ":" + sec;
