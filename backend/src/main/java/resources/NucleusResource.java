@@ -33,7 +33,8 @@ public class NucleusResource {
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(@HeaderParam("Authorization") String token, NucleusData data) {
+    public Response register(@HeaderParam("Authorization") String token,
+                             NucleusData data) {
         LOG.fine("Attempt to create a nucleus by: " + data.president);
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -57,10 +58,8 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
             }
 
-            String creatorUsername = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
-
-            String creatorRole = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
-
+            String creatorUsername = decodedToken.getUid();
+            String creatorRole = getRole(decodedToken);
 
             if (!creatorRole.equals(BO)) {
                 if (creatorRole.equals(A)) {
@@ -72,13 +71,13 @@ public class NucleusResource {
                         LOG.warning(ENTITY_DOES_NOT_EXIST);
                         return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
                     }
-                    else if (!studentsUnion.getString("president").equals(creatorUsername)){
+                    if (!studentsUnion.getString("president").equals(creatorUsername)){
                         txn.rollback();
                         LOG.warning(PERMISSION_DENIED);
                         return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
                     }
                 }
-                else{
+                else {
                     txn.rollback();
                     LOG.warning(PERMISSION_DENIED);
                     return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
@@ -92,30 +91,29 @@ public class NucleusResource {
                 txn.rollback();
                 LOG.warning(NUCLEUS_ALREADY_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_ALREADY_EXISTS).build();
-            } else {
-
-                nucleus = Entity.newBuilder(nucleusKey)
-                        .set("email", data.nucleusEmail)
-                        .set("name", data.name)
-                        .set("id", data.id)
-                        .set("president", data.president)
-                        .set("website", "")
-                        .set("instagram", "")
-                        .set("twitter", "")
-                        .set("facebook", "")
-                        .set("youtube", "")
-                        .set("linkedIn", "")
-                        .set("description", "")
-                        .set("members_list", "")
-                        .set("time_creation", Timestamp.now())
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-                txn.add(nucleus);
-
-                LOG.info("Nucleus registered: " + data.id + "| " + data.name);
-                txn.commit();
-                return Response.ok(nucleus).entity("Nucleus registered").build();
             }
+
+            nucleus = Entity.newBuilder(nucleusKey)
+                    .set("email", data.nucleusEmail)
+                    .set("name", data.name)
+                    .set("id", data.id)
+                    .set("president", data.president)
+                    .set("website", "")
+                    .set("instagram", "")
+                    .set("twitter", "")
+                    .set("facebook", "")
+                    .set("youtube", "")
+                    .set("linkedIn", "")
+                    .set("description", "")
+                    .set("members_list", "")
+                    .set("time_creation", Timestamp.now())
+                    .set("time_lastupdate", Timestamp.now())
+                    .build();
+            txn.add(nucleus);
+            txn.commit();
+
+            LOG.info("Nucleus registered: " + data.id + "| " + data.name);
+            return Response.ok(nucleus).entity("Nucleus registered").build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -123,11 +121,11 @@ public class NucleusResource {
         }
     }
 
-
     @POST
     @Path("/modify")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyNucleus(@HeaderParam("Authorization") String token, NucleusData data){
+    public Response modifyNucleus(@HeaderParam("Authorization") String token,
+                                  NucleusData data){
         LOG.fine("Attempt to modify nucleus.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -151,8 +149,8 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
             }
 
-            String modifierUsername = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
-            String modifierRole = String.valueOf(getRole(decodedToken)).replaceAll("\"", "");
+            String modifierUsername = decodedToken.getUid();
+            String modifierRole = getRole(decodedToken);
 
             if (!modifierRole.equals(BO)) {
                 if (modifierRole.equals(A)) {
@@ -164,13 +162,13 @@ public class NucleusResource {
                         LOG.warning(ENTITY_DOES_NOT_EXIST);
                         return Response.status(Response.Status.NOT_FOUND).entity(PERMISSION_DENIED).build();
                     }
-                    else if (!studentsUnion.getString("president").equals(modifierUsername) || !nucleus.getString("president").equals(modifierUsername) ){
+                    if (!studentsUnion.getString("president").equals(modifierUsername) || !nucleus.getString("president").equals(modifierUsername) ){
                         txn.rollback();
                         LOG.warning(PERMISSION_DENIED);
                         return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
                     }
                 }
-                else{
+                else {
                     txn.rollback();
                     LOG.warning(PERMISSION_DENIED);
                     return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
@@ -178,7 +176,6 @@ public class NucleusResource {
             }
 
             data.fillGaps(nucleus);
-
             Entity newNucleus = Entity.newBuilder(nucleus)
                     .set("name", data.newName)
                     .set("id", data.id)
@@ -193,11 +190,10 @@ public class NucleusResource {
                     .set("description", data.description)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(newNucleus);
+            txn.commit();
 
             LOG.info("Nucleus " + data.name + " has been edited.");
-            txn.commit();
             return Response.ok(newNucleus).entity("Nucleus edited successfully").build();
         } finally {
             if (txn.isActive()) {
@@ -208,7 +204,8 @@ public class NucleusResource {
 
     @DELETE
     @Path("/delete")
-    public Response deleteNucleus(@HeaderParam("Authorization") String token, @QueryParam("id") String id){
+    public Response deleteNucleus(@HeaderParam("Authorization") String token,
+                                  @QueryParam("id") String id){
         LOG.fine("Attempt to delete nucleus.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -225,43 +222,43 @@ public class NucleusResource {
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            }else if( nucleus == null ) {
+            }
+            if( nucleus == null ) {
                 txn.rollback();
                 LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
-            } else {
-                String list = nucleus.getString("members_list");
-                String userPersonalList;
-                Key memberKey;
-                Entity memberEntity;
-                Entity newUser;
-                for(String member : list.split("#")) {
-                    if(!member.equals("")) {
-
-                        memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
-                        memberEntity = txn.get(memberKey);
-                        if (memberEntity == null) {
-                            txn.rollback();
-                            LOG.warning(WRONG_MEMBER);
-                            return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                        }
-                        userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
-                        newUser = Entity.newBuilder(memberEntity)
-                                .set("job_list", userPersonalList)
-                                .set("time_lastupdate", Timestamp.now())
-                                .build();
-
-                        txn.update(newUser);
-                    }
-                }
-
-
-                txn.delete(nucleusKey);
-                LOG.info("Nucleus deleted.");
-                txn.commit();
-                return Response.ok(nucleusKey).build();
             }
+
+            String list = nucleus.getString("members_list");
+            String userPersonalList;
+            Key memberKey;
+            Entity memberEntity;
+            Entity newUser;
+            for(String member : list.split("#")) {
+                if(!member.equals("")) {
+                    memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
+                    memberEntity = txn.get(memberKey);
+
+                    if (memberEntity == null) {
+                        txn.rollback();
+                        LOG.warning(WRONG_MEMBER);
+                        return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
+                    }
+
+                    userPersonalList = memberEntity.getString("job_list");
+                    userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
+                    newUser = Entity.newBuilder(memberEntity)
+                            .set("job_list", userPersonalList)
+                            .set("time_lastupdate", Timestamp.now())
+                            .build();
+                    txn.update(newUser);
+                }
+            }
+            txn.delete(nucleusKey);
+            txn.commit();
+
+            LOG.info("Nucleus deleted.");
+            return Response.ok(nucleusKey).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -274,22 +271,22 @@ public class NucleusResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryNucleus(@HeaderParam("Authorization") String token,
                                  @QueryParam("limit") String limit,
-                                 @QueryParam("offset") String offset, Map<String, String> filters){
+                                 @QueryParam("offset") String offset,
+                                 Map<String, String> filters){
         LOG.fine("Attempt to query nucleus.");
 
-        //Verificar, caso for evento privado, se o token é valido
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
-        QueryResults<Entity> queryResults;
-
-        StructuredQuery.CompositeFilter attributeFilter = null;
         if( filters == null){
             filters = new HashMap<>(1);
         }
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
         StructuredQuery.PropertyFilter propFilter;
+
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
@@ -298,18 +295,15 @@ public class NucleusResource {
             else
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
-
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind("Nucleus")
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
                 .build();
-
-        queryResults = datastore.run(query);
+        QueryResults<Entity> queryResults = datastore.run(query);
 
         List<Entity> results = new ArrayList<>();
-
         queryResults.forEachRemaining(results::add);
 
         LOG.info("Ides receber um query ó filho!");
@@ -321,7 +315,9 @@ public class NucleusResource {
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, NucleusData data) {
+    public Response addMembers(@HeaderParam("Authorization") String token,
+                               @PathParam("id") String id,
+                               NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -339,7 +335,7 @@ public class NucleusResource {
                 LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
             }
-            else if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))){
+            if(!getRole(decodedToken).equals(BO) && !nucleus.getString("president").equals(decodedToken.getUid())) {
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -352,14 +348,15 @@ public class NucleusResource {
             Entity newUser;
 
             for(String member : data.members) {
-
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
                 memberEntity = txn.get(memberKey);
+
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning(WRONG_MEMBER);
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
+
                 if (!list.contains(member)){
                     userPersonalList = memberEntity.getString("job_list");
                     userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "%" + "member");
@@ -372,15 +369,14 @@ public class NucleusResource {
                     list = list.concat("#" + member);
                 }
             }
-
             Entity updatedNucleus = Entity.newBuilder(nucleus)
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(updatedNucleus);
-            LOG.info("Members added.");
             txn.commit();
+
+            LOG.info("Members added.");
             return Response.ok(updatedNucleus).build();
         } finally {
             if (txn.isActive()) {
@@ -393,7 +389,9 @@ public class NucleusResource {
     @PATCH
     @Path("/delete/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@HeaderParam("Authorization") String token, @PathParam("id") String id, NucleusData data) {
+    public Response deleteMembers(@HeaderParam("Authorization") String token,
+                                  @PathParam("id") String id,
+                                  NucleusData data) {
         LOG.fine("Attempt to add members to the nucleus.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -410,14 +408,16 @@ public class NucleusResource {
         try {
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
-            if (!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""))) {
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            } else if (nucleus == null) {
+
+            if (nucleus == null) {
                 txn.rollback();
                 LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
+            }
+            if (!getRole(decodedToken).equals(BO) && !nucleus.getString("president").equals(decodedToken.getUid())) {
+                txn.rollback();
+                LOG.warning(NICE_TRY);
+                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
             }
 
             String list = nucleus.getString("members_list");
@@ -425,14 +425,17 @@ public class NucleusResource {
             Key memberKey;
             Entity memberEntity;
             Entity newUser;
+
             for(String member : data.members) {
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
                 memberEntity = txn.get(memberKey);
+
                 if(memberEntity == null){
                     txn.rollback();
                     LOG.warning(WRONG_MEMBER);
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
                 }
+
                 userPersonalList = memberEntity.getString("job_list");
                 userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
                 newUser = Entity.newBuilder(memberEntity)
@@ -447,10 +450,10 @@ public class NucleusResource {
                     .set("members_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(updatedNucleus);
-            LOG.info("Members removed.");
             txn.commit();
+
+            LOG.info("Members removed.");
             return Response.ok(updatedNucleus).build();
         } finally {
             if (txn.isActive()) {
