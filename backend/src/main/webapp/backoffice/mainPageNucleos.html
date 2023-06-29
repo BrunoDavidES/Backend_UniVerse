@@ -118,17 +118,27 @@
                 <div class="input-container ic1">
                     <input id="idNuc" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="idNuc" class="placeholder" required>Nome/ID</label>
+                    <label for="idNuc" class="placeholder" required>ID</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="description" class="input" type="text" placeholder=" "/>
+                    <input id="nameNuc" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="description" class="placeholder">Descrição (Opcional)</label>
+                    <label for="nameNuc" class="placeholder" required>Nome</label>
                 </div>
                 <div class="input-container ic1">
                     <input id="email" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="email" class="placeholder" required>Email do Núcleo</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="pres" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="pres" class="placeholder" required>Presidente do Núcleo</label>
+                </div>
+               <!-- <div class="input-container ic1">
+                    <input id="description" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="description" class="placeholder">Descrição (Opcional)</label>
                 </div>
                 <div class="input-container ic1">
                     <input id="facebook" class="input" type="text" placeholder=" "/>
@@ -144,13 +154,8 @@
                     <input id="linkedin" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="linkedin" class="placeholder">LinkedIn (Opcional)</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="pres" class="input" type="text" placeholder=" "/>
-                    <div class="cut"></div>
-                    <label for="pres" class="placeholder" required>Presidente do Núcleo</label>
-                </div>
-                <button type="text" class="submit" onclick="postEvent()">Criar Núcleo</button>
+                </div> -->
+                <button type="text" class="submit" onclick="postNucleus()">Criar Núcleo</button>
             </div>
         </div>
         <div id="modNuc" style="display: none;">
@@ -162,19 +167,29 @@
                     <div class="cut"></div>
                     <label for="nucId" class="placeholder">ID do Núcleo</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Obter Núcleo</button>
+                <button type="text" class="submit" onclick="getNucleus()">Obter Núcleo</button>
             </div>
             <br>
             <div class="form">
                 <div class="input-container ic1">
-                    <input id="descriptionMod" class="input" type="text" placeholder=" "/>
-                    <div class="cut"></div>
-                    <label for="descriptionMod" class="placeholder">Descrição</label>
-                </div>
-                <div class="input-container ic1">
                     <input id="emailMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="emailMod" class="placeholder">Email do Núcleo</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="nameMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="nameMod" class="placeholder">Presidente do Núcleo</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="presMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="presMod" class="placeholder">Presidente do Núcleo</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="descriptionMod" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="descriptionMod" class="placeholder">Descrição</label>
                 </div>
                 <div class="input-container ic1">
                     <input id="facebookMod" class="input" type="text" placeholder=" "/>
@@ -192,11 +207,21 @@
                     <label for="linkedinMod" class="placeholder">LinkedIn</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="presMod" class="input" type="text" placeholder=" "/>
+                    <input id="website" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="presMod" class="placeholder">Presidente do Núcleo</label>
+                    <label for="website" class="placeholder">LinkedIn</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Modificar Núcleo</button>
+                <div class="input-container ic1">
+                    <input id="twitter" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="twitter" class="placeholder">LinkedIn</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="youtube" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="youtube" class="placeholder">LinkedIn</label>
+                </div>
+                <button type="text" class="submit" onclick="editNucleus()">Modificar Núcleo</button>
             </div>
             </div>
         </div>
@@ -209,7 +234,7 @@
                     <div class="cut"></div>
                     <label for="nucIdDel" class="placeholder">ID do Núcleo</label>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Apagar Núcleo</button>
+                <button type="text" class="submit" onclick="deleteNucleus()">Apagar Núcleo</button>
             </div>
         </div>
         <div id="nucList" style="display: none;">
