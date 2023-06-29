@@ -23,7 +23,9 @@ public class EntityResource {
     @POST
     @Path("/new/{kind}/{key}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getReceivedInbox(@HeaderParam("Authorization") String token, @PathParam("kind") String kind,@PathParam("key") String keyName, Map<String, String> attributes) {
+    public Response getReceivedInbox(@HeaderParam("Authorization") String token,
+                                     @PathParam("kind") String kind,@PathParam("key") String keyName,
+                                     Map<String, String> attributes) {
         LOG.fine("Attempt to create new entity");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -31,18 +33,13 @@ public class EntityResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
+        if(!getRole(decodedToken).equals(BO)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+        }
 
         Transaction txn = datastore.newTransaction();
             try {
-                /*
-                Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
-                Entity user = txn.get(userKey);
-                */
-                if(!String.valueOf(getRole(decodedToken)).replaceAll("\"", "").equals(BO)){
-                    txn.rollback();
-                    LOG.warning(NICE_TRY);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-                }
                 Key key = datastore.newKeyFactory().setKind(kind).newKey(keyName);
                 Entity.Builder builder = Entity.newBuilder(key);
                 for(Map.Entry<String, String> attribute : attributes.entrySet()) {
@@ -50,9 +47,9 @@ public class EntityResource {
                 }
                 Entity entity = builder.build();
                 txn.add(entity);
+                txn.commit();
 
                 LOG.info("Entity Created");
-                txn.commit();
                 return Response.ok().build();
             } finally {
                 if (txn.isActive()) {
