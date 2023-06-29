@@ -25,6 +25,8 @@ public class ModifyUserResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
+    public ModifyUserResource() {}
+
     @POST
     @Path("/attributes")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -78,10 +80,9 @@ public class ModifyUserResource {
         }
 
         try {
-            UserRecord user = firebaseAuth.getUser(decodedToken.getUid());
             UserRecord target = firebaseAuth.getUser(data.target);
 
-            if (!data.validatePermission(getRole(user), getRole(target))) {
+            if (!data.validatePermission(getRole(decodedToken), getRole(target))) {
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             }
@@ -101,8 +102,6 @@ public class ModifyUserResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
         }
     }
-
-
 
     @DELETE
     @Path("/delete")
@@ -142,4 +141,6 @@ public class ModifyUserResource {
             }
         }
     }
+
+
 }
