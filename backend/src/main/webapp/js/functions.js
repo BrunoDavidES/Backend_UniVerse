@@ -1,3 +1,9 @@
+function verifyLogin() {
+  if(user === ""){
+          window.location.href = "/backoffice/index.html";
+  }
+}
+
 function loadLoggedUser() {
     var xmlhttp = new XMLHttpRequest();
     var user = localStorage.getItem("userLogged");
@@ -26,7 +32,6 @@ function loadLoggedUser() {
         }
       }
     }
-
     xmlhttp.send();
 }
 
@@ -54,8 +59,7 @@ function logout(){
 
       //FEEDS
 
-
-        //Events
+//Events
 function postEvent(){
     var data = {
         "title": document.getElementById("title").value,
@@ -77,11 +81,9 @@ function postEvent(){
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
           console.log("SUCCESS");
-          popup.classList.remove("open-popup");
-          alert(request.responseText);
       } else if (request.readyState === 4) {
           console.log(request.responseText);
-          popup.classList.remove("open-popup");
+          alert(request.responseText);
           console.log("FAIL");
       }
     };
@@ -143,11 +145,11 @@ function editEvent(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
 }
@@ -164,11 +166,11 @@ function deleteEvent(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
 }
@@ -202,14 +204,14 @@ function getEvent(){
             });
 
             entities.forEach(function(entity) {
-                document.getElementById("titleModeLbl").innerHTML = "&emsp;Título do Evento: " + entity.title.value;
-                document.getElementById("startDateModLbl").innerHTML = "&emsp;Data de Inicio: " + entity.startDate.value;
-                document.getElementById("endDateModLbl").innerHTML = "&emsp;Data de Fim: " + entity.endDate.value;
-                document.getElementById("locationModLbl").innerHTML = "&emsp;Localização: " + entity.location.value;
-                document.getElementById("departmentModLbl").innerHTML = "&emsp;Departamento: " + entity.department.value;
-                document.getElementById("capacityLbl").innerHTML = "&emsp;Capacidade máxima do Evento: " + entity.capacity.value;
-                document.getElementById("isPublicLbl").innerHTML = "&emsp;Evento público: " + entity.isPublic.value;
-                document.getElementById("isItPaidLbl").innerHTML = "&emsp;Evento a pagar: " + entity.isItPaid.value;
+                document.getElementById("titleModeLbl").innerHTML = "Título do Evento: " + entity.title.value;
+                document.getElementById("startDateModLbl").innerHTML = "Data de Inicio: " + entity.startDate.value;
+                document.getElementById("endDateModLbl").innerHTML = "Data de Fim: " + entity.endDate.value;
+                document.getElementById("locationModLbl").innerHTML = "Localização: " + entity.location.value;
+                document.getElementById("departmentModLbl").innerHTML = "Departamento: " + entity.department.value;
+                document.getElementById("capacityLbl").innerHTML = "Capacidade máxima do Evento: " + entity.capacity.value;
+                document.getElementById("isPublicLbl").innerHTML = "Evento público: " + entity.isPublic.value;
+                document.getElementById("isItPaidLbl").innerHTML = "Evento a pagar: " + entity.isItPaid.value;
             });
         };
     }
@@ -219,7 +221,6 @@ function getEvent(){
 
 var eventsQueryOffset = 0;
 var eventsSelect = document.getElementById('listLimitId');
-
 
 function queryEvents(){
     var list = document.getElementById('listOfEvents');
@@ -263,18 +264,18 @@ function queryEvents(){
                       details.appendChild(title);
 
                       var description = document.createElement('p');
-                      description.innerHTML = " Nome do evento: " + entity.title.value +
-                                                "<br> ID do evento: " + entity.id.value +
-                                                "<br> Nome do criador do evento: " + entity.authorName.value +
-                                                "<br> Username do criador do evento: " + entity.authorUsername.value +
-                                                "<br> Localização: " + entity.location.value +
-                                                "<br> Evento público: " + entity.isPublic.value +
-                                                "<br> Evento pago: " + entity.isItPaid.value +
-                                                "<br> Capacidade: " + entity.capacity.value +
-                                                "<br> Início: " + entity.startDate.value +
-                                                "<br> Fim: " + entity.endDate.value +
-                                                "<br> Departamento organizador: " + entity.department.value +
-                                                "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+                      description.innerHTML = "&emsp;Nome do evento: " + entity.title.value +
+                                                "<br> &emsp;ID do evento: " + entity.id.value +
+                                                "<br> &emsp;Nome do criador do evento: " + entity.authorName.value +
+                                                "<br> &emsp;Username do criador do evento: " + entity.authorUsername.value +
+                                                "<br> &emsp;Localização: " + entity.location.value +
+                                                "<br> &emsp;Evento público: " + entity.isPublic.value +
+                                                "<br> &emsp;Evento pago: " + entity.isItPaid.value +
+                                                "<br> &emsp;Capacidade: " + entity.capacity.value +
+                                                "<br> &emsp;Início: " + entity.startDate.value +
+                                                "<br> &emsp;Fim: " + entity.endDate.value +
+                                                "<br> &emsp;Departamento organizador: " + entity.department.value +
+                                                "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
 
                       details.appendChild(description);
 
@@ -312,17 +313,16 @@ function validateEvent(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
 }
 
-
-      //News
+//News
 function postNews(){
 
     var data = {
@@ -348,7 +348,6 @@ function postNews(){
                     if (bucketRequest.readyState === 4 ) {
                         if (bucketRequest.status === 200 ){
                             console.log("SUCCESS");
-                            alert("SUCCESS");
                         }
                         else  {
                             console.log("News entity created but error uploading text body to bucket");
@@ -360,7 +359,7 @@ function postNews(){
                 bucketRequest.send(document.getElementById("text").value);
             }
             else {
-                console.log(request.responseText);
+                console.alert(request.responseText);
                 console.log("FAIL");
             }
         }
@@ -368,7 +367,7 @@ function postNews(){
     request.send(JSON.stringify(data));
 }
 
-function validateEvent(){
+function validateNews(){
     var id = document.getElementById("idNewsValidate").value;
 
     var data = {
@@ -384,11 +383,11 @@ function validateEvent(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
 }
@@ -429,7 +428,6 @@ function editNews(){
                         if (bucketPOSTRequest.readyState == 4){
                             if (bucketPOSTRequest.status == 200){
                                 console.log("SUCCESS");
-                                alert("SUCCESS");
                                 localStorage.removeItem(id);
                             }
                             else {
@@ -442,12 +440,11 @@ function editNews(){
                 }
                 else {
                     console.log("SUCCESS");
-                    alert("SUCCESS");
                 }
             }
             else {
                 console.log(request.responseText);
-                alert("DEU ERRO");
+                alert("ALGUMA COISA FALHOU");
             }
         }
     };
@@ -475,7 +472,6 @@ function deleteNews(){
                     if ( bucketDELETERequest.readyState === 4 ) {
                         if ( bucketDELETERequest.status === 200 ) {
                             console.log("SUCCESS");
-                            alert("SUCCESS");
                         }
                         else{
                             console.log("Problems erasing News txt file content from bucket");
@@ -485,7 +481,6 @@ function deleteNews(){
                 }
                 bucketDELETERequest.send("");
             } else {
-                console.log("FAIL");
                 console.log("FAIL");
             }
         };
@@ -518,8 +513,8 @@ function getNews(){
                 });
 
                 entities.forEach(function(entity) {
-                    document.getElementById("titleModLbl").innerHTML = "&emsp;Título da Notícia: " + entity.title.value;
-                    document.getElementById("authorModLbl").innerHTML = "&emsp;Autor da Notícia: " + entity.authorName.value;
+                    document.getElementById("titleModLbl").innerHTML = "Título da Notícia: " + entity.title.value;
+                    document.getElementById("authorModLbl").innerHTML = "Autor da Notícia: " + entity.authorName.value;
                 });
 
                 var bucketGETRequest = new XMLHttpRequest();
@@ -539,16 +534,14 @@ function getNews(){
                         }
                     }
                 }
-
                 bucketGETRequest.send();
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert.log("ALGUMA COISA FALHOU");
             }
         }
     }
-
     request.send(JSON.stringify(data));
 }
 
@@ -591,11 +584,11 @@ function queryNews(){
                       details.appendChild(title);
 
                       var description = document.createElement('p');
-                      description.innerHTML = " Título da notícia: " + entity.title.value +
-                                                "<br> ID da notícia: " + entity.id.value +
-                                                "<br> Nome do criador da notícia: " + entity.authorName.value +
-                                                "<br> Username do utilizador que postou a notícia: " + entity.authorUsername.value +
-                                                "<br> Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+                      description.innerHTML = "&emsp;Título da notícia: " + entity.title.value +
+                                                "<br> &emsp;ID da notícia: " + entity.id.value +
+                                                "<br> &emsp;Nome do criador da notícia: " + entity.authorName.value +
+                                                "<br> &emsp;Username do utilizador que postou a notícia: " + entity.authorUsername.value +
+                                                "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
 
                       details.appendChild(description);
 
@@ -606,9 +599,7 @@ function queryNews(){
                       });
 
                       bottomFunction();
-
                 });
-
                 list.appendChild(listItem);
 
             });
@@ -617,7 +608,7 @@ function queryNews(){
     }
 }
 
-            //USERS
+//USERS
 function modifyUserRole(){
     var target = document.getElementById("target").value;
     var newRole = document.getElementById("newRole").value;
@@ -636,18 +627,18 @@ function modifyUserRole(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
     request.send(JSON.stringify(data));
 }
 
 function deleteUser(){
-    var target = document.getElementById("targetDelUser").value;
+    var target = document.getElementById("target").value;
 
     var data = {
         "target": target
@@ -662,60 +653,76 @@ function deleteUser(){
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
             console.log("SUCCESS");
-            alert(request.responseText);
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
             console.log("FAIL");
+            alert(request.responseText);
         }
     };
 
     request.send(JSON.stringify(data));
 }
 
+var usersQueryOffset = 0;
+
 function queryUsers(){
-    var limit = document.getElementById("limit").value;
-    var offset = document.getElementById("offset").value;
+    var list = document.getElementById("listOfUsers");
+    var limit = document.getElementById("listLimitId").value;
 
     var data = {};
 
-    var email = document.getElementById("email").value;
-    if (email !== "") {
-        data["email"] = email;
-    }
-
-    var name = document.getElementById("name").value;
-    if (name !== "") {
-        data["name"] = name;
-    }
-
-    var role = document.getElementById("role").value;
-    if (role !== "") {
-        data["role"] = role;
-    }
-
-    var status = document.getElementById("status").value;
-    if (status !== "") {
-        data["status"] = status;
-    }
-
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/modify/profile/query?limit="+limit+"&offset="+offset, true);
+    request.open("POST", document.location.origin + "/rest/profile/query?limit=" + limit + "&offset=" + usersQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        }
-        else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-    };
+        if (request.readyState === 4 ) {
+            if ( request.status === 200 ) {
+                const entities = JSON.parse(request.responseText);
 
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.username + " - " + entity.name;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('details');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = entity.name.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        var jobs = entity.jobs;
+                        jobs = jobs.replace();
+                        jobs = jobs.replace(/^#/,'');
+                        jobs = jobs.replace(/%/g, " - ");
+                        description.innerHTML = "&emsp;Nome do user: " + entity.name +
+                                                "<br> &emsp;Username: " + entity.username +
+                                                "<br> &emsp;Email: " + entity.email +
+                                                "<br> &emsp;Role: " + entity.role +
+                                                "<br> &emsp;Lista de cargos na faculdade: " + jobs;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+            }
+            else {
+                alert("ALGUMA COISA FALHOU");
+                console.log("FAIL");
+            }
+        }
+    }
     request.send(JSON.stringify(data));
 }
 
@@ -731,7 +738,6 @@ function getUser() {
         if (request.readyState === 4 && request.status === 200) {
            console.log(request.responseText);
            console.log("SUCCESS");
-           alert(request.responseText);
            const response = JSON.parse(request.responseText);
 
            document.getElementById("usernameInfo").value = response.username;
@@ -742,6 +748,7 @@ function getUser() {
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
+            alert(request.responseText);
             console.log("FAIL");
         }
     };
@@ -829,6 +836,56 @@ function bottomFunction() {
     window.scrollTo(0,document.body.scrollHeight);
     bottomPage.style.display = 'none';
     topPage.style.display = '';
+}
+
+//Departamentos
+function deleteDepartment(){
+    var id = document.getElementById("dptIdDel").value;
+
+
+    var request = new XMLHttpRequest();
+
+    request.open("DELETE", document.location.origin + "/rest/department/delete/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+            alert(request.responseText);
+        }
+    };
+
+    request.send();
+}
+
+//Nucleos
+function deleteDepartment(){
+    var id = document.getElementById("nucIdDel").value;
+
+
+    var request = new XMLHttpRequest();
+
+    request.open("DELETE", document.location.origin + "/rest/nucleus/delete/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            console.log(request.responseText);
+            console.log("SUCCESS");
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            console.log("FAIL");
+            alert(request.responseText);
+        }
+    };
+
+    request.send();
 }
 
 window.addEventListener('load', loadLoggedUser);

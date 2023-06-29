@@ -9,7 +9,7 @@
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body onload="loadLoggedUser()">
+<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve();">
 <div class="cardResize">
   <div class="card" style="width: 250px;">
     <img src="../img/logo.png" alt="User Photo" style="width:100%">
@@ -117,24 +117,22 @@
   </nav>
 
   <div class="home-content">
-    <div class="form" style="width: 420px; margin-left: 5%;">
-      <div class="title">Pessoas na Aplicação</div>
-      <div class="input-container ic1">
-        <input readonly="readonly" class="input" type="text" placeholder="Número de pessoas online:"/>
-      </div>
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+      <div class="title" style="text-align: center">Users na Aplicação</div>
+      <div id="registered" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div style="color: red; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
     <br>
-    <div class="form" style="width: 420px; margin-left: 5%;">
-      <div class="title">Reports por Resolver</div>
-      <div class="input-container ic1">
-        <input readonly="readonly" id="unresolvedRep" class="input" type="text" placeholder="Número de reportes não resolvidos:"/>
-      </div>
-    </div><br>
-    <div class="form" style="width: 420px; margin-left: 5%;">
-      <div class="title">Users Registados</div>
-      <div class="input-container ic1">
-        <input readonly="readonly" id="registered" class="input" type="text" placeholder="Número de users registados na aplicação:"/>
-      </div>
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+      <div class="title" style="text-align: center">Users Registados</div>
+      <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
+    </div>
+    <br>
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+      <div class="title" style="text-align: center">Reports por Resolver</div>
+      <div id="unresolvedRep" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bxs-comment-error'></i></div>
     </div>
   </div>
   <div class="popup" id="popup">
@@ -146,6 +144,7 @@
 </section>
 
 <script src="/js/functions.js"></script>
+<script src="/js/functions2.js"></script>
 <script>
       let popup = document.getElementById("popup");
 
@@ -193,7 +192,9 @@
         	min = min < 10 ? "0" + min : min;
         	sec = sec < 10 ? "0" + sec : sec;
 
-        	let currentTime = hour + ":"
+        	hAux = hour < 10 ? "0" : hour;
+
+        	let currentTime = hAux + hour + ":"
         		+ min + ":" + sec;
 
         	document.getElementById("clock")

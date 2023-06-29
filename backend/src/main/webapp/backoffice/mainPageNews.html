@@ -106,10 +106,11 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'newsAdd', 'newsMod', 'newsDel', 'newsList'); auxListMore(0);" class="active">Adicionar Noticia</button>
-            <button id="editBtn" onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'newsMod', 'newsAdd', 'newsDel', 'newsList'); auxListMore(0);">Modificar Noticia</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList'); auxListMore(0);">Remover Noticia</button>
-            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'newsList', 'newsAdd', 'newsMod', 'newsDel'); auxListMore(1);">Listar Noticias</button>
+            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'valBtn','newsAdd', 'newsMod', 'newsDel', 'newsList', 'newsValidate'); auxListMore(0);" class="active">Adicionar Noticia</button>
+            <button id="editBtn" onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'valBtn', 'newsMod', 'newsAdd', 'newsDel', 'newsList', 'newsValidate'); auxListMore(0);">Modificar Noticia</button>
+            <button id="valBtn" onClick="changeWindow('valBtn', 'postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'newsValidate', 'newsList', 'newsAdd', 'newsMod', 'newsDel'); auxListMore(1);">Validar Notícia</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'valBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList', 'newsValidate'); auxListMore(0);">Remover Noticia</button>
+            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'valBtn', 'newsList', 'newsAdd', 'newsMod', 'newsDel', 'newsValidate'); auxListMore(1);">Listar Noticias</button>
         </div>
         <br><br>
         <div id="newsAdd">
@@ -167,6 +168,19 @@
             </div>
             <br><br>
         </div>
+        <div id="newsValidate" style="display: none;">
+            <div class="form">
+                <div class="title">Validar Notícia</div>
+                <div class="subtitle">Vamos validar uma notícia especifica!</div>
+                <div class="input-container ic1">
+                    <input id="idEventValidate" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id da Notícia</label>
+                </div>
+                <button type="text" class="submit" onclick="validateNews()">Validar Notícia</button>
+            </div>
+            <br><br>
+        </div>
         <div id="newsDel" style="display: none;">
             <div class="form">
                 <div class="title">Remover Notícia</div>
@@ -215,24 +229,28 @@
 
 <script src="/js/functions.js"></script>
 <script>
-       function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+       function changeWindow(btn, btn1, btn2, btn3, btn4, div, div1, div2, div3, div4){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
         var gone3 = document.getElementById(div3);
+        var gone4 = document.getElementById(div4);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
         var button4 = document.getElementById(btn3);
+        var button5 = document.getElementById(btn4);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
         gone3.style.display = 'none';
+        gone4.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
         button4.classList.remove("active");
+        button5.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");

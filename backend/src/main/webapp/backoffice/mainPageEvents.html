@@ -109,8 +109,8 @@
         <div class="topnav" id="myTopnav">
             <button id="postBtn" onClick="changeWindow('postBtn', 'validateBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventValidate', 'eventMod', 'eventDel', 'eventList'); auxListMore(0);" class="active">Adicionar Evento</button>
             <button id="editBtn"  onClick="changeWindow('editBtn', 'validateBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventValidate', 'eventAdd', 'eventDel', 'eventList'); auxListMore(0);">Modificar Evento</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList'); auxListMore(0);">Apagar Evento</button>
             <button id="validateBtn" onClick="changeWindow('validateBtn','queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventValidate', 'eventList', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(0);">Validar Evento</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList'); auxListMore(0);">Apagar Evento</button>
             <button id="queryBtn" onClick="changeWindow('queryBtn', 'validateBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventValidate', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(1);">Listar Eventos</button>
         </div>
         <br><br>
@@ -369,7 +369,6 @@
 
       function bottomFunction() {
         window.scrollTo(0,document.body.scrollHeight);
-        bottomPage.style.display = 'none';
         topPage.style.display = '';
       }
 </script>

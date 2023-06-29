@@ -7,10 +7,11 @@ function registeredUsers(){
     xmlhttp.onreadystatechange = function() {
         if(xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
-                document.getElementById("registered").value = xmlhttp.responseText;
+                document.getElementById("registered").innerHTML = xmlhttp.responseText;
             }
             else{
-                alert(xmlhttp.responseText);
+                print(xmlhttp.responseText);
+                alert("Falhou");
             }
         }
     }
@@ -18,7 +19,7 @@ function registeredUsers(){
     xmlhttp.send();
 }
 
-function postEvent(){
+function repToSolve(){
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.open("GET", document.location.origin + "/rest/reports/unresolved", true);
@@ -27,10 +28,11 @@ function postEvent(){
     xmlhttp.onreadystatechange = function() {
         if(xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
-                document.getElementById("unresolvedRep").value = xmlhttp.responseText;
+                document.getElementById("unresolvedRep").innerHTML = xmlhttp.responseText;
             }
             else{
-                alert(xmlhttp.responseText);
+                print(xmlhttp.responseText);
+                alert("Falhou");
             }
         }
     }
