@@ -864,8 +864,38 @@ function deleteDepartment(){
     request.send();
 }
 
+function postDepartment(){
+var data = {
+        "id": document.getElementById("idDpt").value,
+        "email": document.getElementById("email").value,
+        "name": document.getElementById("nameDpt").value,
+        "president": document.getElementById("presDpt").value,
+         "phoneNumber": document.getElementById("phoneNumber").value,
+        "address": document.getElementById("address").value,
+        "fax": document.getElementById("fax").value
+
+    };
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/department/register", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+      if (request.readyState === 4 && request.status === 200) {
+          console.log(request.responseText);
+          console.log("SUCCESS");
+      } else if (request.readyState === 4) {
+          console.log(request.responseText);
+          alert(request.responseText);
+          console.log("FAIL");
+      }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
 //Nucleos
-function deleteDepartment(){
+function deleteNucleus(){
     var id = document.getElementById("nucIdDel").value;
 
 
