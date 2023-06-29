@@ -27,12 +27,13 @@ public class ProfileResource {
 
     public Gson g = new Gson();
 
-    // Talvez adicionar LinkedIn
+    public ProfileResource() {}
 
     @GET
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getProfile(@HeaderParam("Authorization") String token, @PathParam("username") String username){
+    public Response getProfile(@HeaderParam("Authorization") String token,
+                               @PathParam("username") String username){
         LOG.fine("Attempt to get profile by " + username);
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -45,7 +46,7 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Empty param").build();
         }
 
-        String requester = String.valueOf(decodedToken.getUid()).replaceAll("\"", "");
+        String requester = decodedToken.getUid();
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(requester);
         Entity user = datastore.get(userKey);
 
@@ -54,9 +55,7 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("User does not exist "  + requester).build();
         }
 
-        // Vai ter de mudar quando se souber os atributos a devolver em cada caso
         if (!username.equals(requester)){
-            // Faz um perfil menos completo
             userKey = datastore.newKeyFactory().setKind(USER).newKey(username);
             user = datastore.get(userKey);
 
@@ -65,9 +64,7 @@ public class ProfileResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
             }
         }
-        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         ProfileData data = new ProfileData();
-        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         data.username = username;
         data.name = user.getString("name");
         data.email = user.getString("email");
@@ -80,8 +77,9 @@ public class ProfileResource {
 
     @POST
     @Path("/personalEvent/add")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response addPersonalEvent(@HeaderParam("Authorization") String token, PersonalEventsData data) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addPersonalEvent(@HeaderParam("Authorization") String token,
+                                     PersonalEventsData data) {
         LOG.fine("Attempt to add a personal event.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -91,29 +89,32 @@ public class ProfileResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
+
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
+
             String list = user.getString(PERSONAL_EVENT_LIST);
             if(list.contains(data.title)) {
                 txn.rollback();
                 LOG.warning("Personal event name already used.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
             }
-            list = list.concat("#" + data.title + "%" + String.valueOf(decodedToken.getUid()).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+
+            list = list.concat("#" + data.title + "%" + decodedToken.getUid() + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(updatedUser);
-            LOG.info("Personal event added.");
             txn.commit();
+
+            LOG.info("Personal event added.");
             return Response.ok(updatedUser).build();
         } finally {
             if (txn.isActive()) {
@@ -124,8 +125,9 @@ public class ProfileResource {
 
     @GET
     @Path("/personalEvent/get/{title}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response getPersonalEvent(@HeaderParam("Authorization") String token, @PathParam("title") String title){
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getPersonalEvent(@HeaderParam("Authorization") String token,
+                                     @PathParam("title") String title){
         LOG.fine("Attempt to edit a personal event.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -134,19 +136,22 @@ public class ProfileResource {
         }
 
         Transaction txn = datastore.newTransaction();
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
+
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
+
             String list = user.getString(PERSONAL_EVENT_LIST);
             if(!list.contains(title)) {
                 txn.rollback();
                 LOG.warning("Personal event does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
             }
+
             String[] l = list.split("#");
             String[] oldEvent = new String[5];
             for(String event: l){
@@ -156,7 +161,6 @@ public class ProfileResource {
                 }
             }
         PersonalEventsData data = new PersonalEventsData();
-        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
         data.title = oldEvent[0];
         data.username = oldEvent[1];
         data.beginningDate = oldEvent[2];
@@ -169,8 +173,10 @@ public class ProfileResource {
 
     @PATCH
     @Path("/personalEvent/edit/{oldTitle}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response editPersonalEvent(@HeaderParam("Authorization") String token, @PathParam("oldTitle") String oldTitle, PersonalEventsData data){
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response editPersonalEvent(@HeaderParam("Authorization") String token,
+                                      @PathParam("oldTitle") String oldTitle,
+                                      PersonalEventsData data){
         LOG.fine("Attempt to edit a personal event.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -180,19 +186,22 @@ public class ProfileResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
+
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
+
             String list = user.getString(PERSONAL_EVENT_LIST);
             if(!list.contains(oldTitle)) {
                 txn.rollback();
                 LOG.warning("Personal event does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
             }
+
             String[] l = list.split("#");
             String oldEvent = "";
             for(String event: l){
@@ -201,16 +210,16 @@ public class ProfileResource {
                     break;
                 }
             }
-            list = list.replace(oldEvent, data.title + "%" + String.valueOf(decodedToken.getUid()).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
+            list = list.replace(oldEvent, data.title + "%" + decodedToken.getUid() + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
             Entity updatedUser = Entity.newBuilder(user)
                     .set("personal_event_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(updatedUser);
-            LOG.info("Personal event edited.");
             txn.commit();
+
+            LOG.info("Personal event edited.");
             return Response.ok(updatedUser).build();
         } finally {
             if (txn.isActive()) {
@@ -221,8 +230,9 @@ public class ProfileResource {
 
     @PATCH
     @Path("/personalEvent/delete/{oldTitle}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response deletePersonalEvent(@HeaderParam("Authorization") String token, @PathParam("oldTitle") String oldTitle){
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deletePersonalEvent(@HeaderParam("Authorization") String token,
+                                        @PathParam("oldTitle") String oldTitle){
         LOG.fine("Attempt to delete a personal event.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -232,19 +242,22 @@ public class ProfileResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(decodedToken.getUid()).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
+
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
+
             String list = user.getString(PERSONAL_EVENT_LIST);
             if(!list.contains(oldTitle)) {
                 txn.rollback();
                 LOG.warning("Personal event does not exist.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
             }
+
             String[] l = list.split("#");
             String oldEvent = null;
             for(String event: l){
@@ -259,10 +272,10 @@ public class ProfileResource {
                     .set("personal_event_list", list)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
-
             txn.update(updatedUser);
-            LOG.info("Personal event deleted.");
             txn.commit();
+
+            LOG.info("Personal event deleted.");
             return Response.ok(updatedUser).build();
         } finally {
             if (txn.isActive()) {
@@ -270,7 +283,6 @@ public class ProfileResource {
             }
         }
     }
-    //FAZER GETPERSONALEVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     @POST
     @Path("/query")
@@ -280,23 +292,23 @@ public class ProfileResource {
                                  @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query users.");
 
-        //Verificar, caso for evento privado, se o token é valido
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
-        if(!String.valueOf(decodedToken.getUid()).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if(!decodedToken.getUid().equals(BO)) {
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
-        QueryResults<Entity> queryResults;
 
-        StructuredQuery.CompositeFilter attributeFilter = null;
         if( filters == null){
             filters = new HashMap<>(1);
         }
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
         StructuredQuery.PropertyFilter propFilter;
+
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
@@ -312,11 +324,9 @@ public class ProfileResource {
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
                 .build();
-
-        queryResults = datastore.run(query);
+        QueryResults<Entity> queryResults = datastore.run(query);
 
         List<Entity> results = new ArrayList<>();
-
         queryResults.forEachRemaining(results::add);
 
         LOG.info("Ides receber um query ó filho!");
@@ -328,22 +338,22 @@ public class ProfileResource {
     @POST
     @Path("/numberOfUsers")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryUsersNum(@HeaderParam("Authorization") String token, Map<String, String> filters) {
+    public Response queryUsersNum(@HeaderParam("Authorization") String token,
+                                  Map<String, String> filters) {
         LOG.fine("Attempt to count the query users");
 
-        // Verificar, caso for evento privado, se o token é valido
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
         }
 
-        QueryResults<Entity> queryResults;
-
-        StructuredQuery.CompositeFilter attributeFilter = null;
         if (filters == null) {
             filters = new HashMap<>(1);
         }
+
+        StructuredQuery.CompositeFilter attributeFilter = null;
         StructuredQuery.PropertyFilter propFilter;
+
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
@@ -358,24 +368,17 @@ public class ProfileResource {
                 .setFilter(attributeFilter)
                 .build();
 
-        queryResults = datastore.run(query);
-
-        List<Entity> results = new ArrayList<>();
-
-        //queryResults.forEachRemaining(results::add);
+        QueryResults<Entity> queryResults = datastore.run(query);
 
         LOG.info("Received a query!");
+
         int count = 0;
-        // Get the total number of entities
         while (queryResults.hasNext()) {
-            results.add(queryResults.next());
+            queryResults.next();
             count++;
         }
-        // Convert the response object to JSON
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(count);
 
-        return Response.ok(jsonResponse).build();
+        return Response.ok(count).build();
     }
 
 }
