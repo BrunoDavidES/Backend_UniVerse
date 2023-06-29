@@ -1,7 +1,7 @@
 function verifyLogin() {
   var user = localStorage.getItem("userLogged");
   if(user === ""){
-        window.location.href = "/backoffice/index.html";
+          window.location.href = "/backoffice/index.html";
   }
 }
 
@@ -546,7 +546,6 @@ function getNews(){
     request.send(JSON.stringify(data));
 }
 
-//FALTA QUERY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 var newsQueryOffset = 0;
 
@@ -585,7 +584,7 @@ function queryNews(){
                       details.appendChild(title);
 
                       var description = document.createElement('p');
-                      description.innerHTML = "&emsp;Título da notícia: " + entity.title.value +
+                      description.innerHTML = " &emsp;Título da notícia: " + entity.title.value +
                                                 "<br> &emsp;ID da notícia: " + entity.id.value +
                                                 "<br> &emsp;Nome do criador da notícia: " + entity.authorName.value +
                                                 "<br> &emsp;Username do utilizador que postou a notícia: " + entity.authorUsername.value +
@@ -691,7 +690,7 @@ function queryUsers(){
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = entity.name.value;
+                        title.textContent = entity.name;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
@@ -717,9 +716,10 @@ function queryUsers(){
                     });
                     list.appendChild(listItem);
                 });
+                usersQueryOffset += limit;
             }
             else {
-                alert("ALGUMA COISA FALHOU");
+                alert("FAIL");
                 console.log("FAIL");
             }
         }
@@ -756,57 +756,77 @@ function getUser() {
 
     request.send();
 }
-        //REPORTS
 
+//REPORTS
+
+var reportsQueryOffset = 0;
 function queryReports(){
     var limit = document.getElementById("limit").value;
-    var offset = document.getElementById("offset").value;
-
-    var data = {};
-
-    var title = document.getElementById("title").value;
-    if (title !== "") {
-        data.title = title;
-    }
-
-    var id = document.getElementById("id").value;
-    if (id !== "") {
-        data.id = id;
-    }
-
-    var reporter = document.getElementById("reporter").value;
-    if (reporter !== "") {
-        data.reporter = reporter;
-    }
-
-    var location = document.getElementById("location").value;
-    if (location !== "") {
-            data.location = location;
-    }
-
-    var status = document.getElementById("status").value;
-    if (status !== "") {
-        data.status = status;
-    }
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+offset, true);
+    request.open("POST", document.location.origin + "/rest/modify/reports/query?limit="+limit+"&offset="+reportsQueryOffset, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-            alert(request.responseText);
-        }
-        else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-        }
-    };
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
 
-    request.send(JSON.stringify(data));
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        title: entity.properties.title,
+                        reporter: entity.properties.reporter,
+                        location: entity.properties.location,
+                        id: entity.properties.id,
+                        time_creation: entity.properties.time_creation,
+                        time_lastUpdated: entity.properties.time_lastUpdated,
+                        status: entity.properties.status
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('details');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = entity.title.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Título do Report: " + entity.title.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
+                                                "<br> &emsp;Localização: " + entity.location.value +
+                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
+                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated +
+                                                "<br> &emsp;Estado do Report: " + entity.status.value;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                newsQueryOffset += limit;
+            }
+            else {
+                console.log(request.responseText);
+                alert.log("Wrong ID for News");
+            }
+        }
+    }
+    request.send();
 }
 
 function reportStatus(){
@@ -864,6 +884,41 @@ function deleteDepartment(){
     request.send();
 }
 
+function getDepartment() {
+    var id = document.getElementById("dptIdMod").value;
+
+    var data = {
+        "id":id
+    }
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/department/query/?limit=1&offset=0", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+           console.log(request.responseText);
+           console.log("SUCCESS");
+           const response = JSON.parse(request.responseText);
+
+           document.getElementById("addressMod").value = response.address.value;
+           document.getElementById("emailMod").value = response.email.value;
+           document.getElementById("faxMod").value = response.fax.value;
+           document.getElementById("nameDptMod").value = response.name.value;
+           document.getElementById("phoneNumberMod").value = response.phoneNumber.value;
+           document.getElementById("presDptMod").value = response.president.value;
+
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert(request.responseText);
+            console.log("FAIL");
+        }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
 function postDepartment(){
 var data = {
         "id": document.getElementById("idDpt").value,
@@ -889,6 +944,69 @@ var data = {
           alert(request.responseText);
           console.log("FAIL");
       }
+    };
+
+    request.send(JSON.stringify(data));
+}
+
+function editDepartment(){
+
+    var id = document.getElementById("dptIdMod").value;
+    var email = document.getElementById("emailMod").value;
+    var name = document.getElementById("nameDptMod").value;
+    var president = document.getElementById("presDptMod").value;
+    var phoneNumber = document.getElementById("phoneNumberMod").value;
+    var address = document.getElementById("addressMod").value;
+    var fax = document.getElementById("faxMod").value;
+
+    var data = {
+            "id": id,
+            "email": email,
+            "name": name,
+            "president": president,
+            "phoneNumber": phoneNumber,
+            "address": address,
+            "fax": fax
+
+        };
+
+    if (email !== "") {
+            data["email"] = email;
+    }
+
+    if (name !== "") {
+            data["name"] = name;
+    }
+
+    if (president !== "") {
+            data["president"] = president;
+    }
+
+    if (phoneNumber !== "") {
+            data["phoneNumber"] = phoneNumber;
+    }
+
+    if (address !== "") {
+            data["address"] = address;
+    }
+
+    if (fax !== "") {
+            data["fax"] = fax;
+    }
+
+    var request = new XMLHttpRequest();
+    request.open("POST", document.location.origin + "/rest/department/modify", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+                  console.log(request.responseText);
+                  console.log("SUCCESS");
+              } else if (request.readyState === 4) {
+                  console.log(request.responseText);
+                  alert(request.responseText);
+                  console.log("FAIL");
+              }
     };
 
     request.send(JSON.stringify(data));
