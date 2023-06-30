@@ -15,6 +15,48 @@ import java.util.logging.Logger;
 @Path("/modify")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ModifyUserResource {
+
+    private static final String CAPI = "Your not one of us\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⢀⣞⣆⢀⣠⢶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⠀⢀⣀⡤⠤⠖⠒⠋⠉⣉⠉⠹⢫⠾⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n" +
+            "⢠⡏⢰⡴⠀⠀⠀⠉⠙⠟⠃⠀⠀⠀⠈⠙⠦⣄⡀⢀⣀⣠⡤⠤⠶⠒⠒⢿⠋⠈⠀⣒⡒⠲⠤⣄⡀⠀⠀⠀⠀⠀⠀\n" +
+            "⢸⠀⢸⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠴⠂⣀⠀⠀⣴⡄⠉⢷⡄⠚⠀⢤⣒⠦⠉⠳⣄⡀⠀⠀⠀\n" +
+            "⠸⡄⠼⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣄⡂⠠⣀⠐⠍⠂⠙⣆⠀⠀\n" +
+            "⠀⠙⠦⢄⣀⣀⣀⣀⡀⠀⢷⠀⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⡇⠠⣀⠱⠘⣧⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠈⠉⢷⣧⡄⢼⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⡈⠀⢄⢸⡄\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⡀⠃⠘⠂⠲⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠀⡈⢘⡇\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢫⡑⠣⠰⠀⢁⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⣸⠁\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣯⠂⡀⢨⠀⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡆⣾⡄⠀⠀⠀⠀⣀⠐⠁⡴⠁⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⡈⡀⢠⣧⣤⣀⣀⡀⢀⡀⠀⠀⢀⣼⣀⠉⡟⠀⢀⡀⠘⢓⣤⡞⠁⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢺⡁⢁⣸⡏⠀⠀⠀⠀⠁⠀⠉⠉⠁⠹⡟⢢⢱⠀⢸⣷⠶⠻⡇⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡏⠈⡟⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠁⠀⠻⣧⠀⠀⣹⠁⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠚⠃⣰⣥⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⠼⢙⡷⡻⠀⡼⠁⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠟⠿⡿⠕⠊⠉⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣶⣾⠉⣹⣷⣟⣚⣁⡼⠁⠀⠀⠀⠀⠀\n" +
+            "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀";
+
+
+    private static final String BO = "BO";
+    private static final String D = "D";
+    private static final String ROLE = "role";
+    private static final String USER = "User";
+    private static final String EVENT = "Event";
+    private static final String NEWS = "News";
+    private static final String USER_CLAIM = "user";
+    private static final String NAME_CLAIM = "name";
+    private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
+    private static final String MISSING_PARAMETER = "Missing parameter.";
+    private static final String TOKEN_NOT_FOUND = "Token not found.";
+    private static final String USER_DOES_NOT_EXIST = "User does not exist.";
+    private static final String ONE_OF_THE_USERS_DOES_NOT_EXIST = "One of the users does not exist.";
+    private static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
+    private static final String PASSWORD_INCORRECT = "Password incorrect.";
+    private static final String NICE_TRY = "Nice try but your not a capi person.";
+    private static final String PERMISSION_DENIED = "Permission denied.";
+    private static final String DEPARTMENT = "Department";
+    private static final String WRONG_PRESIDENT = "President doesn't exists.";
+    private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
+    private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
@@ -32,25 +74,26 @@ public class ModifyUserResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
-                LOG.warning("Token not found");
-                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             data.fillGaps(user);
             if( user == null ) {
                 txn.rollback();
-                LOG.warning("User or password incorrect");
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim("user").toString()).build();
+                LOG.warning(USER_OR_PASSWORD_INCORRECT);
+                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim(USER_CLAIM).toString()).build();
             } else {
                     Entity newUser = Entity.newBuilder(user)
                             .set("name", data.name)
                             .set("status", data.status)
+                            .set("license_plate", data.license_plate)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
 
                     txn.update(newUser);
-                    LOG.info(token.getClaim("user").toString() + " edited.");
+                    LOG.info(token.getClaim(USER_CLAIM).toString() + " edited.");
                     txn.commit();
                     return Response.ok(user).build();
 
@@ -69,8 +112,8 @@ public class ModifyUserResource {
         LOG.fine("Attempt to modify pwd.");
 
         if( !data.validatePwd()) {
-            LOG.warning("Missing or wrong parameter");
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing or wrong parameter").build();
+            LOG.warning(MISSING_OR_WRONG_PARAMETER);
+            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -79,16 +122,16 @@ public class ModifyUserResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
-                LOG.warning("Token not found");
-                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
 
             if( user == null ) {
                 txn.rollback();
-                LOG.warning("User or password incorrect");
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+                LOG.warning(USER_OR_PASSWORD_INCORRECT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
             } else {
                 if(user.getString("password").equals(DigestUtils.sha512Hex(data.password)) ) {
 
@@ -98,13 +141,13 @@ public class ModifyUserResource {
                             .build();
 
                     txn.update(newUser);
-                    LOG.info(token.getClaim("user").toString() + " pwd edited.");
+                    LOG.info(token.getClaim(USER_CLAIM).toString() + " pwd edited.");
                     txn.commit();
                     return Response.ok(user).build();
                 } else {
                     txn.rollback();
-                    LOG.warning("User or password incorrect");
-                    return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect").build();
+                    LOG.warning(USER_OR_PASSWORD_INCORRECT);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
                 }
             }
         } finally {
@@ -125,11 +168,11 @@ public class ModifyUserResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
-                LOG.warning("Token not found");
-                return Response.status(Response.Status.FORBIDDEN).entity("Token not found").build();
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(String.valueOf(token.getClaim("user")).replaceAll("\"", ""));
-            Key targetKey = datastore.newKeyFactory().setKind("User").newKey(data.target);
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
 
@@ -137,23 +180,81 @@ public class ModifyUserResource {
 
             if(user == null || target == null) {
                 txn.rollback();
-                LOG.warning("One of the users does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("One of the users does not exist.").build();
+                LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
             } else
-                if( !data.validatePermission(String.valueOf(token.getClaim("role")).replaceAll("\"", ""), target.getString("role"))) {
+                if( !data.validatePermission(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE))) {
                     txn.rollback();
-                    LOG.warning("Wrong permissions.");
-                    return Response.status(Response.Status.BAD_REQUEST).entity("Wrong permissions.").build();
+                    LOG.warning(PERMISSION_DENIED);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-                    Entity newUser = Entity.newBuilder(target)
-                            .set("role", data.newRole)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
+                Entity.Builder newUser = Entity.newBuilder(target);
 
-                    txn.update(newUser);
-                    LOG.info(data.target + " role has been updated successfully.");
-                    txn.commit();
-                    return Response.ok(target).build();
+                newUser.set("email", target.getString("email"))
+                        .set("name", target.getString("name"))
+                        .set("password", target.getString("password"))
+                        .set("role", data.newRole)
+                        .set("license_plate", target.getString("license_plate"))
+                        .set("status",  target.getString("status"))
+                        .set("job_list",  target.getString("job_list"))
+                        .set("personal_event_list", target.getString("personal_event_list"))  //#string%string%string%string#string%...
+                        .set("time_creation", target.getTimestamp("time_creation"))
+                        .set("time_lastupdate", Timestamp.now());
+
+                if(data.newRole.equals(D)){
+                    if(data.office == null)
+                        data.office = "";
+                    newUser.set("office", data.office);
+                }else
+                    newUser.set("office", "");
+                Entity u = newUser.build();
+                txn.put(u);
+                LOG.info(data.target + " role has been updated successfully.");
+                txn.commit();
+                return Response.ok(target).build();
+            }
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @DELETE
+    @Path("/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUser(@Context HttpServletRequest request, ModifyRoleData data){
+        LOG.fine("Attempt to delete: " + data.target +".");
+        Transaction txn = datastore.newTransaction();
+        try {
+            final ValToken validator = new ValToken();
+            DecodedJWT token = validator.checkToken(request);
+
+            if (token == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
+            Entity user = txn.get(userKey);
+            Entity target = txn.get(targetKey);
+
+            //Falta criar token novo e apagar o antigo
+
+            if(user == null || target == null) {
+                txn.rollback();
+                LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
+            } else
+            if( !data.validateDelete(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE)) && !String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "").equals(data.target)) {
+                txn.rollback();
+                LOG.warning(PERMISSION_DENIED);
+                return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
+            } else {
+                txn.delete(targetKey);
+                LOG.info("Target deleted.");
+                txn.commit();
+                return Response.ok(target).build();
             }
         } finally {
             if (txn.isActive()) {

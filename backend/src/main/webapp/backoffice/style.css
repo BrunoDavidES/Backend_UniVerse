@@ -1,0 +1,124 @@
+    body {
+      font-family: "Lato", sans-serif;
+    }
+
+    .container{
+		justify-content: center;
+    	align-items: center;
+  		text-align:center;
+  	}
+
+	.bottomRight{
+  		display:block;
+  		position:absolute;
+  		bottom:0;
+  		right:0;
+  	}
+
+    .topleft {
+        padding: 8px 20px;
+      	position: absolute;
+      	top: 0;
+      	left: 0;
+      	color: rgb(237,233,232);
+    }
+
+  	.button {
+  		border: none;
+  		color: white;
+  		padding: 8px 20px;
+  		text-align: center;
+  		text-decoration: none;
+  		display: inline-block;
+  		font-size: 16px;
+  		margin: 4px 2px;
+  		transition-duration: 0.4s;
+  		cursor: pointer;
+	}
+
+	input[type=text], input[type=password] {
+      border-radius: 10px;
+      width: 40%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+	.button1 {
+		background-color: rgb(210,212,211);
+	 	color: black;
+	  	border: 2px solid #4CAF50;
+	}
+
+	.button1:hover {
+	  	background-color: #4CAF50;
+	  	color: rgb(237,233,232);
+	}
+
+	.button2 {
+      	background-color: rgb(210,212,211);
+     	color: black;
+     	border: 2px solid rgb(0,128,255);
+    }
+
+    .button2:hover {
+      	background-color: rgb(0,128,255);
+      	color: rgb(237,233,232);
+    }
+
+    .sidenav {
+      height: 100%;
+      width: 160px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .sidenav a {
+      padding: 6px 8px 6px 16px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+    }
+
+    .sidenav a:hover {
+      color: #f1f1f1;
+    }
+
+    .split {
+      height: 100%;
+      width: 40%;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      overflow-x: hidden;
+      padding-top: 20px;
+    }
+
+    .left {
+      left: 0;
+      background-color: #0A2558;
+    }
+
+    .right {
+      right: 0;
+      padding-right: 150px;
+      background-color: rgb();
+    }
+
+    @media (max-width: 700px) {
+        .left{
+            width: 0;
+        }
+
+        input[type=text], input[type=password]{
+            width: 90%;
+        }
+    }

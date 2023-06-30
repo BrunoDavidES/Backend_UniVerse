@@ -46,14 +46,14 @@ public class NucleusData {
     }
 
     public boolean validateModify(){
-        return name != null;
+        return id != null;
     }
 
     public void fillGaps(Entity nucleus){
         if (newName == null) newName = nucleus.getString("name");
         if (id == null) id = nucleus.getString("id");
         if (president == null) president = nucleus.getString("president");
-        if (nucleusEmail == null) nucleusEmail = nucleus.getString("nucleusEmail");
+        if (nucleusEmail == null) nucleusEmail = nucleus.getString("email");
         if (website == null) website = nucleus.getString("website");
         if (instagram == null) instagram = nucleus.getString("instagram");
         if (twitter == null) twitter = nucleus.getString("twitter");

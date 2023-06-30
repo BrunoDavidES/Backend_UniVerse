@@ -13,7 +13,6 @@ public class DepartmentData {
     public String email;
     public String name;
     public String president;
-    public String location;
     public String phoneNumber;
     public String address;
     public String fax;
@@ -38,7 +37,7 @@ public boolean validateList(){
 
     public boolean validateModify() {
         if(this.email != null)
-            if (!email.matches("^[A-Za-z0-9._%+-]+@@(fct\\.unl\\.pt)$")) {
+            if (!email.matches("^[A-Za-z0-9._%+-]+@(fct\\.unl\\.pt)$")) {
                 return false;
             }
         return id != null ;
@@ -50,8 +49,6 @@ public boolean validateList(){
             this.email = department.getString("email");
         if(this.president == null)
             this.president = department.getString("president");
-        if(this.location == null)
-            this.location = department.getString("location");
         if(this.phoneNumber == null)
             this.phoneNumber = department.getString("phoneNumber");
         if(this.address == null)
