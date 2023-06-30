@@ -50,13 +50,16 @@ public class MessageResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Sender and recipient cannot be the same").build();
         }
 
-        try {
-            DatabaseReference senderRef = firebaseDatabase.getReference("Users").child(senderId);
-            String messageId = senderRef.child("inbox").child(recipientId).push().getKey();
-            senderRef.child("inbox").child(recipientId).child(messageId).setValueAsync(data);
+        senderId = senderId.replace(".", "");
+        recipientId = recipientId.replace(".", "");
 
-            DatabaseReference recipientRef = firebaseDatabase.getReference("Users").child(recipientId);
-            recipientRef.child("inbox").child(senderId).child(messageId).setValueAsync(data);
+        try {
+            DatabaseReference senderRef = firebaseDatabase.getReference("Users").child(senderId).child("inbox").child(recipientId);
+            String messageId = senderRef.push().getKey();
+            senderRef.child(messageId).setValueAsync(data);
+
+            DatabaseReference recipientRef = firebaseDatabase.getReference("Users").child(recipientId).child("inbox").child(senderId);
+            recipientRef.child(messageId).setValueAsync(data);
 
             LOG.info("Message sent");
             return Response.ok(messageId).build();
