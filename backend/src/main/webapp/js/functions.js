@@ -1165,6 +1165,83 @@ function editDepartment(){
     request.send(JSON.stringify(data));
 }
 
+
+var departmentsQueryOffset = 0;
+function queryDepartments(){
+    var limit = document.getElementById("listLimitId").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/department/query?limit="+limit+"&offset="+departmentsQueryOffset, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        name: entity.properties.name,
+                        id: entity.properties.id,
+                        address: entity.properties.address,
+                        email: entity.properties.email,
+                        fax: entity.properties.fax,
+                        president: entity.properties.president,
+                        phone_number: entity.properties.phone_number,
+                        members_list: entity.properties.members_list,
+                        time_creation: entity.properties.time_creation,
+                        time_lastUpdated: entity.properties.time_lastUpdated,
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('details');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = entity.title.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Nome do Núcleo: " + entity.name.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Username do presidente: " + entity.president.value +
+                                                "<br> &emsp;Endereço: " + entity.address.value +
+                                                "<br> &emsp;Email: " + entity.email.value +
+                                                "<br> &emsp;Fax: " + entity.fax.value +
+                                                "<br> &emsp;Número de telefone: " + entity.phone_number.value +
+                                                "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
+                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
+                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                departmentsQueryOffset += limit;
+            }
+            else {
+                console.log(request.responseText);
+                alert.log("FAIL");
+            }
+        }
+    }
+    request.send();
+}
+
 //Nucleos
 function postNucleus(){
 var data = {
