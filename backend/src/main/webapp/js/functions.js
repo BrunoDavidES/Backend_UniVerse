@@ -298,6 +298,14 @@ function queryEvents(){
     }
 }
 
+function clearListEvents(){
+    var r1 = document.getElementById("listOfEvents");
+    var r2 = document.getElementById("details");
+    r1.replaceChildren();
+    r2.replaceChildren();
+    eventsQueryOffset = 0;
+}
+
 function validateEvent(){
     var id = document.getElementById("idEventValidate").value;
 
