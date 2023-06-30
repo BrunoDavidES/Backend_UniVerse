@@ -394,9 +394,9 @@ public class FeedResource {
     }
 
     @POST
-    @Path("/query/Events/timeGap/{firstDate}/{endDate}")
+    @Path("/query/{kind}/timeGap/{firstDate}/{endDate}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryEntriesTimeGap(@Context HttpServletRequest request, @PathParam("firstDate") String firstDate,  @PathParam("endDate") String endDate){
+    public Response queryEntriesTimeGap(@Context HttpServletRequest request, @PathParam("kind") String kind, @PathParam("firstDate") String firstDate,  @PathParam("endDate") String endDate){
         LOG.fine("Attempt to query feed ");
 
         //VERIFICAR QUE O UTILIZADOR QUE CHAMA ESTE METODO É BACOFFICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -426,7 +426,7 @@ public class FeedResource {
 
 
         Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind(EVENT)
+                .setKind(kind)
                 .setFilter(attributeFilter)
                 .build();
 
