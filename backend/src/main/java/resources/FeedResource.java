@@ -392,4 +392,42 @@ public class FeedResource {
 
         return Response.ok(jsonResponse).build();
     }
+
+    @POST
+    @Path("/query/Events/timeGap/{firstDate}/{endDate}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryEntriesTimeGap(@Context HttpServletRequest request, @PathParam("firstDate") String firstDate,  @PathParam("endDate") String endDate,
+                                        @QueryParam("limit") String limit,
+                                        @QueryParam("offset") String offset){
+        LOG.fine("Attempt to query feed ");
+
+        //Verificar, caso for evento privado, se o token é valido
+
+
+
+        QueryResults<Entity> queryResults;
+
+        Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
+        Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
+
+        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
+                .setKind(EVENT)
+                .setFilter(StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
+                        StructuredQuery.PropertyFilter.le("time_creation", endDateTS)))
+                .setLimit(Integer.parseInt(limit))
+                .setOffset(Integer.parseInt(offset))
+                .build();
+
+
+        queryResults = datastore.run(query);
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(results::add);
+
+        LOG.info("Ides receber um query ó filho!");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(results)).build();
+
+    }
 }
