@@ -109,7 +109,8 @@ public class RegisterResource {
                         .set("role", data.getRole())
                         .set("license_plate", data.license_plate)
                         .set("status", "ACTIVE")
-                        .set("job_list", "")
+                        .set("department_job", "")
+                        .set("nucleus_job", "")
                         .set("personal_event_list", "")  //#string%string%string%string#string%...
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())

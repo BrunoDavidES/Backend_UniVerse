@@ -1,6 +1,7 @@
 package util;
 
 import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.LatLng;
 
 import java.util.List;
 import java.util.Map;
@@ -14,17 +15,20 @@ public class DepartmentData {
     public String name;
     public String president;
     public String phoneNumber;
-    public String address;
+    public LatLng location;
+    public double latitude;
+    public double longitude;
     public String fax;
 
 
     public DepartmentData() { }
 
     public boolean validateRegister() {
-        if (id == null || email == null || name == null || president == null || address == null || phoneNumber == null) {
+
+        if (id == null || email == null || name == null || president == null || latitude == 0 || longitude == 0 || phoneNumber == null) {
             return false;
         }
-
+        this.location = LatLng.of(this.latitude,this.longitude);
         if (!id.matches(".{3,64}")){
             return false;
         }
@@ -51,8 +55,10 @@ public boolean validateList(){
             this.president = department.getString("president");
         if(this.phoneNumber == null)
             this.phoneNumber = department.getString("phoneNumber");
-        if(this.address == null)
-            this.address = department.getString("address");
+        if(this.location == null)
+            this.location = department.getLatLng("location");
+        else
+            this.location = LatLng.of(this.latitude,this.longitude);
         if(this.fax == null)
             this.fax = department.getString("fax");
     }
