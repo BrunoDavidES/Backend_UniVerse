@@ -212,8 +212,23 @@
             <button type="text" class="submit" onclick="deleteDepartment()">Apagar Departamento</button>
         </div>
     </div>
-    <div id="dptList" style="display: none;">
+    <div id="dptList" class="list" style="display: none;">
+        <h1 class="title" style="text-align: center;">Listar Departamentos</h1>
+        <br>
+        <h2 class="subtitle" for="listLimitId" style="display: inline;">Departamentos por listagem: &emsp;</h2>
+        <select id="listLimitId" style="width: 80px; display: inline;">
+            <option value=5>5</option>
+            <option value=10>10</option>
+            <option value=15>15</option>
+            <option value=20>20</option>
+        </select>
 
+        <ul id="listOfDepartments"></ul>
+        <hr class="rounded">
+        <br>
+        <div id="details"></div>
+        <br>
+        <button class="submit" onclick="queryDepartments();">Listar</button>
     </div>
     </div>
     <div class="popup" id="popup" style="">
