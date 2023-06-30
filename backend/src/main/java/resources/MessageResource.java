@@ -39,8 +39,9 @@ public class MessageResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
 
-        String senderId = data.getSenderId();
+        String senderId = decodedToken.getUid();
         String recipientId = data.getRecipientId();
+        data.setSent(senderId);
 
         if (!userExists(senderId) || !userExists(recipientId)) {
             return Response.status(Response.Status.NOT_FOUND).entity(USER_DOES_NOT_EXIST).build();

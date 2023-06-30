@@ -1,19 +1,14 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.cloud.Timestamp;
 
 public class MessageData {
-    private String chatId;
     private String senderId;
     private String recipientId;
     private String message;
+    private Timestamp sentTime;
 
     public MessageData() {}
-
-    public boolean validate() {
-        return senderId != null && recipientId != null && message != null;
-    }
 
     public String getSenderId() {
         return senderId;
@@ -27,7 +22,7 @@ public class MessageData {
         return recipientId;
     }
 
-    public void setRecipientIds(String recipientId) {
+    public void setRecipientId(String recipientId) {
         this.recipientId = recipientId;
     }
 
@@ -39,7 +34,21 @@ public class MessageData {
         this.message = message;
     }
 
-    public String getChatId() { return chatId; }
+    public Timestamp getSentTime() {
+        return sentTime;
+    }
 
-    public void setChatId(String chatId) { this.chatId = chatId; }
+    public void setSentTime(Timestamp sentTime) {
+        this.sentTime = sentTime;
+    }
+
+    public boolean validate() {
+        return recipientId != null && message != null;
+    }
+
+    public void setSent(String senderId) {
+        this.senderId = senderId;
+        this.recipientId = null;
+        this.sentTime = Timestamp.now();
+    }
 }
