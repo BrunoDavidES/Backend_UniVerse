@@ -878,13 +878,13 @@ function queryReports(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.textContent = entity.title.value + " - " + entity.status.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = entity.title.value;
+                        title.textContent = " " + entity.title.value;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
@@ -892,8 +892,8 @@ function queryReports(){
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
                                                 "<br> &emsp;Localização: " + entity.location.value +
-                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
-                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated +
+                                                "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString() +
                                                 "<br> &emsp;Estado do Report: " + entity.status.value;
 
                         details.appendChild(description);
@@ -950,13 +950,13 @@ function queryUnresolvedReports(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.textContent = entity.title.value + " - " + entity.status.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('unresDetails');
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = entity.title.value;
+                        title.textContent = " " + entity.title.value;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
@@ -964,8 +964,8 @@ function queryUnresolvedReports(){
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
                                                 "<br> &emsp;Localização: " + entity.location.value +
-                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
-                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated +
+                                                "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString() +
                                                 "<br> &emsp;Estado do Report: " + entity.status.value;
 
                         details.appendChild(description);
@@ -1220,7 +1220,7 @@ function queryDepartments(){
                         phone_number: entity.properties.phone_number,
                         members_list: entity.properties.members_list,
                         time_creation: entity.properties.time_creation,
-                        time_lastUpdated: entity.properties.time_lastUpdated,
+                        time_lastUpdated: entity.properties.time_lastupdate    ,
                     };
                 });
 
@@ -1244,8 +1244,8 @@ function queryDepartments(){
                                                 "<br> &emsp;Fax: " + entity.fax.value +
                                                 "<br> &emsp;Número de telefone: " + entity.phone_number.value +
                                                 "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
-                                                "<br> &emsp;Criado em: " + entity.time_creation.value +
-                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated.value;
+                                                "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
 
                         details.appendChild(description);
 

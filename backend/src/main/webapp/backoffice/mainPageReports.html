@@ -196,7 +196,7 @@
             <br>
             <div id="unresDetails"></div>
             <br>
-            <button class="submit" onclick="loadingPopupOn();queryUnresolvedReports();loadingPopupOff();">Listar</button>
+            <button class="submit" onclick="queryUnresolvedReports()">Listar</button>
         </div>
         <div id="reportAll" class="list" style="display: none;">
             <h1 class="title" style="text-align: center;">Listar todos os Reports</h1>
@@ -214,7 +214,7 @@
             <br>
             <div id="details"></div>
             <br>
-            <button class="submit" onclick="loadingPopupOn();queryReports();loadingPopupOff();">Listar</button>
+            <button class="submit" onclick="queryReports()">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">
@@ -227,16 +227,6 @@
 
 <script src="/js/functions.js"></script>
 <script>
-      let loading = document.getElementById("loadingPopup");
-
-      function loadingPopupOn(){
-           loading.classList.add("openLoadingPopup");
-      }
-
-      function loadingPopupOff(){
-           loading.classList.remove("openLoadingPopup");
-      }
-
       function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);

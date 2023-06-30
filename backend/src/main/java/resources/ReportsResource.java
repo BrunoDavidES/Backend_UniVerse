@@ -315,7 +315,7 @@ public class ReportsResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter =
-                StructuredQuery.CompositeFilter.and( StructuredQuery.PropertyFilter.neq( STATUS_CLAIM, STATUS_SEEN ) );
+                StructuredQuery.CompositeFilter.and( StructuredQuery.PropertyFilter.neq( STATUS_CLAIM, STATUS_RESOLVED ) );
         if( filters == null){
             filters = new HashMap<>(1);
         }
