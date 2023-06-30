@@ -10,7 +10,7 @@ function registeredUsers(){
                 document.getElementById("registered").innerHTML = xmlhttp.responseText;
             }
             else{
-                print(xmlhttp.responseText);
+                console.log(xmlhttp.responseText);
             }
         }
     }
@@ -30,7 +30,7 @@ function repToSolve(){
                 document.getElementById("unresolvedRep").innerHTML = xmlhttp.responseText;
             }
             else{
-                print(xmlhttp.responseText);
+                console.log(xmlhttp.responseText);
             }
         }
     }
@@ -54,7 +54,7 @@ function newsToSolve(){
                 document.getElementById("unresolvedNews").innerHTML = xmlhttp.responseText;
             }
             else{
-                print(xmlhttp.responseText);
+                console.log(xmlhttp.responseText);
             }
         }
     }
