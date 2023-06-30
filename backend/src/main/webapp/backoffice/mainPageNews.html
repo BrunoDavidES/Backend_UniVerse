@@ -204,6 +204,15 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select>
+            <br><br>
+            <label>
+                <p class="subtitle" style="display: inline;">Filtrar entre </p>
+                <input id="dateStart" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                <p class="subtitle" style="display: inline;"> (Data Inical) &emsp; e </p> &emsp;
+                <input id="dateEnd" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                <p class="subtitle" style="display: inline;"> (Data Final) &emsp;</p>
+            </label>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearList();">Apagar Lista</button></div>
 
             <ul id="listOfNews"></ul>
             <hr class="rounded">
@@ -306,6 +315,32 @@
         window.scrollTo(0,document.body.scrollHeight);
         bottomPage.style.display = 'none';
         topPage.style.display = '';
+      }
+
+      function formatDate() {
+        var x = document.getElementById("dateStart").value;
+        x = new Date(x);
+        x.setHours(x.getHours() - x.getHours());
+        return x;
+      }
+
+      function formatDate2() {
+        var x2 = document.getElementById("dateEnd").value;
+        x2 = new Date(x2);
+        x2.setHours(x2.getHours() - x2.getHours());
+        x2.setMinutes(x2.getMinutes() - x2.getMinutes());
+        x2.setSeconds(x2.getSeconds() - x2.getSeconds());
+        x2.setHours(23);
+        x2.setMinutes(59);
+        x2.setSeconds(59);
+        return x2;
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
       }
 </script>
 

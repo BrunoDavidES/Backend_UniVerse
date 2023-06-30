@@ -11,7 +11,6 @@ function registeredUsers(){
             }
             else{
                 print(xmlhttp.responseText);
-                alert("Falhou");
             }
         }
     }
@@ -32,10 +31,33 @@ function repToSolve(){
             }
             else{
                 print(xmlhttp.responseText);
-                alert("Falhou");
             }
         }
     }
 
     xmlhttp.send();
+}
+
+function newsToSolve(){
+     var notRes = {
+        "validated_backoffice": false
+     };
+
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", document.location.origin + "/rest/feed/numberOf/News", true);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    xmlhttp.onreadystatechange = function() {
+        if(xmlhttp.readyState == 4) {
+            if(xmlhttp.status == 200) {
+                document.getElementById("unresolvedRep").innerHTML = xmlhttp.responseText;
+            }
+            else{
+                print(xmlhttp.responseText);
+            }
+        }
+    }
+
+    xmlhttp.send(notRes);
 }
