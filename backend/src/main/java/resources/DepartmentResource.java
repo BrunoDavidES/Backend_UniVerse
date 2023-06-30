@@ -109,7 +109,6 @@ public class DepartmentResource {
                         .set("phone_number", data.phoneNumber)
                         .set("location", data.location)
                         .set("fax", data.fax)
-                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -334,13 +333,12 @@ public class DepartmentResource {
             String[] attributes;
             Key memberKey;
             Entity memberEntity;
+            Key updatedMemberKey;
             Entity newUser;
-            for(String valuesOfMember : data.members) {
+            for(String valuesOfMember : data.members){
                 attributes = valuesOfMember.split("%");
-
                 memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                Key updatedMemberKey = datastore.newKeyFactory().addAncestor(PathElement.of(DEPARTMENT, id)).setKind(USER).newKey(memberKey.getId());
-                memberEntity = txn.get(updatedMemberKey);
+                memberEntity = txn.get(memberKey);
                 if (memberEntity == null) {
                     txn.rollback();
                     LOG.warning(WRONG_MEMBER);
@@ -349,7 +347,6 @@ public class DepartmentResource {
                 userJob = memberEntity.getString("department_job");
                 if (userJob.equals("")) {
                     newUser = Entity.newBuilder(memberEntity)
-                            .setKey(updatedMemberKey)  // Set the key path as the key
                             .set("department_job", id + "%" + attributes[0])
                             .set("time_lastupdate", Timestamp.now())
                             .build();
