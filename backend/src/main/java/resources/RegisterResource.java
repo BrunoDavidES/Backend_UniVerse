@@ -71,7 +71,7 @@ public class RegisterResource {
             return Response.ok(userRecord).build();
         } catch (FirebaseAuthException e) {
             LOG.warning("Firebase registration failed: " + e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Firebase registration failed: " + e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Firebase registration failed: " + e.getMessage()).build();
         }
     }
 
