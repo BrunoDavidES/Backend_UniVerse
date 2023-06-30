@@ -2,6 +2,7 @@ package util;
 
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.LatLng;
+import  com.google.cloud.datastore.*;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ public class DepartmentData {
 
 
     public String id;  //acronimo do departamento, exemplo MIEI
-    public List<String> members;
+    public List<? extends Value<?>> members;
     public String email;
     public String name;
     public String president;
