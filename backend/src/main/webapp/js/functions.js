@@ -688,29 +688,46 @@ function queryUsers(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                const entities = JSON.parse(request.responseText);
+                const response = JSON.parse(request.responseText);
+
+                var uN;
+                const entities = response.map(function(entity) {
+                    return {
+                        name: entity.properties.name,
+                        username: (entity.properties.email.value).split("@")[0],
+                        email: entity.properties.email,
+                        role: entity.properties.role,
+                        jobs: entity.properties.job_list,
+                        license_plate: entity.properties.license_plate,
+                        time_creation: entity.properties.time_creation,
+                        time_lastupdate: entity.properties.time_lastupdate
+                    };
+                });
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.username + " - " + entity.name;
+                    listItem.textContent = entity.username.value + " - " + entity.name.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = entity.name;
+                        title.textContent = entity.name.value;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
-                        var jobs = entity.jobs;
+                        var jobs = entity.jobs.value;
                         jobs = jobs.replace();
                         jobs = jobs.replace(/^#/,'');
                         jobs = jobs.replace(/%/g, " - ");
-                        description.innerHTML = "&emsp;Nome do user: " + entity.name +
-                                                "<br> &emsp;Username: " + entity.username +
-                                                "<br> &emsp;Email: " + entity.email +
-                                                "<br> &emsp;Role: " + entity.role +
-                                                "<br> &emsp;Lista de cargos na faculdade: " + jobs;
+                        description.innerHTML = "&emsp;Nome do user: " + entity.name.value +
+                                                "<br> &emsp;Username: " + entity.username.value +
+                                                "<br> &emsp;Email: " + entity.email.value +
+                                                "<br> &emsp;Role: " + entity.role.value +
+                                                "<br> &emsp;Lista de cargos na faculdade: " + jobs.value +
+                                                "<br> &emsp;Matrícula da viatura pessoal: " + entity.license_plate.value +
+                                                "<br> &emsp;Conta criada em: " + (entity.time_creation.value).toString() +
+                                                "<br> &emsp;Último update feito em: " + (entity.time_lastupdate.value).toString();
 
                         details.appendChild(description);
 
@@ -799,8 +816,8 @@ var id = document.getElementById("idReport").value;
                     document.getElementById("location").value = entity.location.value;
                     document.getElementById("authorRep").value = entity.reporter.value;
                     document.getElementById("statusRep").value = entity.status.value;
-                    document.getElementById("creationRep").value = entity.time_creation.value;
-                    document.getElementById("lastUpdatedRep").value = entity.time_lastUpdated.value;
+                    document.getElementById("creationRep").value = new Date(entity.time_creation.value.seconds * 1000).toString();
+                    document.getElementById("lastUpdatedRep").value = new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
                 });
 
                 var bucketGETRequest = new XMLHttpRequest();
@@ -1209,17 +1226,17 @@ function queryDepartments(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                    listItem.textContent = entity.name.value + " - " + entity.id.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = entity.title.value;
+                        title.textContent = entity.name.value;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
-                        description.innerHTML = "&emsp;Nome do Núcleo: " + entity.name.value +
+                        description.innerHTML = "&emsp;Nome do Departamento: " + entity.name.value +
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do presidente: " + entity.president.value +
                                                 "<br> &emsp;Endereço: " + entity.address.value +
@@ -1228,7 +1245,7 @@ function queryDepartments(){
                                                 "<br> &emsp;Número de telefone: " + entity.phone_number.value +
                                                 "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
                                                 "<br> &emsp;Criado em: " + entity.time_creation.value +
-                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated;
+                                                "<br> &emsp;Última modificação: " + entity.time_lastUpdated.value;
 
                         details.appendChild(description);
 
