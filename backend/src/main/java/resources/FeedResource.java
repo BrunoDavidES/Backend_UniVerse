@@ -401,19 +401,35 @@ public class FeedResource {
                                         @QueryParam("offset") String offset){
         LOG.fine("Attempt to query feed ");
 
-        //Verificar, caso for evento privado, se o token é valido
+        //VERIFICAR QUE O UTILIZADOR QUE CHAMA ESTE METODO É BACOFFICE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
+
+        if (token == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        }
 
 
-
+        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+        }
+        StructuredQuery.CompositeFilter attributeFilter;
         QueryResults<Entity> queryResults;
 
         Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
         Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
 
-        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
+            attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
+                    StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
+
+
+
+
+        Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(EVENT)
-                .setFilter(StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
-                        StructuredQuery.PropertyFilter.le("time_creation", endDateTS)))
+                .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit))
                 .setOffset(Integer.parseInt(offset))
                 .build();
