@@ -834,6 +834,7 @@ var id = document.getElementById("idReport").value;
 var reportsQueryOffset = 0;
 function queryReports(){
     var limit = document.getElementById("listLimitId").value;
+    var list = document.getElementById("listOfReports");
 
     var request = new XMLHttpRequest();
 
@@ -904,7 +905,8 @@ function queryReports(){
 
 var unresReportsQueryOffset = 0;
 function queryUnresolvedReports(){
-    var limit = document.getElementById("listOfUnresReports").value;
+    var limit = document.getElementById("unResListLimitId").value;
+    var list = document.getElementById("listOfUnresReports");
 
     var request = new XMLHttpRequest();
 
@@ -1177,6 +1179,7 @@ function editDepartment(){
 var departmentsQueryOffset = 0;
 function queryDepartments(){
     var limit = document.getElementById("listLimitId").value;
+    var list = document.getElementById("listOfDepartments");
 
     var request = new XMLHttpRequest();
 
