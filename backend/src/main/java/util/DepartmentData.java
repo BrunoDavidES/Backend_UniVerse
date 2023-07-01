@@ -56,7 +56,7 @@ public boolean validateList(){
             this.president = department.getString("president");
         if(this.phoneNumber == null)
             this.phoneNumber = department.getString("phoneNumber");
-        if(this.location == null)
+        if(this.latitude == 0 || this.longitude == 0)
             this.location = department.getLatLng("location");
         else
             this.location = LatLng.of(this.latitude,this.longitude);

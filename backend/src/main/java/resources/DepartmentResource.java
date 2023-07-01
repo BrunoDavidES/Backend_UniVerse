@@ -108,7 +108,6 @@ public class DepartmentResource {
                         .set("phone_number", data.phoneNumber)
                         .set("location", data.location)
                         .set("fax", data.fax)
-                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -218,32 +217,19 @@ public class DepartmentResource {
                 LOG.warning(WRONG_DEPARTMENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
             } else {
-                String list = department.getString("members_list");
-                String userPersonalList;
-                String[] attributes;
-                Key memberKey;
-                Entity memberEntity;
-                Entity newUser;
-                for(String valuesOfMember : list.split("#")) {
-                    if(!valuesOfMember.equals("")) {
-                        attributes = valuesOfMember.split("%");
+                Query<Entity> query = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("department", id))
+                        .build();
 
-                        memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                        memberEntity = txn.get(memberKey);
-                        if (memberEntity == null) {
-                            txn.rollback();
-                            LOG.warning(WRONG_MEMBER);
-                            return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                        }
-                        userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
-                        newUser = Entity.newBuilder(memberEntity)
-                                .set("job_list", userPersonalList)
-                                .set("time_lastupdate", Timestamp.now())
-                                .build();
-
-                        txn.update(newUser);
-                    }
+                QueryResults<Entity> queryResults = datastore.run(query);
+                while (queryResults.hasNext()) {
+                    Entity userEntity = queryResults.next();
+                    userEntity = Entity.newBuilder(userEntity)
+                            .set("department", "")
+                            .set("department_job", "")
+                            .build();
+                    txn.update(userEntity);
                 }
                 txn.delete(departmentKey);
                 LOG.info("Department deleted.");
@@ -312,6 +298,8 @@ public class DepartmentResource {
 
     }
 
+    //Department já não gere membros
+/*
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel%username"
@@ -545,4 +533,6 @@ public class DepartmentResource {
             }
         }
     }
+
+ */
 }
