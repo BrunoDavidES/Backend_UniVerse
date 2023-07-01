@@ -56,6 +56,7 @@ public class ModifyUserResource {
     private static final String WRONG_PRESIDENT = "President doesn't exists.";
     private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
     private static final String WRONG_DEPARTMENT = "Department does not exist.";
+    private static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
     private static final String WRONG_MEMBER = "Member doesn't exists.";
     private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
@@ -80,6 +81,24 @@ public class ModifyUserResource {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
             Entity user = txn.get(userKey);
             data.fillGaps(user);
+            if(!data.department.equals("")){
+                Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+                Entity department = txn.get(departmentKey);
+                if( department == null ) {
+                    txn.rollback();
+                    LOG.warning(WRONG_DEPARTMENT);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+                }
+            }
+            if(!data.nucleus.equals("")){
+                Key nucleustKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.nucleus);
+                Entity nucleus = txn.get(nucleustKey);
+                if( nucleus == null ) {
+                    txn.rollback();
+                    LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
+                }
+            }
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
@@ -88,6 +107,10 @@ public class ModifyUserResource {
                     Entity newUser = Entity.newBuilder(user)
                             .set("name", data.name)
                             .set("status", data.status)
+                            .set("department", data.department)
+                            .set("department_job", data.department_job) //VER QUAL O ROLE PARA VER O JOB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            .set("nucleus", data.nucleus)
+                            .set("nucleus_job", data.nucleus_job)
                             .set("license_plate", data.license_plate)
                             .set("time_lastupdate", Timestamp.now())
                             .build();
@@ -190,16 +213,7 @@ public class ModifyUserResource {
             } else {
                 Entity.Builder newUser = Entity.newBuilder(target);
 
-                newUser.set("email", target.getString("email"))
-                        .set("name", target.getString("name"))
-                        .set("password", target.getString("password"))
-                        .set("role", data.newRole)
-                        .set("license_plate", target.getString("license_plate"))
-                        .set("status",  target.getString("status"))
-                        .set("job_list",  target.getString("job_list"))
-                        .set("personal_event_list", target.getString("personal_event_list"))  //#string%string%string%string#string%...
-                        .set("time_creation", target.getTimestamp("time_creation"))
-                        .set("time_lastupdate", Timestamp.now());
+                newUser.set("role", data.newRole);
 
                 if(data.newRole.equals(D)){
                     if(data.office == null)
@@ -208,7 +222,7 @@ public class ModifyUserResource {
                 }else
                     newUser.set("office", "");
                 Entity u = newUser.build();
-                txn.put(u);
+                txn.update(u);
                 LOG.info(data.target + " role has been updated successfully.");
                 txn.commit();
                 return Response.ok(target).build();

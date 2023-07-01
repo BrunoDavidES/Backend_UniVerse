@@ -153,6 +153,7 @@ public class NucleusResource {
                         .set("email", data.nucleusEmail)
                         .set("name", data.name)
                         .set("id", data.id)
+                        .set("location", data.location)
                         .set("president", data.president)
                         .set("website", "")
                         .set("instagram", "")
@@ -161,7 +162,6 @@ public class NucleusResource {
                         .set("youtube", "")
                         .set("linkedIn", "")
                         .set("description", "")
-                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -240,6 +240,7 @@ public class NucleusResource {
             Entity newNucleus = Entity.newBuilder(nucleus)
                     .set("name", data.newName)
                     .set("id", data.id)
+                    .set("location", data.location)
                     .set("president", data.president)
                     .set("email", data.nucleusEmail)
                     .set("website", data.website)
@@ -292,33 +293,20 @@ public class NucleusResource {
                 LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
             } else {
-                String list = nucleus.getString("members_list");
-                String userPersonalList;
-                Key memberKey;
-                Entity memberEntity;
-                Entity newUser;
-                for(String member : list.split("#")) {
-                    if(!member.equals("")) {
+                Query<Entity> query = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("nucleus", id))
+                        .build();
 
-                        memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
-                        memberEntity = txn.get(memberKey);
-                        if (memberEntity == null) {
-                            txn.rollback();
-                            LOG.warning(WRONG_MEMBER);
-                            return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                        }
-                        userPersonalList = memberEntity.getString("job_list");
-                        userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
-                        newUser = Entity.newBuilder(memberEntity)
-                                .set("job_list", userPersonalList)
-                                .set("time_lastupdate", Timestamp.now())
-                                .build();
-
-                        txn.update(newUser);
-                    }
+                QueryResults<Entity> queryResults = datastore.run(query);
+                while (queryResults.hasNext()) {
+                    Entity userEntity = queryResults.next();
+                    userEntity = Entity.newBuilder(userEntity)
+                            .set("nucleus", "")
+                            .set("nucleus_job", "")
+                            .build();
+                    txn.update(userEntity);
                 }
-
-
                 txn.delete(nucleusKey);
                 LOG.info("Nucleus deleted.");
                 txn.commit();
@@ -382,7 +370,7 @@ public class NucleusResource {
         return Response.ok(g.toJson(results)).build();
 
     }
-
+/*
     @POST
     @Path("/add/members/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -529,5 +517,7 @@ public class NucleusResource {
             }
         }
     }
+
+ */
 
 }
