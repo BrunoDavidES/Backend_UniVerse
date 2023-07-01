@@ -1476,7 +1476,7 @@ function queryNucleus(){
     var request = new XMLHttpRequest();
 
     //request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
-    request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+1+"&offset="+queryNucleusCursor, true);
+    request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
