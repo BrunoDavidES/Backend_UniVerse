@@ -11,7 +11,7 @@ public class DepartmentData {
 
 
     public String id;  //acronimo do departamento, exemplo MIEI
-    public List<? extends Value<?>> members;
+    public List<String> members;
     public String email;
     public String name;
     public String president;

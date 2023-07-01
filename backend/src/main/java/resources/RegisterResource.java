@@ -90,7 +90,7 @@ public class RegisterResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(data.username);
+            Key userKey = datastore.newKeyFactory().setKind(USER).addAncestor(PathElement.of(DEPARTMENT, "default")).newKey(data.username);
             Entity user = txn.get(userKey);
 
             if( user != null ) {

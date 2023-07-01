@@ -109,7 +109,6 @@ public class DepartmentResource {
                         .set("phone_number", data.phoneNumber)
                         .set("location", data.location)
                         .set("fax", data.fax)
-                        .set("members_list", "")
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -175,7 +174,6 @@ public class DepartmentResource {
                         .set("president", data.president)
                         .set("phone_number", data.phoneNumber)
                         .set("location", data.location)
-                        .set("members_list", data.members)
                         .set("fax", data.fax)
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -228,12 +226,27 @@ public class DepartmentResource {
                         .build();
 
                 QueryResults<Entity> queryResults = datastore.run(query);
+
+                Key updatedMemberKey;
+                Entity newUser;
                 while (queryResults.hasNext()) {
-                    Entity userEntity = queryResults.next();
-                    userEntity = Entity.newBuilder(userEntity)
+                    Entity memberEntity = queryResults.next();
+                    updatedMemberKey = datastore.newKeyFactory().addAncestor(PathElement.of(DEPARTMENT, "default")).setKind(USER).newKey(memberEntity.getString("email").split("@")[0]);
+                    newUser = Entity.newBuilder(updatedMemberKey)
+                            .set("email", memberEntity.getString("email"))
+                            .set("name", memberEntity.getString("name"))
+                            .set("password", memberEntity.getString("password"))
+                            .set("role", memberEntity.getString("role"))
+                            .set("license_plate", memberEntity.getString("license_plate"))
+                            .set("status", memberEntity.getString("status"))
                             .set("department_job", "")
+                            .set("nucleus_job", memberEntity.getString("nucleus_job"))
+                            .set("personal_event_list", memberEntity.getString("personal_event_list"))  //#string%string%string%string#string%...
+                            .set("time_creation",memberEntity.getTimestamp("time_creation"))
+                            .set("time_lastupdate", Timestamp.now())
                             .build();
-                    txn.update(userEntity);
+                    txn.put(newUser);
+                    txn.delete(memberEntity.getKey());
                 }
                 // Delete department
                 txn.delete(departmentKey);
@@ -248,13 +261,13 @@ public class DepartmentResource {
             }
         }
     }
-        //POR CURSOR EM VEZ DE OFFSET LIMIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //POR CURSOR EM VEZ DE OFFSET LIMIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryDepartment(@Context HttpServletRequest request,
-                               @QueryParam("limit") String limit,
-                               @QueryParam("offset") String offset, Map<String, String> filters){
+                                    @QueryParam("limit") String limit,
+                                    @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query departments.");
 
         //Verificar, caso for evento privado, se o token é valido
@@ -335,10 +348,11 @@ public class DepartmentResource {
             String[] attributes;
             Key memberKey;
             Entity memberEntity;
+            Key updatedMemberKey;
             Entity newUser;
-            for(Value<?> valuesOfMember : data.members){
-                attributes = valuesOfMember.toString().split("%");
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
+            for(String valuesOfMember : data.members){
+                attributes = valuesOfMember.split("%");
+                memberKey = datastore.newKeyFactory().addAncestor(PathElement.of(DEPARTMENT, "default")).setKind(USER).newKey(attributes[1]);
                 memberEntity = txn.get(memberKey);
                 if (memberEntity == null) {
                     txn.rollback();
@@ -347,24 +361,28 @@ public class DepartmentResource {
                 }
                 userJob = memberEntity.getString("department_job");
                 if (userJob.equals("")) {
-                    newUser = Entity.newBuilder(memberEntity)
+                    updatedMemberKey = datastore.newKeyFactory().addAncestor(PathElement.of(DEPARTMENT, id)).setKind(USER).newKey(attributes[1]);
+                    newUser = Entity.newBuilder(updatedMemberKey)
+                            .set("email", memberEntity.getString("email"))
+                            .set("name", memberEntity.getString("name"))
+                            .set("password", memberEntity.getString("password"))
+                            .set("role", memberEntity.getString("role"))
+                            .set("license_plate", memberEntity.getString("license_plate"))
+                            .set("status", memberEntity.getString("status"))
                             .set("department_job", id + "%" + attributes[0])
+                            .set("nucleus_job", memberEntity.getString("nucleus_job"))
+                            .set("personal_event_list", memberEntity.getString("personal_event_list"))  //#string%string%string%string#string%...
+                            .set("time_creation",memberEntity.getTimestamp("time_creation"))
                             .set("time_lastupdate", Timestamp.now())
                             .build();
-
-                    txn.update(newUser);
+                    txn.put(newUser);
+                    txn.delete(memberKey);
                 }
             }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", data.members)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
 
-            txn.update(updatedDepartment);
-
-            LOG.info("Members added.");
+            LOG.info("Members added." + PathElement.of(DEPARTMENT, id));
             txn.commit();
-            return Response.ok(updatedDepartment).build();
+            return Response.ok(department).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -405,39 +423,40 @@ public class DepartmentResource {
                 LOG.warning(WRONG_DEPARTMENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
             }
-            List<Value<?>> list = department.getList("members_list");
-            String[] attributes;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(Value<?> valuesOfMember : data.members) {
-                attributes = valuesOfMember.toString().split("%");
-                if(list.contains(valuesOfMember)) {
-                    memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                    memberEntity = txn.get(memberKey);
-                    if (memberEntity == null) {
-                        txn.rollback();
-                        LOG.warning(WRONG_MEMBER);
-                        return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                    }
-                    newUser = Entity.newBuilder(memberEntity)
-                            .set("department_job", "")
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
 
-                    txn.update(newUser);
-                    list.remove(valuesOfMember);
-                }
-            }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("User")
+                    .setFilter(PropertyFilter.hasAncestor(departmentKey))
                     .build();
 
-            txn.update(updatedDepartment);
+            QueryResults<Entity> queryResults = datastore.run(query);
+            Key updatedMemberKey;
+            Entity newUser;
+            while (queryResults.hasNext()) {
+                Entity userEntity = queryResults.next();
+                if(data.members.contains(userEntity.getString("department_job"))) {
+                    Entity memberEntity = queryResults.next();
+                    updatedMemberKey = datastore.newKeyFactory().addAncestor(PathElement.of(DEPARTMENT, "default")).setKind(USER).newKey(memberEntity.getString("email").split("@")[0]);
+                    newUser = Entity.newBuilder(updatedMemberKey)
+                            .set("email", memberEntity.getString("email"))
+                            .set("name", memberEntity.getString("name"))
+                            .set("password", memberEntity.getString("password"))
+                            .set("role", memberEntity.getString("role"))
+                            .set("license_plate", memberEntity.getString("license_plate"))
+                            .set("status", memberEntity.getString("status"))
+                            .set("department_job", "")
+                            .set("nucleus_job", memberEntity.getString("nucleus_job"))
+                            .set("personal_event_list", memberEntity.getString("personal_event_list"))  //#string%string%string%string#string%...
+                            .set("time_creation",memberEntity.getTimestamp("time_creation"))
+                            .set("time_lastupdate", Timestamp.now())
+                            .build();
+                    txn.put(newUser);
+                    txn.delete(userEntity.getKey());
+                }
+            }
             LOG.info("Members removed.");
             txn.commit();
-            return Response.ok(updatedDepartment).build();
+            return Response.ok(department).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -476,39 +495,29 @@ public class DepartmentResource {
                 LOG.warning(WRONG_DEPARTMENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
             }
-            List<Value<?>> list = department.getList("members_list");
-            String[] attributes;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(Value<?> valuesOfMember : data.members) {
-                attributes = valuesOfMember.toString().split("%");
-                for(Value<?> l : list){
-                    if(l.toString().contains(attributes[1])) {
-                        memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                        memberEntity = txn.get(memberKey);
-                        if (memberEntity == null) {
-                            txn.rollback();
-                            LOG.warning(WRONG_MEMBER);
-                            return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                        }
-                        newUser = Entity.newBuilder(memberEntity)
-                                .set("department_job", id + "%" + attributes[0])
-                                .set("time_lastupdate", Timestamp.now())
-                                .build();
 
-                        txn.update(newUser);
-                        list.remove(l);
-                        list.add(valuesOfMember);
-                    }
-                }
-            }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("User")
+                    .setFilter(PropertyFilter.hasAncestor(departmentKey))
                     .build();
 
-            txn.update(updatedDepartment);
+            QueryResults<Entity> queryResults = datastore.run(query);
+            while (queryResults.hasNext()) {
+                Entity userEntity = queryResults.next();
+                if(data.members.contains(userEntity.getString("department_job").split("%")[1])){
+                    String job = "";
+                    for (String j : data.members){
+                        if(j.split("%")[1].equals(userEntity.getString("department_job").split("%")[1])){
+                            job = j.split("%")[0];
+                            break;
+                        }
+                    }
+                    userEntity = Entity.newBuilder(userEntity)
+                            .set("department_job", id + "%" + job)
+                            .build();
+                    txn.update(userEntity);
+                }
+            }
             LOG.info("Members edited.");
             txn.commit();
             return Response.ok(department).build();
