@@ -43,7 +43,10 @@ public class FeedResource {
     private static final String MISSING_OR_WRONG_PARAMETER = "Missing or wrong parameter.";
     private static final String TOKEN_NOT_FOUND = "Token not found.";
     private static final String BO = "BO";
-    private static final String D = "D";
+    private static final String TEACHER = "T";
+    private static final String WORKER = "W";
+    private static final String STUDENT = "S";
+    private static final String ADMIN = "A";
     private static final String ROLE = "role";
     private static final String USER = "User";
     private static final String EVENT = "Event";
@@ -88,9 +91,14 @@ public class FeedResource {
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
-            if (kind.equals(EVENT) && !role.equals(D) && !role.equals(BO)){
+            if (kind.equals(EVENT) && !role.equals(TEACHER) && !role.equals(BO) && !role.equals(ADMIN)){
                 LOG.warning("No permission to create an event.");
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
+            }
+
+            if (kind.equals(NEWS) && !role.equals(BO) & !role.equals(ADMIN) & !role.equals(TEACHER) & !role.equals(STUDENT)){
+                LOG.warning("No permission to post news.");
+                return Response.status(Response.Status.FORBIDDEN).entity("No permission to post news.").build();
             }
 
             Transaction txn = datastore.newTransaction();
@@ -191,7 +199,7 @@ public class FeedResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request").build();
             }
 
-            if( !(entry.getString("authorUsername").equals(username) || role.equals(BO)) ){
+            if( !(entry.getString("authorUsername").equals(username) || role.equals(BO) || role.equals(ADMIN)) ){
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
@@ -259,7 +267,7 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(kind + " does not exist");
                 return Response.status(Response.Status.BAD_REQUEST).entity(kind + " does not exist").build();
-            } else if( !(entry.getString("authorUsername").equals(username) || role.equals(BO)) ) {
+            } else if( !(entry.getString("authorUsername").equals(username) || role.equals(BO) || role.equals(ADMIN)) ) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
@@ -285,22 +293,33 @@ public class FeedResource {
         LOG.fine("Attempt to query feed " + kind);
 
         //Verificar, caso for evento privado, se o token é valido
-        if(kind.equals(EVENT)) {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
 
+        if(kind.equals(EVENT)) {
             if (token == null) {
                 LOG.info(TOKEN_NOT_FOUND);
                 if (filters == null)
-                    filters = new HashMap<>(1);
+                    filters = new HashMap<>(2);
                 filters.put("isPublic", "yes");
             }
+        }
+
+        if (token != null){
+            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+
+            if( !(role.equals(BO) || role.equals(ADMIN)) ) {
+                filters.put("validated_backoffice", "true");
+            }
+        }
+        else {
+            filters.put("validated_backoffice", "true");
         }
 
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-        if( filters == null){
+        if( filters == null ){
             filters = new HashMap<>(1);
         }
         StructuredQuery.PropertyFilter propFilter;
@@ -343,16 +362,27 @@ public class FeedResource {
         LOG.fine("Attempt to count the query feed " + kind);
 
         // Verificar, caso for evento privado, se o token é valido
-        if (kind.equals(EVENT)) {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
 
+        if (kind.equals(EVENT)) {
             if (token == null) {
                 LOG.info(TOKEN_NOT_FOUND);
                 if (filters == null)
                     filters = new HashMap<>(1);
                 filters.put("isPublic", "yes");
             }
+        }
+
+        if (token != null){
+            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+
+            if( !(role.equals(BO) || role.equals(ADMIN)) ) {
+                filters.put("validated_backoffice", "true");
+            }
+        }
+        else {
+            filters.put("validated_backoffice", "true");
         }
 
         QueryResults<Entity> queryResults;
@@ -378,15 +408,11 @@ public class FeedResource {
 
         queryResults = datastore.run(query);
 
-        List<Entity> results = new ArrayList<>();
-
-        //queryResults.forEachRemaining(results::add);
-
         LOG.info("Received a query!");
         int count = 0;
         // Get the total number of entities
         while (queryResults.hasNext()) {
-            results.add(queryResults.next());
+            queryResults.next();
             count++;
         }
         // Convert the response object to JSON
@@ -411,8 +437,8 @@ public class FeedResource {
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
-
-        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+        String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+        if(! (role.equals(BO) || role.equals(ADMIN)) ){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
@@ -425,14 +451,10 @@ public class FeedResource {
             attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
                     StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
 
-
-
-
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
                 .build();
-
 
         queryResults = datastore.run(query);
 
@@ -440,9 +462,8 @@ public class FeedResource {
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de " + kind + " entre um intervalo de datas foi pedido");
         Gson g = new Gson();
         return Response.ok(g.toJson(results)).build();
-
     }
 }

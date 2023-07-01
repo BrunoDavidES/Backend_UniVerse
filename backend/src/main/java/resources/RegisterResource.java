@@ -114,7 +114,6 @@ public class RegisterResource {
                         .set("nucleus", "")
                         .set("nucleus_job", "")
                         .set("office","")
-                        .set("personal_event_list", "")  //#string%string%string%string#string%...
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();

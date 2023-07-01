@@ -48,8 +48,9 @@ public class NucleusResource {
 
 
     private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
+    private static final String TEACHER = "T";
+    private static final String STUDENT = "S";
+    private static final String ADMIN = "A";
     private static final String ROLE = "role";
     private static final String USER = "User";
     private static final String EVENT = "Event";
@@ -79,7 +80,6 @@ public class NucleusResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
     public NucleusResource() { }
-
 
 
     @POST
@@ -112,32 +112,12 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
             }
 
-            String creatorUsername = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
 
-            String creatorRole = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
-
-
-            if (!creatorRole.equals(BO)) {
-                if (creatorRole.equals(A)) {
-                    Key studentsUnionKey = datastore.newKeyFactory().setKind(STUDENTS_UNION).newKey(STUDENTS_UNION);
-                    Entity studentsUnion = txn.get(studentsUnionKey);
-
-                    if (studentsUnion == null){
-                        txn.rollback();
-                        LOG.warning(ENTITY_DOES_NOT_EXIST);
-                        return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-                    }
-                    else if (!studentsUnion.getString("president").equals(creatorUsername)){
-                        txn.rollback();
-                        LOG.warning(PERMISSION_DENIED);
-                        return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-                    }
-                }
-                else{
-                    txn.rollback();
-                    LOG.warning(PERMISSION_DENIED);
-                    return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-                }
+            if (!role.equals(BO) && !role.equals(ADMIN)) {
+                txn.rollback();
+                LOG.warning(PERMISSION_DENIED);
+                return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
             }
 
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
@@ -148,7 +128,6 @@ public class NucleusResource {
                 LOG.warning(NUCLEUS_ALREADY_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_ALREADY_EXISTS).build();
             } else {
-
                 nucleus = Entity.newBuilder(nucleusKey)
                         .set("email", data.nucleusEmail)
                         .set("name", data.name)
@@ -211,31 +190,39 @@ public class NucleusResource {
 
             String modifierUsername = String.valueOf(token.getClaim(USER)).replaceAll("\"", "");
             String modifierRole = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+            String prevPresident = nucleus.getString("president");
 
-            if (!modifierRole.equals(BO)) {
-                if (modifierRole.equals(A)) {
-                    Key studentsUnionKey = datastore.newKeyFactory().setKind(STUDENTS_UNION).newKey(STUDENTS_UNION);
-                    Entity studentsUnion = txn.get(studentsUnionKey);
-
-                    if (studentsUnion == null){
-                        txn.rollback();
-                        LOG.warning(ENTITY_DOES_NOT_EXIST);
-                        return Response.status(Response.Status.NOT_FOUND).entity(PERMISSION_DENIED).build();
-                    }
-                    else if (!studentsUnion.getString("president").equals(modifierUsername) || !nucleus.getString("president").equals(modifierUsername) ){
-                        txn.rollback();
-                        LOG.warning(PERMISSION_DENIED);
-                        return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-                    }
-                }
-                else{
-                    txn.rollback();
-                    LOG.warning(PERMISSION_DENIED);
-                    return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-                }
+            if (!modifierRole.equals(BO) && !modifierRole.equals(ADMIN) && !prevPresident.equals(modifierUsername)) {
+                txn.rollback();
+                LOG.warning(PERMISSION_DENIED);
+                return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
             }
 
             data.fillGaps(nucleus);
+
+            if (!modifierUsername.equals(data.president)){
+                Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+                Entity president = txn.get(presidentKey);
+
+                if (president == null){
+                    txn.rollback();
+                    LOG.warning(WRONG_PRESIDENT);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
+                }
+
+                Key previousPresidentKey = datastore.newKeyFactory().setKind(USER).newKey(prevPresident);
+
+                Entity newPreviousPresident = Entity.newBuilder(txn.get(previousPresidentKey))
+                        .set("nucleus_job", "Member")
+                        .build();
+                txn.update(newPreviousPresident);
+
+                Entity newPresident = Entity.newBuilder(presidentKey)
+                        .set("nucleus", data.id)
+                        .set("nucleus_job", "Presidente")
+                        .build();
+                txn.update(newPresident);
+            }
 
             Entity newNucleus = Entity.newBuilder(nucleus)
                     .set("name", data.newName)
@@ -284,7 +271,8 @@ public class NucleusResource {
             Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
-            if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+            if(!role.equals(BO) && !role.equals(ADMIN)){
                 txn.rollback();
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
@@ -352,7 +340,6 @@ public class NucleusResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-
         EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind("Nucleus")
                 .setFilter(attributeFilter)
@@ -375,154 +362,4 @@ public class NucleusResource {
                 .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
                 .build();
     }
-/*
-    @POST
-    @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
-        LOG.fine("Attempt to add members to the nucleus.");
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
-            Entity nucleus = txn.get(nucleusKey);
-
-            if( nucleus == null ) {
-                txn.rollback();
-                LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
-                return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
-            }
-            else if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))){
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            }
-
-            String list = nucleus.getString("members_list");;
-            String userPersonalList;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-
-            for(String member : data.members) {
-
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
-                memberEntity = txn.get(memberKey);
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning(WRONG_MEMBER);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                }
-                if (!list.contains(member)){
-                    userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + nucleus.getString("id") + "%" + "member");
-                    newUser = Entity.newBuilder(memberEntity)
-                            .set("job_list", userPersonalList)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
-
-                    txn.update(newUser);
-                    list = list.concat("#" + member);
-                }
-            }
-
-            Entity updatedNucleus = Entity.newBuilder(nucleus)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-
-            txn.update(updatedNucleus);
-            LOG.info("Members added.");
-            txn.commit();
-            return Response.ok(updatedNucleus).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-
-    @PATCH
-    @Path("/delete/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@Context HttpServletRequest request, @PathParam("id") String id, NucleusData data) {
-        LOG.fine("Attempt to add members to the nucleus.");
-
-        if (data.validateList()) {
-            LOG.warning("List is empty.");
-            return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
-
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
-            Entity nucleus = txn.get(nucleusKey);
-            if (!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO) && !nucleus.getString("president").equals(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))) {
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            } else if (nucleus == null) {
-                txn.rollback();
-                LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
-                return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
-            }
-
-            String list = nucleus.getString("members_list");
-            String userPersonalList;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(String member : data.members) {
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(member);
-                memberEntity = txn.get(memberKey);
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning(WRONG_MEMBER);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                }
-                userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + nucleus.getString("id") + "%member", "");
-                newUser = Entity.newBuilder(memberEntity)
-                        .set("job_list", userPersonalList)
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-
-                txn.update(newUser);
-                list = list.replace("#"+member, "");
-            }
-            Entity updatedNucleus = Entity.newBuilder(nucleus)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-
-            txn.update(updatedNucleus);
-            LOG.info("Members removed.");
-            txn.commit();
-            return Response.ok(updatedNucleus).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
- */
-
 }

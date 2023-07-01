@@ -52,22 +52,17 @@ public class NucleusData {
     }
 
     public void fillGaps(Entity nucleus){
-        if (newName == null) newName = nucleus.getString("name");
-        if (id == null) id = nucleus.getString("id");
-        if (president == null) president = nucleus.getString("president");
-        if (location == null) location = nucleus.getString("location");
-        if (nucleusEmail == null) nucleusEmail = nucleus.getString("email");
-        if (website == null) website = nucleus.getString("website");
-        if (instagram == null) instagram = nucleus.getString("instagram");
-        if (twitter == null) twitter = nucleus.getString("twitter");
-        if (facebook == null) facebook = nucleus.getString("facebook");
-        if (youtube == null) youtube = nucleus.getString("youtube");
-        if (linkedIn == null) linkedIn = nucleus.getString("linkedIn");
-        if (description == null) description = nucleus.getString("description");
+        if (newName == null || newName.equals("")) newName = nucleus.getString("name");
+        if (id == null || id.equals("")) id = nucleus.getString("id");
+        if (president == null || president.equals("")) president = nucleus.getString("president");
+        if (location == null || location.equals("")) location = nucleus.getString("location");
+        if (nucleusEmail == null || nucleusEmail.equals("")) nucleusEmail = nucleus.getString("email");
+        if (website == null || website.equals("")) website = nucleus.getString("website");
+        if (instagram == null || instagram.equals("")) instagram = nucleus.getString("instagram");
+        if (twitter == null || twitter.equals("")) twitter = nucleus.getString("twitter");
+        if (facebook == null || facebook.equals("")) facebook = nucleus.getString("facebook");
+        if (youtube == null || youtube.equals("")) youtube = nucleus.getString("youtube");
+        if (linkedIn == null || linkedIn.equals("")) linkedIn = nucleus.getString("linkedIn");
+        if (description == null || description.equals("")) description = nucleus.getString("description");
     }
-
-    public boolean validateList(){
-        return this.members == null || this.members.isEmpty();
-    }
-
 }

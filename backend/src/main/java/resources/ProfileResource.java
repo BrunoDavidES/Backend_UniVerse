@@ -41,8 +41,10 @@ public class ProfileResource {
 
 
     private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
+    private static final String TEACHER = "T";
+    private static final String WORKER = "W";
+    private static final String STUDENT = "S";
+    private static final String ADMIN = "A";
     private static final String ROLE = "role";
     private static final String USER = "User";
     private static final String EVENT = "Event";
@@ -88,8 +90,6 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("Empty param").build();
         }
 
-
-
         final ValToken validator = new ValToken();
         DecodedJWT token = validator.checkToken(request);
 
@@ -106,6 +106,8 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity("User does not exist "  + requester).build();
         }
 
+        ProfileData data = new ProfileData();
+
         // Vai ter de mudar quando se souber os atributos a devolver em cada caso
         if (!username.equals(requester)){
             // Faz um perfil menos completo
@@ -113,18 +115,34 @@ public class ProfileResource {
             user = datastore.get(userKey);
 
             if( user == null ) {
-                LOG.warning(USER_OR_PASSWORD_INCORRECT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
+                LOG.warning(USER_DOES_NOT_EXIST);
+                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
         }
-        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
-        ProfileData data = new ProfileData();
-        // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
+
         data.username = username;
         data.name = user.getString("name");
         data.email = user.getString("email");
         data.role = user.getString("role");
-        data.jobs = user.getString("job_list");
+        data.department = user.getString("department");
+        data.department_job = user.getString("department_job");
+
+        if (data.role.equals(STUDENT)){
+            data.nucleus = user.getString("nucleus");
+            data.nucleus_job = user.getString("nucleus_job");
+        }
+
+        if (data.role.equals(TEACHER)){
+            data.office = user.getString("office");
+        }
+        String requesterUsername = String.valueOf(token.getClaim(USER_CLAIM));
+        String requesterRole = String.valueOf(token.getClaim(ROLE));
+
+        if ( requesterUsername.equals(username) || requesterRole.equals(BO) || requesterRole.equals(ADMIN) ){
+            data.license_plate = user.getString("license_plate");
+            data.status = user.getString("status");
+        }
+
 
         LOG.fine("Profile successfully gotten");
         return Response.ok(g.toJson(data)).build();
@@ -398,7 +416,6 @@ public class ProfileResource {
             }
         }
     }
-    //FAZER GETPERSONALEVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     @POST
     @Path("/query")
@@ -416,14 +433,16 @@ public class ProfileResource {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
-        if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+        if(!role.equals(BO) && !role.equals(ADMIN)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-        if( filters == null){
+        if( filters == null ){
             filters = new HashMap<>(1);
         }
         StructuredQuery.PropertyFilter propFilter;
@@ -451,7 +470,7 @@ public class ProfileResource {
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de users pedido");
         Gson g = new Gson();
         return Response.ok(g.toJson(results))
                 .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
@@ -476,7 +495,6 @@ public class ProfileResource {
                 filters = new HashMap<>(1);
         }
 
-
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
@@ -500,15 +518,12 @@ public class ProfileResource {
 
         queryResults = datastore.run(query);
 
-        List<Entity> results = new ArrayList<>();
-
-        //queryResults.forEachRemaining(results::add);
 
         LOG.info("Received a query!");
         int count = 0;
         // Get the total number of entities
         while (queryResults.hasNext()) {
-            results.add(queryResults.next());
+            queryResults.next();
             count++;
         }
         // Convert the response object to JSON

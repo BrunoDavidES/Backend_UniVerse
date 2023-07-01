@@ -40,7 +40,9 @@ public class LoginResource {
 
 
 	private static final String BO = "BO";
-	private static final String D = "D";
+	private static final String TEACHER = "T";
+	private static final String WORKER = "W";
+	private static final String STUDENT = "S";
 	private static final String ROLE = "role";
 	private static final String USER = "User";
 	private static final String EVENT = "Event";

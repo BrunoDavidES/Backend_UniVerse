@@ -1,6 +1,5 @@
 package util;
 
-import java.util.List;
 
 public class ReportData {
     public String title;

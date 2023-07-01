@@ -39,8 +39,10 @@ public class ReportsResource {
 
 
     private static final String BO = "BO";
-    private static final String D = "D";
-    private static final String A = "A";
+    private static final String TEACHER = "T";
+    private static final String STUDENT = "S";
+    private static final String WORKER = "W";
+    private static final String ADMIN = "A";
     private static final String ROLE = "role";
     private static final String USER = "User";
     private static final String EVENT = "Event";
@@ -200,11 +202,13 @@ public class ReportsResource {
             Key eventKey = datastore.newKeyFactory().setKind(REPORT).newKey(id);
             Entity entry = txn.get(eventKey);
 
+            String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
+
             if( entry == null ) {
                 txn.rollback();
                 LOG.warning(REPORT_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(REPORT_DOES_NOT_EXIST).build();
-            } else if(!String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "").equals(BO)){
+            } else if(!role.equals(BO) && !role.equals(ADMIN)){
                 LOG.warning(NICE_TRY);
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
             }else {
@@ -248,10 +252,9 @@ public class ReportsResource {
         }
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO)){
+        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN) ){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-
         }
 
         QueryResults<Entity> queryResults;
@@ -310,7 +313,7 @@ public class ReportsResource {
         }
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO)){
+        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN)){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
 
@@ -370,7 +373,7 @@ public class ReportsResource {
         }
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO)){
+        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN)){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
 

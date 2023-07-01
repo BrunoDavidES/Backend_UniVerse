@@ -48,19 +48,19 @@ public class DepartmentData {
         return id != null ;
     }
     public void fillGaps(Entity department) {
-        if(this.name == null)
+        if(this.name == null || this.name.equals(""))
             this.name = department.getString("name");
-        if(this.email == null)
+        if(this.email == null || this.email.equals(""))
             this.email = department.getString("email");
-        if(this.president == null)
+        if(this.president == null || this.president.equals(""))
             this.president = department.getString("president");
-        if(this.phoneNumber == null)
+        if(this.phoneNumber == null || this.phoneNumber.equals(""))
             this.phoneNumber = department.getString("phoneNumber");
         if(this.latitude == 0 || this.longitude == 0)
             this.location = department.getLatLng("location");
         else
             this.location = LatLng.of(this.latitude,this.longitude);
-        if(this.fax == null)
+        if(this.fax == null || this.fax.equals(""))
             this.fax = department.getString("fax");
     }
 }

@@ -36,7 +36,9 @@ public class ModifyUserResource {
 
 
     private static final String BO = "BO";
-    private static final String D = "D";
+    private static final String TEACHER = "T";
+    private static final String WORKER = "W";
+    private static final String STUDENT = "S";
     private static final String ROLE = "role";
     private static final String USER = "User";
     private static final String EVENT = "Event";
@@ -206,19 +208,23 @@ public class ModifyUserResource {
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
             } else
-            if( !data.validatePermission(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE))) {
+            if( !data.validatePermission(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE), target)) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
                 Entity.Builder newUser = Entity.newBuilder(target);
 
-                newUser.set("role", data.newRole);
+                newUser.set("role", data.newRole)
+                        .set("department", data.department)
+                        .set("department_job", data.department_job);
 
-                if(data.newRole.equals(D)){
+                if(data.newRole.equals(TEACHER)){
                     if(data.office == null)
                         data.office = "";
-                    newUser.set("office", data.office);
+                    newUser.set("nucleus", "")
+                            .set("nucleus_job", "")
+                            .set("office", data.office);
                 }else
                     newUser.set("office", "");
                 Entity u = newUser.build();
