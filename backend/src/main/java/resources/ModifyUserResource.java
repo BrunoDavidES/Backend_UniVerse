@@ -271,6 +271,17 @@ public class ModifyUserResource {
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
+                Query<Entity> query = Query.newEntityQueryBuilder()
+                        .setKind("PersonalEvent")
+                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(targetKey))
+                        .build();
+
+                QueryResults<Entity> queryResults = datastore.run(query);
+                Entity memberEntity;
+                while (queryResults.hasNext()) {
+                    memberEntity = queryResults.next();
+                    txn.delete(memberEntity.getKey());
+                }
                 txn.delete(targetKey);
                 LOG.info("Target deleted.");
                 txn.commit();

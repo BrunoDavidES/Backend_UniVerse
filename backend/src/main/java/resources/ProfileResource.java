@@ -281,10 +281,10 @@ public class ProfileResource {
                 .build();
 
         QueryResults<Entity> queryResults = datastore.run(query);
-
+        Entity memberEntity;
         List<PersonalEventsData> result = new ArrayList<>();
         while (queryResults.hasNext()) {
-            Entity memberEntity = queryResults.next();
+            memberEntity = queryResults.next();
             if(memberEntity.getString("beginningDate").contains("-" + monthAndYear)){
                 PersonalEventsData data = new PersonalEventsData();
                 data.id = memberEntity.getString("id");
@@ -333,26 +333,14 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            Query<Entity> query = Query.newEntityQueryBuilder()
-                    .setKind("PersonalEvent")
-                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
-                    .setFilter(StructuredQuery.PropertyFilter.eq("id", id))
+            Entity updatedEvent = Entity.newBuilder(event)
+                    .set("title", data.title)
+                    .set("beginningDate", data.beginningDate)
+                    .set("hours", data.hours)
+                    .set("location", data.location)
+                    .set("time_lastupdate", Timestamp.now())
                     .build();
-
-            QueryResults<Entity> queryResults = datastore.run(query);
-
-            while (queryResults.hasNext()) {
-                Entity memberEntity = queryResults.next();
-                Entity updatedEvent = Entity.newBuilder(memberEntity)
-                        .set("title", data.title)
-                        .set("beginningDate", data.beginningDate)
-                        .set("hours", data.hours)
-                        .set("location", data.location)
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-                txn.update(updatedEvent);
-            }
-
+            txn.update(updatedEvent);
             LOG.info("Personal event edited.");
             txn.commit();
             return Response.ok(id).build();
@@ -393,20 +381,7 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            Query<Entity> query = Query.newEntityQueryBuilder()
-                    .setKind("PersonalEvent")
-                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
-                    .setFilter(StructuredQuery.PropertyFilter.eq("id", id))
-
-                    .build();
-
-            QueryResults<Entity> queryResults = datastore.run(query);
-
-            while (queryResults.hasNext()) {
-                Entity memberEntity = queryResults.next();
-                txn.delete(memberEntity.getKey());
-            }
-
+            txn.delete(eventKey);
             LOG.info("Personal event deleted.");
             txn.commit();
             return Response.ok(id).build();
