@@ -336,7 +336,7 @@ public class NucleusResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryNucleus(@Context HttpServletRequest request,
                                     @QueryParam("limit") String limit,
-                                    @QueryParam("offset") String offset, Map<String, String> filters){
+                                    @QueryParam("offset") String cursor, Map<String, String> filters){
         LOG.fine("Attempt to query nucleus.");
 
         //Verificar, caso for evento privado, se o token é valido
@@ -364,14 +364,17 @@ public class NucleusResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+
+        EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind("Nucleus")
                 .setFilter(attributeFilter)
-                .setLimit(Integer.parseInt(limit))
-                .setOffset(Integer.parseInt(offset))
-                .build();
+                .setLimit(Integer.parseInt(limit));
 
-        queryResults = datastore.run(query);
+        if ( !cursor.equals("EMPTY") ){
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
+
+        queryResults = datastore.run(query.build());
 
         List<Entity> results = new ArrayList<>();
 
@@ -379,8 +382,7 @@ public class NucleusResource {
 
         LOG.info("Ides receber um query ó filho!");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
-
+        return Response.ok(g.toJson(results, queryResults.getCursorAfter().toUrlSafe().getClass())).build();
     }
 
     @POST

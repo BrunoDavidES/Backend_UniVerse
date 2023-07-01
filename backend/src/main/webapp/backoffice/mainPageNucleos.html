@@ -135,7 +135,7 @@
                     <div class="cut"></div>
                     <label for="pres" class="placeholder" required>Presidente do Núcleo</label>
                 </div>
-               <!-- <div class="input-container ic1">
+                <div class="input-container ic1">
                     <input id="description" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="description" class="placeholder">Descrição (Opcional)</label>
@@ -154,7 +154,7 @@
                     <input id="linkedin" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="linkedin" class="placeholder">LinkedIn (Opcional)</label>
-                </div> -->
+                </div>
                 <button type="text" class="submit" onclick="postNucleus()">Criar Núcleo</button>
             </div>
         </div>
@@ -237,8 +237,23 @@
                 <button type="text" class="submit" onclick="deleteNucleus()">Apagar Núcleo</button>
             </div>
         </div>
-        <div id="nucList" style="display: none;">
+        <div id="nucList" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar Núcleos</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Núcleos por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
 
+            <ul id="listOfNucleus"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="details"></div>
+            <br>
+            <button class="submit" onclick="queryNucleus()">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">

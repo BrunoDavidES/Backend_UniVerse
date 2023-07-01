@@ -1473,4 +1473,89 @@ function deleteNucleus(){
     request.send();
 }
 
+var queryNucleusCursor = "EMPTY";
+function queryNucleus(){
+    var limit = document.getElementById("listLimitId").value;
+    var list = document.getElementById("listOfNucleus");
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        name: entity.properties.name,
+                        id: entity.properties.id,
+                        description: entity.properties.description,
+                        email: entity.properties.email,
+                        president: entity.properties.president,
+                        members_list: entity.properties.members_list,
+                        facebook: entity.properties.facebook,
+                        instagram: entity.properties.instagram,
+                        twitter: entity.properties.twitter,
+                        website: entity.properties.website,
+                        youtube: entity.properties.youtube,
+                        time_creation: entity.properties.time_creation,
+                        time_lastUpdated: entity.properties.time_lastupdate
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.name.value + " - " + entity.id.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('details');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = entity.name.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Nome do Núcleo: " + entity.name.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Username do presidente: " + entity.president.value +
+                                                "<br> &emsp;Descrição: " + entity.description.value +
+                                                "<br> &emsp;Email: " + entity.email.value +
+                                                "<br> &emsp;Presidente: " + entity.president.value +
+                                                "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
+                                                "<br> &emsp;Facebook: " + entity.facebook.value +
+                                                "<br> &emsp;Instagram: " + entity.instagram.value +
+                                                "<br> &emsp;Twitter: " + entity.twitter.value +
+                                                "<br> &emsp;Website: " + entity.website.value +
+                                                "<br> &emsp;Youtube: " + entity.youtube.value +
+                                                "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+
+
+            }
+            else {
+                console.log(request.responseText);
+                alert("FAIL");
+            }
+        }
+    }
+    request.send();
+}
+
 window.addEventListener('load', loadLoggedUser);
