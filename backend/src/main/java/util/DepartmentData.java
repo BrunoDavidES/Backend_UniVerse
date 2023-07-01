@@ -1,6 +1,8 @@
 package util;
 
 import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.LatLng;
+import  com.google.cloud.datastore.*;
 
 import java.util.List;
 import java.util.Map;
@@ -14,26 +16,29 @@ public class DepartmentData {
     public String name;
     public String president;
     public String phoneNumber;
-    public String address;
+    public LatLng location;
+    public double latitude;
+    public double longitude;
     public String fax;
 
 
     public DepartmentData() { }
 
     public boolean validateRegister() {
-        if (id == null || email == null || name == null || president == null || address == null || phoneNumber == null) {
+
+        if (id == null || email == null || name == null || president == null || latitude == 0 || longitude == 0 || phoneNumber == null) {
             return false;
         }
-
+        this.location = LatLng.of(this.latitude,this.longitude);
         if (!id.matches(".{3,64}")){
             return false;
         }
 
         return email.matches("^[A-Za-z0-9._%+-]+@(fct\\.unl\\.pt)$");
     }
-public boolean validateList(){
+    public boolean validateList(){
         return this.members == null || this.members.isEmpty();
-}
+    }
 
     public boolean validateModify() {
         if(this.email != null)
@@ -51,8 +56,10 @@ public boolean validateList(){
             this.president = department.getString("president");
         if(this.phoneNumber == null)
             this.phoneNumber = department.getString("phoneNumber");
-        if(this.address == null)
-            this.address = department.getString("address");
+        if(this.latitude == 0 || this.longitude == 0)
+            this.location = department.getLatLng("location");
+        else
+            this.location = LatLng.of(this.latitude,this.longitude);
         if(this.fax == null)
             this.fax = department.getString("fax");
     }

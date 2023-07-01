@@ -1,6 +1,7 @@
 package util;
 
 import com.google.cloud.datastore.Entity;
+import com.google.cloud.datastore.LatLng;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class NucleusData {
     public String nucleusEmail;
 
     // Modify
-
+    public String location;
     public String newName;
 
     public List<String> members;
@@ -46,6 +47,7 @@ public class NucleusData {
     }
 
     public boolean validateModify(){
+
         return id != null;
     }
 
@@ -53,6 +55,7 @@ public class NucleusData {
         if (newName == null) newName = nucleus.getString("name");
         if (id == null) id = nucleus.getString("id");
         if (president == null) president = nucleus.getString("president");
+        if (location == null) location = nucleus.getString("location");
         if (nucleusEmail == null) nucleusEmail = nucleus.getString("email");
         if (website == null) website = nucleus.getString("website");
         if (instagram == null) instagram = nucleus.getString("instagram");

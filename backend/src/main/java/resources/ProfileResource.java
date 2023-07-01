@@ -14,10 +14,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Path("/profile")
@@ -156,23 +153,34 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString(PERSONAL_EVENT_LIST);
-            if(list.contains(data.title)) {
-                txn.rollback();
-                LOG.warning("Personal event name already used.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event name already used.").build();
-            }
-            list = list.concat("#" + data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
-            Entity updatedUser = Entity.newBuilder(user)
-                    .set("personal_event_list", list)
+            Key feedKey;
+            Entity eventAux;
+            String id;
+            do {
+                id = UUID.randomUUID().toString();
+                feedKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))).setKind("PersonalEvent").newKey(id);
+                eventAux = txn.get(feedKey);
+            } while (eventAux != null);
+
+            Key eventKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))).setKind("PersonalEvent").newKey(id);
+            Entity event = txn.get(eventKey);
+
+            event = Entity.newBuilder(eventKey)
+                    .set("id", id)
+                    .set("title", data.title)
+                    .set("username", data.username)
+                    .set("beginningDate", data.beginningDate)
+                    .set("hours", data.hours)
+                    .set("location", data.location)
+                    .set("time_created", Timestamp.now())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
-            txn.update(updatedUser);
+            txn.add(event);
             LOG.info("Personal event added.");
             txn.commit();
-            return Response.ok(updatedUser).build();
+            return Response.ok(event).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -181,50 +189,45 @@ public class ProfileResource {
     }
 
     @GET
-    @Path("/personalEvent/get/{title}")
+    @Path("/personalEvent/get/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response getPersonalEvent(@Context HttpServletRequest request,@PathParam("title") String title){
+    public Response getPersonalEvent(@Context HttpServletRequest request,@PathParam("id") String id){
         LOG.fine("Attempt to get a personal event.");
 
         Transaction txn = datastore.newTransaction();
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
 
-            if (token == null) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
+        if (token == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        }
 
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
-            Entity user = txn.get(userKey);
-            if( user == null ) {
-                txn.rollback();
-                LOG.warning(USER_DOES_NOT_EXIST);
-                return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
-            }
-            String list = user.getString(PERSONAL_EVENT_LIST);
-            if(!list.contains(title)) {
-                txn.rollback();
-                LOG.warning("Personal event does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
-            }
-            String[] l = list.split("#");
-            String[] oldEvent = new String[5];
-            for(String event: l){
-                oldEvent = event.split("%");
-                if(oldEvent[0].equals(title)){
-                    break;
-                }
-            }
+        Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
+        Entity user = txn.get(userKey);
+        if( user == null ) {
+            txn.rollback();
+            LOG.warning(USER_DOES_NOT_EXIST);
+            return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
+        }
+        Key eventKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))).setKind("PersonalEvent").newKey(id);
+        Entity event = txn.get(eventKey);
+        if(event == null) {
+            txn.rollback();
+            LOG.warning("User does not have this event.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
+        }
+
         PersonalEventsData data = new PersonalEventsData();
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
-        data.title = oldEvent[0];
-        data.username = oldEvent[1];
-        data.beginningDate = oldEvent[2];
-        data.hours = oldEvent[3];
-        data.location = oldEvent[4];
+        data.id = event.getString("id");
+        data.title = event.getString("title");
+        data.username = event.getString("username");
+        data.beginningDate = event.getString("beginningDate");
+        data.hours = event.getString("hours");
+        data.location = event.getString("location");
 
-        LOG.fine("Personal event successfully gotten");
+        LOG.fine("Personal event successfully obtained.");
         return Response.ok(g.toJson(data)).build();
     }
 
@@ -251,22 +254,40 @@ public class ProfileResource {
             LOG.warning(USER_DOES_NOT_EXIST);
             return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
         }
-        String list = user.getString(PERSONAL_EVENT_LIST);
-        String[] l = list.split("#");
-        String[] oldEvent;
-        List<PersonalEventsData> result = new ArrayList<>();
 
-        for(String event: l){
-            oldEvent = event.split("%");
-            if(!oldEvent[0].equals("") && oldEvent[2].contains("-" + monthAndYear)){
-                PersonalEventsData data = new PersonalEventsData();
-                data.title = oldEvent[0];
-                data.username = oldEvent[1];
-                data.beginningDate = oldEvent[2];
-                data.hours = oldEvent[3];
-                data.location = oldEvent[4];
-                result.add(data);
-            }
+        /*
+        // Update department's children
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("PersonalEvent")
+                .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                .build();
+
+        QueryResults<Entity> queryResults = datastore.run(query);
+*/
+        Query<Entity> query = Query.newEntityQueryBuilder()
+                .setKind("PersonalEvent")
+                .setFilter(StructuredQuery.CompositeFilter.and(
+                        StructuredQuery.PropertyFilter.hasAncestor(userKey),
+                        StructuredQuery.PropertyFilter.ge("beginningDate", "01-" + monthAndYear),
+                        StructuredQuery.PropertyFilter.lt("beginningDate", "01-" + getNextMonth(monthAndYear))
+                ))
+                .build();
+
+        QueryResults<Entity> queryResults = datastore.run(query);
+
+        List<PersonalEventsData> result = new ArrayList<>();
+        while (queryResults.hasNext()) {
+            Entity memberEntity = queryResults.next();
+            //if(memberEntity.getString("beginningDate").contains("-" + monthAndYear)){
+            PersonalEventsData data = new PersonalEventsData();
+            data.id = memberEntity.getString("id");
+            data.title = memberEntity.getString("title");
+            data.username = memberEntity.getString("username");
+            data.beginningDate = memberEntity.getString("beginningDate");
+            data.hours = memberEntity.getString("hours");
+            data.location = memberEntity.getString("location");
+            result.add(data);
+            //}
         }
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
 
@@ -275,10 +296,26 @@ public class ProfileResource {
         return Response.ok(g.toJson(result)).build();
     }
 
+    private String getNextMonth(String monthAndYear) {
+        String[] parts = monthAndYear.split("-");
+        int month = Integer.parseInt(parts[0]);
+        int year = Integer.parseInt(parts[1]);
+
+        if (month == 12) {
+            month = 1;
+            year++;
+        } else {
+            month++;
+        }
+
+        return String.format("%02d-%04d", month, year);
+    }
+
+
     @PATCH
-    @Path("/personalEvent/edit/{oldTitle}")
+    @Path("/personalEvent/edit/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response editPersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle, PersonalEventsData data){
+    public Response editPersonalEvent(@Context HttpServletRequest request,@PathParam("id") String id, PersonalEventsData data){
         LOG.fine("Attempt to edit a personal event.");
 
         Transaction txn = datastore.newTransaction();
@@ -298,31 +335,27 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString(PERSONAL_EVENT_LIST);
-            if(!list.contains(oldTitle)) {
+            Key eventKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))).setKind("PersonalEvent").newKey(id);
+            Entity event = txn.get(eventKey);
+            if(event == null) {
                 txn.rollback();
-                LOG.warning("Personal event does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
+                LOG.warning("User does not have this event.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            String[] l = list.split("#");
-            String oldEvent = "";
-            for(String event: l){
-                if(event.contains(oldTitle)){
-                    oldEvent = event;
-                    break;
-                }
-            }
-            list = list.replace(oldEvent, data.title + "%" + String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "") + "%" + data.beginningDate + "%" + data.hours + "%" + data.location);
 
-            Entity updatedUser = Entity.newBuilder(user)
-                    .set("personal_event_list", list)
+            Entity updatedEvent = Entity.newBuilder(event)
+                    .set("title", data.title)
+                    .set("username", data.username)
+                    .set("beginningDate", data.beginningDate)
+                    .set("hours", data.hours)
+                    .set("location", data.location)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
-            txn.update(updatedUser);
+            txn.update(updatedEvent);
             LOG.info("Personal event edited.");
             txn.commit();
-            return Response.ok(updatedUser).build();
+            return Response.ok(updatedEvent).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -331,9 +364,9 @@ public class ProfileResource {
     }
 
     @PATCH
-    @Path("/personalEvent/delete/{oldTitle}")
+    @Path("/personalEvent/delete/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
-    public Response deletePersonalEvent(@Context HttpServletRequest request,@PathParam("oldTitle") String oldTitle){
+    public Response deletePersonalEvent(@Context HttpServletRequest request,@PathParam("id") String id){
         LOG.fine("Attempt to delete a personal event.");
 
         Transaction txn = datastore.newTransaction();
@@ -353,31 +386,17 @@ public class ProfileResource {
                 LOG.warning(USER_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
             }
-            String list = user.getString(PERSONAL_EVENT_LIST);
-            if(!list.contains(oldTitle)) {
+            Key eventKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))).setKind("PersonalEvent").newKey(id);
+            Entity event = txn.get(eventKey);
+            if(event == null) {
                 txn.rollback();
-                LOG.warning("Personal event does not exist.");
-                return Response.status(Response.Status.BAD_REQUEST).entity("Personal event does not exist.").build();
+                LOG.warning("User does not have this event.");
+                return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            String[] l = list.split("#");
-            String oldEvent = null;
-            for(String event: l){
-                if(event.contains(oldTitle)){
-                    oldEvent = event;
-                    break;
-                }
-            }
-            list = list.replace("#" + oldEvent, "");
-
-            Entity updatedUser = Entity.newBuilder(user)
-                    .set("personal_event_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-
-            txn.update(updatedUser);
+            txn.delete(eventKey);
             LOG.info("Personal event deleted.");
             txn.commit();
-            return Response.ok(updatedUser).build();
+            return Response.ok(event).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -390,8 +409,8 @@ public class ProfileResource {
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryUsers(@Context HttpServletRequest request,
-                                 @QueryParam("limit") String limit,
-                                 @QueryParam("offset") String offset, Map<String, String> filters){
+                               @QueryParam("limit") String limit,
+                               @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query users.");
 
         //Verificar, caso for evento privado, se o token é valido
@@ -449,14 +468,14 @@ public class ProfileResource {
 
         // Verificar, caso for evento privado, se o token é valido
 
-            final ValToken validator = new ValToken();
-            DecodedJWT token = validator.checkToken(request);
+        final ValToken validator = new ValToken();
+        DecodedJWT token = validator.checkToken(request);
 
-            if (token == null) {
-                LOG.info(TOKEN_NOT_FOUND);
-                if (filters == null)
-                    filters = new HashMap<>(1);
-            }
+        if (token == null) {
+            LOG.info(TOKEN_NOT_FOUND);
+            if (filters == null)
+                filters = new HashMap<>(1);
+        }
 
 
         QueryResults<Entity> queryResults;
@@ -501,4 +520,3 @@ public class ProfileResource {
     }
 
 }
-
