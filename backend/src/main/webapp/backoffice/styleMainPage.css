@@ -5,6 +5,13 @@
         filter: invert(1);
     }
 
+    .eventPhoto {
+     	width: 90%;
+       	height: 50%;
+       	object-fit: cover;
+       	object-position: center;
+    }
+
     *{
       margin: 0;
       padding: 0;
@@ -532,7 +539,7 @@
       position: fixed;
       bottom: 90px;
       right: 30px;
-      z-index: 99;
+      z-index: 299;
       font-size: 18px;
       border: none;
       outline: none;
@@ -576,6 +583,23 @@
         padding: 15px;
         border-radius: 4px;
     }
+
+    #moreList2 {
+            width: 102px;
+            display: none;
+            position: fixed;
+            bottom: 160px;
+            right: 30px;
+            z-index: 99;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            background-color: #0A2558;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 4px;
+        }
 
     /* Responsive Media Query */
     @media (max-width: 1550px) {

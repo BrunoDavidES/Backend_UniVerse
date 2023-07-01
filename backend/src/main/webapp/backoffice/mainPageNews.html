@@ -73,14 +73,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -126,6 +118,11 @@
                     <input id="author" class="input" type="text" placeholder=" " />
                     <div class="cut"></div>
                     <label for="author" class="placeholder">Autor da Notícia</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPic" accept="image/*" onchange="updateNewsPic()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="News Picture" class="eventPhoto">
                 </div>
                 <div class="input-container2 ic2">
                     <textarea id="text" class="input" cols="40" rows="5"></textarea>
@@ -158,6 +155,11 @@
                     <input id="authorMod" class="input" type="text" placeholder=" " />
                     <div class="cut"></div>
                     <label id="authorModLbl" for="author" class="placeholder">Autor da Notícia</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPicMod" accept="image/*" onchange="updateNewsPicMod()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="News Picture" class="eventPhoto">
                 </div>
                 <div class="input-container2 ic2">
                     <textarea id="textMod" class="input" cols="40" rows="5"></textarea>
@@ -341,6 +343,28 @@
         var r2 = document.getElementById("details");
         r1.replaceChildren();
         r2.replaceChildren();
+      }
+
+      function updateNewsPic() {
+        let selectedFile = document.getElementById("newsPic").files[0];
+        if(selectedFile.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("newsPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+      }
+
+      function updateNewsPicMod() {
+        let selectedFile2 = document.getElementById("newsPicMod").files[0];
+        if(selectedFile2.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("newsPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
       }
 </script>
 

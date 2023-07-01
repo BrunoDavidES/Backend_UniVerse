@@ -8,7 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
-<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="queryDepartments();" id="moreList">Mais <i class='bx bx-buildings' ></i></button>
+<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -71,14 +73,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -104,10 +98,10 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addDpt', 'modDpt', 'delDpt', 'dptList')" class="active">Criar Departamento</button>
-            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modDpt', 'addDpt', 'delDpt', 'dptList')">Modificar perfil do Departamento</button>
-            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delDpt', 'modDpt', 'addDpt', 'dptList')">Apagar Departamento</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'dptList', 'delDpt', 'addDpt', 'modDpt')">Listar Departamentos</button>
+            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addDpt', 'modDpt', 'delDpt', 'dptList'); auxListMore(0);" class="active">Criar Departamento</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modDpt', 'addDpt', 'delDpt', 'dptList'); auxListMore(0);">Modificar perfil do Departamento</button>
+            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delDpt', 'modDpt', 'addDpt', 'dptList'); auxListMore(0);">Apagar Departamento</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'dptList', 'delDpt', 'addDpt', 'modDpt'); auxListMore(1);">Listar Departamentos</button>
         </div>
 
         <br><br>
@@ -118,7 +112,7 @@
                 <div class="input-container ic1">
                     <input id="idDpt" class="input" type="text" placeholder=" " required/>
                     <div class="cut"></div>
-                    <label for="idDpt" class="placeholder">ID do departamento</label>
+                    <label for="idDpt" class="placeholder">ID do Departamento</label>
                 </div>
                 <div class="input-container ic1">
                     <input id="address" class="input" type="text" placeholder=" " required/>
@@ -152,6 +146,7 @@
                 </div>
                 <button type="text" class="submit" onclick="postDepartment()">Criar Departamento</button>
             </div>
+            <br><br>
         </div>
         <div id="modDpt" style="display: none;">
             <div class="form">
@@ -198,6 +193,7 @@
                 </div>
                 <button type="text" class="submit" onclick="editDepartment()">Modificar Departamento</button>
             </div>
+            <br><br>
         </div>
     </div>
     <div id="delDpt" style="display: none;">
@@ -211,6 +207,7 @@
             </div>
             <button type="text" class="submit" onclick="deleteDepartment()">Apagar Departamento</button>
         </div>
+        <br><br>
     </div>
     <div id="dptList" class="list" style="display: none;">
         <h1 class="title" style="text-align: center;">Listar Departamentos</h1>
@@ -222,6 +219,7 @@
             <option value=15>15</option>
             <option value=20>20</option>
         </select>
+        <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfDepartments', 'details');">Apagar Lista</button></div>
 
         <ul id="listOfDepartments"></ul>
         <hr class="rounded">
@@ -284,19 +282,44 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
       function topFunction() {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        topPage.style.display = '';
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
       }
 </script>
 
