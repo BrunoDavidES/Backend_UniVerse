@@ -368,7 +368,7 @@ public class NucleusResource {
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de núcleos pedido");
         Gson g = new Gson();
 
         return Response.ok(g.toJson(results))

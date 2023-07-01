@@ -220,9 +220,7 @@ function getEvent(){
     request.send(JSON.stringify(idData));
 }
 
-var eventsQueryOffset = 0;
-var eventsSelect = document.getElementById('listLimitId');
-
+var queryEventsCursor = "EMPTY";
 function queryEvents(){
     var list = document.getElementById('listOfEvents');
     var limit = parseInt(document.getElementById("listLimitId").value);
@@ -230,7 +228,7 @@ function queryEvents(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + eventsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + queryEventsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
@@ -293,7 +291,7 @@ function queryEvents(){
                 list.appendChild(listItem);
 
             });
-            eventsQueryOffset += limit;
+            eventsQueryOffset = request.getResponseHeader("X-Cursor");
         }
     }
 }
@@ -555,8 +553,7 @@ function getNews(){
 }
 
 
-var newsQueryOffset = 0;
-
+var queryNewsCursor = "EMPTY";
 function queryNews(){
     var list = document.getElementById('listOfNews');
     var limit = parseInt(document.getElementById("listLimitId").value);
@@ -564,7 +561,7 @@ function queryNews(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + newsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + queryNewsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
@@ -611,7 +608,7 @@ function queryNews(){
                 list.appendChild(listItem);
 
             });
-            newsQueryOffset += limit;
+            queryNewsCursor = request.getResponseHeader("X-Cursor");
         }
     }
 }
@@ -672,8 +669,7 @@ function deleteUser(){
     request.send(JSON.stringify(data));
 }
 
-var usersQueryOffset = 0;
-
+var queryUsersCursor = "EMPTY";
 function queryUsers(){
     var list = document.getElementById("listOfUsers");
     var limit = document.getElementById("listLimitId").value;
@@ -682,7 +678,7 @@ function queryUsers(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/profile/query?limit=" + limit + "&offset=" + usersQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/profile/query?limit=" + limit + "&offset=" + queryUsersCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
@@ -741,7 +737,7 @@ function queryUsers(){
                     });
                     list.appendChild(listItem);
                 });
-                usersQueryOffset += limit;
+                queryUsersCursor = request.getResponseHeader("X-Cursor");
             }
             else {
                 alert("FAIL");
@@ -848,14 +844,14 @@ var id = document.getElementById("idReport").value;
     request.send(JSON.stringify(data));
 }
 
-var reportsQueryOffset = 0;
+var queryReportsCursor = "EMPTY";
 function queryReports(){
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfReports");
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/reports/query?limit="+limit+"&offset="+reportsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/reports/query?limit="+limit+"&offset="+queryReportsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
@@ -908,7 +904,7 @@ function queryReports(){
                     });
                     list.appendChild(listItem);
                 });
-                reportsQueryOffset += limit;
+                queryReportsCursor = request.getResponseHeader("X-Cursor");
             }
             else {
                 console.log(request.responseText);
@@ -920,14 +916,14 @@ function queryReports(){
 }
 
 
-var unresReportsQueryOffset = 0;
+var queryUnresolvedReportsCursor = "EMPTY";
 function queryUnresolvedReports(){
     var limit = document.getElementById("unResListLimitId").value;
     var list = document.getElementById("listOfUnresReports");
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/reports/query/unresolved?limit="+limit+"&offset=" + unresReportsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/reports/query/unresolved?limit="+limit+"&offset=" + queryUnresolvedReportsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
@@ -980,7 +976,7 @@ function queryUnresolvedReports(){
                     });
                     list.appendChild(listItem);
                 });
-                unresReportsQueryOffset += limit;
+                queryUnresolvedReportsCursor = request.getResponseHeader("X-Cursor");
             }
             else {
                 console.log(request.responseText);
@@ -1193,14 +1189,14 @@ function editDepartment(){
 }
 
 
-var departmentsQueryOffset = 0;
+var queryDepartmentsCursor = "EMPTY";
 function queryDepartments(){
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfDepartments");
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/department/query?limit="+limit+"&offset="+departmentsQueryOffset, true);
+    request.open("POST", document.location.origin + "/rest/department/query?limit="+limit+"&offset="+queryDepartmentsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange  = function() {
@@ -1259,7 +1255,7 @@ function queryDepartments(){
                     });
                     list.appendChild(listItem);
                 });
-                departmentsQueryOffset += limit;
+                queryDepartmentsCursor = request.getResponseHeader("X-Cursor");
             }
             else {
                 console.log(request.responseText);

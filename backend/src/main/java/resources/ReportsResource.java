@@ -235,8 +235,8 @@ public class ReportsResource {
     @POST
     @Path("/query")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryReports(@Context HttpServletRequest request, @QueryParam("limit") int limit,
-                                 @QueryParam("offset") int offset, Map<String, String> filters) {
+    public Response queryReports(@Context HttpServletRequest request, @QueryParam("limit") String limit,
+                                 @QueryParam("offset") String cursor, Map<String, String> filters) {
         LOG.fine("Attempt to query reports.");
 
         final ValToken validator = new ValToken();
@@ -271,30 +271,34 @@ public class ReportsResource {
             }
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind(REPORT)
                 .setFilter(attributeFilter)
-                .setLimit(limit)
-                .setOffset(offset)
-                .build();
+                .setLimit(Integer.parseInt(limit));
 
-        queryResults = datastore.run(query);
+        if ( !cursor.equals("EMPTY") ){
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
+
+        queryResults = datastore.run(query.build());
 
         List<Entity> results = new ArrayList<>();
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de reports pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
 
+        return Response.ok(g.toJson(results))
+                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
+                .build();
     }
 
     @POST
     @Path("/query/unresolved")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response queryUnresolvedReports(@Context HttpServletRequest request, @QueryParam("limit") int limit,
-                                 @QueryParam("offset") int offset, Map<String, String> filters) {
+    public Response queryUnresolvedReports(@Context HttpServletRequest request, @QueryParam("limit") String limit,
+                                 @QueryParam("offset") String cursor, Map<String, String> filters) {
         LOG.fine("Attempt to query reports.");
 
         final ValToken validator = new ValToken();
@@ -328,23 +332,27 @@ public class ReportsResource {
 
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind(REPORT)
                 .setFilter(attributeFilter)
-                .setLimit(limit)
-                .setOffset(offset)
-                .build();
+                .setLimit(Integer.parseInt(limit));
 
-        queryResults = datastore.run(query);
+        if ( !cursor.equals("EMPTY") ){
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
+
+        queryResults = datastore.run(query.build());
 
         List<Entity> results = new ArrayList<>();
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de reports não resolvidos pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
 
+        return Response.ok(g.toJson(results))
+                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
+                .build();
     }
 
     @GET

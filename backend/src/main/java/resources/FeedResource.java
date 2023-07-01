@@ -281,7 +281,7 @@ public class FeedResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
                                 @QueryParam("limit") String limit,
-                                @QueryParam("offset") String offset, Map<String, String> filters){
+                                @QueryParam("offset") String cursor, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
         //Verificar, caso for evento privado, se o token é valido
@@ -313,23 +313,26 @@ public class FeedResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
+        EntityQuery.Builder query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
                 .setKind(kind)
                 .setFilter(attributeFilter)
-                .setLimit(Integer.parseInt(limit))
-                .setOffset(Integer.parseInt(offset))
-                .build();
+                .setLimit(Integer.parseInt(limit));
 
+        if ( !cursor.equals("EMPTY") ){
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
 
-        queryResults = datastore.run(query);
+        queryResults = datastore.run(query.build());
 
         List<Entity> results = new ArrayList<>();
 
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de " + kind + " pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
+        return Response.ok(g.toJson(results))
+                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
+                .build();
 
     }
 
