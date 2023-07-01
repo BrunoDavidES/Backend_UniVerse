@@ -169,7 +169,7 @@ public class ProfileResource {
             event = Entity.newBuilder(eventKey)
                     .set("id", id)
                     .set("title", data.title)
-                    .set("username", data.username)
+                    .set("username", String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""))
                     .set("beginningDate", data.beginningDate)
                     .set("hours", data.hours)
                     .set("location", data.location)
@@ -180,7 +180,7 @@ public class ProfileResource {
             txn.add(event);
             LOG.info("Personal event added.");
             txn.commit();
-            return Response.ok(event).build();
+            return Response.ok(id).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -255,7 +255,7 @@ public class ProfileResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(USER_DOES_NOT_EXIST).build();
         }
 
-        /*
+
         // Update department's children
         Query<Entity> query = Query.newEntityQueryBuilder()
                 .setKind("PersonalEvent")
@@ -263,31 +263,20 @@ public class ProfileResource {
                 .build();
 
         QueryResults<Entity> queryResults = datastore.run(query);
-*/
-        Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind("PersonalEvent")
-                .setFilter(StructuredQuery.CompositeFilter.and(
-                        StructuredQuery.PropertyFilter.hasAncestor(userKey),
-                        StructuredQuery.PropertyFilter.ge("beginningDate", "01-" + monthAndYear),
-                        StructuredQuery.PropertyFilter.lt("beginningDate", "01-" + getNextMonth(monthAndYear))
-                ))
-                .build();
-
-        QueryResults<Entity> queryResults = datastore.run(query);
 
         List<PersonalEventsData> result = new ArrayList<>();
         while (queryResults.hasNext()) {
             Entity memberEntity = queryResults.next();
-            //if(memberEntity.getString("beginningDate").contains("-" + monthAndYear)){
-            PersonalEventsData data = new PersonalEventsData();
-            data.id = memberEntity.getString("id");
-            data.title = memberEntity.getString("title");
-            data.username = memberEntity.getString("username");
-            data.beginningDate = memberEntity.getString("beginningDate");
-            data.hours = memberEntity.getString("hours");
-            data.location = memberEntity.getString("location");
-            result.add(data);
-            //}
+            if(memberEntity.getString("beginningDate").contains("-" + monthAndYear)){
+                PersonalEventsData data = new PersonalEventsData();
+                data.id = memberEntity.getString("id");
+                data.title = memberEntity.getString("title");
+                data.username = memberEntity.getString("username");
+                data.beginningDate = memberEntity.getString("beginningDate");
+                data.hours = memberEntity.getString("hours");
+                data.location = memberEntity.getString("location");
+                result.add(data);
+            }
         }
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
 
@@ -296,25 +285,9 @@ public class ProfileResource {
         return Response.ok(g.toJson(result)).build();
     }
 
-    private String getNextMonth(String monthAndYear) {
-        String[] parts = monthAndYear.split("-");
-        int month = Integer.parseInt(parts[0]);
-        int year = Integer.parseInt(parts[1]);
-
-        if (month == 12) {
-            month = 1;
-            year++;
-        } else {
-            month++;
-        }
-
-        return String.format("%02d-%04d", month, year);
-    }
-
-
-    @PATCH
+    @POST
     @Path("/personalEvent/edit/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response editPersonalEvent(@Context HttpServletRequest request,@PathParam("id") String id, PersonalEventsData data){
         LOG.fine("Attempt to edit a personal event.");
 
@@ -342,20 +315,29 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-
-            Entity updatedEvent = Entity.newBuilder(event)
-                    .set("title", data.title)
-                    .set("username", data.username)
-                    .set("beginningDate", data.beginningDate)
-                    .set("hours", data.hours)
-                    .set("location", data.location)
-                    .set("time_lastupdate", Timestamp.now())
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("PersonalEvent")
+                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                    .setFilter(StructuredQuery.PropertyFilter.eq("id", id))
                     .build();
 
-            txn.update(updatedEvent);
+            QueryResults<Entity> queryResults = datastore.run(query);
+
+            while (queryResults.hasNext()) {
+                Entity memberEntity = queryResults.next();
+                Entity updatedEvent = Entity.newBuilder(memberEntity)
+                        .set("title", data.title)
+                        .set("beginningDate", data.beginningDate)
+                        .set("hours", data.hours)
+                        .set("location", data.location)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+                txn.update(updatedEvent);
+            }
+
             LOG.info("Personal event edited.");
             txn.commit();
-            return Response.ok(updatedEvent).build();
+            return Response.ok(id).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -363,7 +345,7 @@ public class ProfileResource {
         }
     }
 
-    @PATCH
+    @DELETE
     @Path("/personalEvent/delete/{id}")
     @Consumes(MediaType.APPLICATION_JSON)                                        //list composta por string que tem valor: "#papel-username"
     public Response deletePersonalEvent(@Context HttpServletRequest request,@PathParam("id") String id){
@@ -393,10 +375,23 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            txn.delete(eventKey);
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("PersonalEvent")
+                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(userKey))
+                    .setFilter(StructuredQuery.PropertyFilter.eq("id", id))
+
+                    .build();
+
+            QueryResults<Entity> queryResults = datastore.run(query);
+
+            while (queryResults.hasNext()) {
+                Entity memberEntity = queryResults.next();
+                txn.delete(memberEntity.getKey());
+            }
+
             LOG.info("Personal event deleted.");
             txn.commit();
-            return Response.ok(event).build();
+            return Response.ok(id).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
