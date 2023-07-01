@@ -280,12 +280,12 @@ public class FeedResource {
     @Path("/query/{kind}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryEntries(@Context HttpServletRequest request, @PathParam("kind") String kind,
-                                 @QueryParam("limit") String limit, @QueryParam("offset") String offset,
-                                 Map<String, String> filters) {
+                                 @QueryParam("limit") String limit,
+                                 @QueryParam("offset") String offset, Map<String, String> filters){
         LOG.fine("Attempt to query feed " + kind);
 
-        // Verificar, caso for evento privado, se o token é valido
-        if (kind.equals("EVENT")) {
+        //Verificar, caso for evento privado, se o token é valido
+        if(kind.equals(EVENT)) {
             final ValToken validator = new ValToken();
             DecodedJWT token = validator.checkToken(request);
 
@@ -300,45 +300,38 @@ public class FeedResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-        if (filters == null) {
+        if( filters == null){
             filters = new HashMap<>(1);
         }
         StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
-            if (attributeFilter == null)
+            if(attributeFilter == null)
                 attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
             else
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        EntityQuery.Builder queryBuilder = Query.newEntityQueryBuilder()
+        Query<Entity> query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
                 .setKind(kind)
                 .setFilter(attributeFilter)
-                .setLimit(Integer.parseInt(limit));
-
-        if (offset != null) {
-            queryBuilder.setStartCursor(Cursor.fromUrlSafe(offset));
-        }
+                .setLimit(Integer.parseInt(limit))
+                .setOffset(Integer.parseInt(offset))
+                .build();
 
 
-
-        Query<Entity> query = queryBuilder.build();
         queryResults = datastore.run(query);
 
-        Cursor newOffset = queryResults.getCursorAfter();
         List<Entity> results = new ArrayList<>();
 
         queryResults.forEachRemaining(results::add);
 
-
         LOG.info("Ides receber um query ó filho!");
-
         Gson g = new Gson();
-        return Response.ok(g.toJson(results), g.toJson(newOffset)).build();
-    }
+        return Response.ok(g.toJson(results)).build();
 
+    }
 
     @POST
     @Path("/numberOf/{kind}")
@@ -426,8 +419,8 @@ public class FeedResource {
         Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
         Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
 
-            attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
-                    StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
+        attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
+                StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
 
 
 

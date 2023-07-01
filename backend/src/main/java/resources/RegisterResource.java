@@ -90,7 +90,7 @@ public class RegisterResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).addAncestor(PathElement.of(DEPARTMENT, "default")).newKey(data.username);
+            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(data.username);
             Entity user = txn.get(userKey);
 
             if( user != null ) {
@@ -109,8 +109,7 @@ public class RegisterResource {
                         .set("role", data.getRole())
                         .set("license_plate", data.license_plate)
                         .set("status", "ACTIVE")
-                        .set("department_job", "")
-                        .set("nucleus_job", "")
+                        .set("job_list", "")
                         .set("personal_event_list", "")  //#string%string%string%string#string%...
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
