@@ -298,9 +298,9 @@ function queryEvents(){
     }
 }
 
-function clearListEvents(){
-    var r1 = document.getElementById("listOfEvents");
-    var r2 = document.getElementById("details");
+function clearListEvents(c1, c2){
+    var r1 = document.getElementById(c1);
+    var r2 = document.getElementById(c2);
     r1.replaceChildren();
     r2.replaceChildren();
     eventsQueryOffset = 0;

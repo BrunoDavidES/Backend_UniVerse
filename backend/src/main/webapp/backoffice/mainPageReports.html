@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title> Reports FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
-    <link rel="stylesheet" href="details.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
-<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="queryUnresolvedReports();" id="moreList">Mais <i class='bx bx-book-alt' ></i></button>
+<button onclick="queryReports();" id="moreList2">Mais <i class='bx bx-book-alt' ></i></button>
+<button onclick="topFunction();" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -72,14 +74,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -106,10 +100,10 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll')" class="active">Obter Report</button>
-            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport')">Estado do Report</button>
-            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport')">Listar Reports por resolver</button>
-            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport')">Listar todos os Reports</button>
+            <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll'); auxListMore(0);" class="active">Obter Report</button>
+            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport'); auxListMore(0);">Estado do Report</button>
+            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport'); auxListMore(1);">Listar Reports por resolver</button>
+            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport'); auxListMore(2);">Listar todos os Reports</button>
         </div>
         <br><br>
         <div id="getReport">
@@ -189,7 +183,8 @@
                 <option value=10>10</option>
                 <option value=15>15</option>
                 <option value=20>20</option>
-            </select>
+            </select><br>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfUnresReports', 'unresDetails');">Apagar Lista</button></div>
 
             <ul id="listOfUnresReports"></ul>
             <hr class="rounded">
@@ -207,7 +202,8 @@
                 <option value=10>10</option>
                 <option value=15>15</option>
                 <option value=20>20</option>
-            </select>
+            </select><br>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfReports', 'details');">Apagar Lista</button></div>
 
             <ul id="listOfReports"></ul>
             <hr class="rounded">
@@ -268,19 +264,49 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let myList2 = document.getElementById("moreList2");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
+            else if(varAux == 2){
+                myList2.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            myList2.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
       function topFunction() {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        topPage.style.display = '';
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
       }
 </script>
 

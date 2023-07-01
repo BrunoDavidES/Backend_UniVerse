@@ -8,7 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
-<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="queryEvents();" id="moreList">Mais <i class='bx bx-pie-chart-alt-2' ></i></button>
+<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -71,14 +73,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -104,10 +98,10 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addNuc', 'modNuc', 'delNuc', 'nucList')" class="active">Criar Núcleo</button>
-            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modNuc', 'addNuc', 'delNuc', 'nucList')">Modificar peril do Núcleo</button>
-            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delNuc', 'modNuc', 'addNuc', 'nucList')">Apagar Núcleo</button>
-            <button id="listBtn" onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'nucList', 'delNuc', 'addNuc', 'modNuc')">Listar Núcleos</button>
+            <button id="addBtn" onClick="changeWindow('addBtn', 'modBtn', 'delBtn', 'listBtn', 'addNuc', 'modNuc', 'delNuc', 'nucList'); auxListMore(0);" class="active">Criar Núcleo</button>
+            <button id="modBtn" onClick="changeWindow('modBtn', 'addBtn', 'delBtn', 'listBtn', 'modNuc', 'addNuc', 'delNuc', 'nucList'); auxListMore(0);">Modificar peril do Núcleo</button>
+            <button id="delBtn" onClick="changeWindow('delBtn', 'addBtn', 'modBtn', 'listBtn', 'delNuc', 'modNuc', 'addNuc', 'nucList'); auxListMore(0);">Apagar Núcleo</button>
+            <button id="listBtn" onClick="changeWindow('listBtn', 'delBtn', 'modBtn', 'addBtn', 'nucList', 'delNuc', 'addNuc', 'modNuc'); auxListMore(1);">Listar Núcleos</button>
         </div>
 
         <br><br>
@@ -237,8 +231,24 @@
                 <button type="text" class="submit" onclick="deleteNucleus()">Apagar Núcleo</button>
             </div>
         </div>
-        <div id="nucList" style="display: none;">
+        <div id="nucList" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar Núcleos</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Núcleos por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfNuc', 'details');">Apagar Lista</button></div>
 
+            <ul id="listOfNuc"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="details"></div>
+            <br>
+            <button class="submit" onclick="">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">
@@ -294,19 +304,45 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
       function topFunction() {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        bottomPage.style.display = 'none';
+        topPage.style.display = '';
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
       }
 </script>
 

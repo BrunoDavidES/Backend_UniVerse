@@ -73,14 +73,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -141,6 +133,11 @@
                     <input id="department" class="input" type="text" placeholder=" "/>
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="updateEventPic()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label for="title">Capacidade máxima do Evento: &emsp;</label>
@@ -199,6 +196,11 @@
                     <input id="departmentMod" class="input" type="text" placeholder=" " />
                     <div class="cut cut"></div>
                     <label id="departmentModLbl" for="department" class="placeholder">Departamento</label>
+                </div><br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="updateEventPicMod()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label id="capacityLbl" for="title">Capacidade máxima do Evento</label>
@@ -267,7 +269,7 @@
                     <input id="dateEnd" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
                     <p class="subtitle" style="display: inline;"> (Data Final) &emsp;</p>
                 </label>
-                <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents();">Apagar Lista</button></div>
+                <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfEvents', 'details');">Apagar Lista</button></div>
             </div>
 
             <ul id="listOfEvents"> </ul>
@@ -431,6 +433,28 @@
         }
         queryEventsWithDates(d1,d2);
       }
+
+    function updateEventPic() {
+        let selectedFile = document.getElementById("eventPic").files[0];
+        if(selectedFile.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("eventPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+    }
+
+    function updateEventPicMod() {
+        let selectedFile2 = document.getElementById("eventPicMod").files[0];
+        if(selectedFile2.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("eventPicMod").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+    }
 </script>
 
 </body>
