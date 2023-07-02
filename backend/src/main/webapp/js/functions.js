@@ -291,7 +291,7 @@ function queryEvents(){
                 list.appendChild(listItem);
 
             });
-            eventsQueryOffset = request.getResponseHeader("X-Cursor");
+            queryEventsCursor = request.getResponseHeader("X-Cursor");
         }
     }
 }

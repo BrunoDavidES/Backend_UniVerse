@@ -59,7 +59,7 @@ function newsToSolve(){
         }
     }
 
-    xmlhttp.send(notRes);
+    xmlhttp.send(JSON.stringify(notRes));
 }
 
 function queryEventsWithDates(date1, date2){
@@ -136,56 +136,56 @@ function queryEventsWithDates(date1, date2){
 function queryNewsWithDates(date1, date2){
     var data = {};
 
-        var request = new XMLHttpRequest();
+    var list = document.getElementById("listOfNews");
+    var request = new XMLHttpRequest();
 
-        request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + newsQueryOffset, true);
-        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        request.send(JSON.stringify(data));
-        request.onreadystatechange  = function() {
-            if (request.readyState === 4 && request.status === 200) {
-                const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
-                return {
-                    authorUsername: entity.properties.authorUsername,
-                    authorName: entity.properties.authorName,
-                    title: entity.properties.title,
-                    id: entity.properties.id,
-                    validated_backoffice: entity.properties.validated_backoffice,
-                    };
+    request.open("POST", document.location.origin + "/rest/feed/query/News/timeGap/" + date1 + "/" + date2, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.send(JSON.stringify(data));
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            const response = JSON.parse(request.responseText);
+            const entities = response.map(function(entity) {
+            return {
+                authorUsername: entity.properties.authorUsername,
+                authorName: entity.properties.authorName,
+                title: entity.properties.title,
+                id: entity.properties.id,
+                validated_backoffice: entity.properties.validated_backoffice,
+                };
+            });
+
+            entities.forEach(function(entity) {
+                var listItem = document.createElement("li");
+                listItem.textContent = entity.title.value + " - " + entity.authorName.value;
+                listItem.addEventListener('click', function() {
+                      var details = document.getElementById('details');
+                      details.innerHTML = '';
+
+                      var title = document.createElement('h2');
+                      title.textContent = entity.title.value;
+                      details.appendChild(title);
+
+                      var description = document.createElement('p');
+                      description.innerHTML = " &emsp;Título da notícia: " + entity.title.value +
+                                                "<br> &emsp;ID da notícia: " + entity.id.value +
+                                                "<br> &emsp;Nome do criador da notícia: " + entity.authorName.value +
+                                                "<br> &emsp;Username do utilizador que postou a notícia: " + entity.authorUsername.value +
+                                                "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+
+                      details.appendChild(description);
+
+                      var siblings = Array.from(listItem.parentNode.children);
+                      var currentIndex = siblings.indexOf(listItem);
+                      siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                          sibling.classList.toggle('closed');
+                      });
+
+                      bottomFunction();
                 });
+                list.appendChild(listItem);
 
-                entities.forEach(function(entity) {
-                    var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.authorName.value;
-                    listItem.addEventListener('click', function() {
-                          var details = document.getElementById('details');
-                          details.innerHTML = '';
-
-                          var title = document.createElement('h2');
-                          title.textContent = entity.title.value;
-                          details.appendChild(title);
-
-                          var description = document.createElement('p');
-                          description.innerHTML = " &emsp;Título da notícia: " + entity.title.value +
-                                                    "<br> &emsp;ID da notícia: " + entity.id.value +
-                                                    "<br> &emsp;Nome do criador da notícia: " + entity.authorName.value +
-                                                    "<br> &emsp;Username do utilizador que postou a notícia: " + entity.authorUsername.value +
-                                                    "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
-
-                          details.appendChild(description);
-
-                          var siblings = Array.from(listItem.parentNode.children);
-                          var currentIndex = siblings.indexOf(listItem);
-                          siblings.slice(currentIndex + 1).forEach(function(sibling) {
-                              sibling.classList.toggle('closed');
-                          });
-
-                          bottomFunction();
-                    });
-                    list.appendChild(listItem);
-
-                });
-                newsQueryOffset += limit;
-            }
+            });
         }
+    }
 }

@@ -412,12 +412,9 @@
       }
 
       function sortDates(d1, d2){
-        if(d2 < d1) {
-            alert('A data inicial tem de ser antes da data final');
-        }
-
         if((d1 == '') && (d2 == '')){
             queryEvents();
+            return;
         }
         else if( (d1 != '') && (d2 == '')){
             d1 = d1.concat('T13%3A00%3A00.192Z');
@@ -426,6 +423,9 @@
         else if( (d1 == '') && (d2 != '')){
             d1 = '1000-12-31T22%3A59%3A59.252Z';
             d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        else if(d2 < d1) {
+            alert('A data inicial tem de ser antes da data final');
         }
         else{
             d1 = d1.concat('T13%3A00%3A00.192Z');

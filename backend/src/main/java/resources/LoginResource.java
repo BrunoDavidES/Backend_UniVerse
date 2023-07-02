@@ -43,6 +43,7 @@ public class LoginResource {
 	private static final String TEACHER = "T";
 	private static final String WORKER = "W";
 	private static final String STUDENT = "S";
+	private static final String ADMIN = "A";
 	private static final String ROLE = "role";
 	private static final String USER = "User";
 	private static final String EVENT = "Event";
@@ -129,7 +130,7 @@ public class LoginResource {
 				LOG.warning(USER_DOES_NOT_EXIST);
 				return Response.status(Response.Status.UNAUTHORIZED).entity(USER_OR_PASSWORD_INCORRECT).build();
 			} else {
-				if(!user.getString(ROLE).equals(BO)){
+				if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN)){
 					txn.rollback();
 					LOG.warning(NICE_TRY);
 					return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();

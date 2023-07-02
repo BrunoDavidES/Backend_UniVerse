@@ -415,11 +415,8 @@ public class FeedResource {
             queryResults.next();
             count++;
         }
-        // Convert the response object to JSON
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(count);
 
-        return Response.ok(jsonResponse).build();
+        return Response.ok(count).build();
     }
 
     @POST

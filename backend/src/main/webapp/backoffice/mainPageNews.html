@@ -221,7 +221,7 @@
             <br>
             <div id="details"></div>
             <br>
-            <button class="submit" onclick="queryNews()">Listar</button>
+            <button class="submit" onclick="sortDates(dateStart.value, dateEnd.value);">Listar</button>
         </div>
         <br><br>
     </div>
@@ -239,6 +239,7 @@
 </section>
 
 <script src="/js/functions.js"></script>
+<script src="/js/functions2.js"></script>
 <script>
        function changeWindow(btn, btn1, btn2, btn3, btn4, div, div1, div2, div3, div4){
         var appear = document.getElementById(div);
@@ -339,16 +340,39 @@
       }
 
       function clearList(){
-        var r1 = document.getElementById("listOfEvents");
+        var r1 = document.getElementById("listOfNews");
         var r2 = document.getElementById("details");
         r1.replaceChildren();
         r2.replaceChildren();
       }
 
+       function sortDates(d1, d2){
+        if((d1 == '') && (d2 == '')){
+            queryNews();
+            return;
+        }
+        else if( (d1 != '') && (d2 == '')){
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = '3000-12-31T22%3A59%3A59.252Z';
+        }
+        else if( (d1 == '') && (d2 != '')){
+            d1 = '1000-12-31T22%3A59%3A59.252Z';
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        else if(d2 < d1) {
+            alert('A data inicial tem de ser antes da data final');
+        }
+        else{
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        queryNewsWithDates(d1,d2);
+      }
+
       function updateNewsPic() {
         let selectedFile = document.getElementById("newsPic").files[0];
-        if(selectedFile.size > 8500000){
-            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        if(selectedFile.size > 5242880){
+            alert('Ficheiro demasiado pesado (máximo de 5 MB)');
             document.getElementById("newsPic").value = "";
         }
         else{
@@ -358,8 +382,8 @@
 
       function updateNewsPicMod() {
         let selectedFile2 = document.getElementById("newsPicMod").files[0];
-        if(selectedFile2.size > 8500000){
-            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        if(selectedFile2.size > 5242880){
+            alert('Ficheiro demasiado pesado (máximo de 5 MB)');
             document.getElementById("newsPic").value = "";
         }
         else{
