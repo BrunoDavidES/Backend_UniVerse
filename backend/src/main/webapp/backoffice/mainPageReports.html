@@ -184,7 +184,7 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfUnresReports', 'unresDetails');">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListUnresReports('listOfUnresReports', 'unresDetails');">Apagar Lista</button></div>
 
             <ul id="listOfUnresReports"></ul>
             <hr class="rounded">
@@ -203,7 +203,7 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfReports', 'details');">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListReports('listOfReports', 'details');">Apagar Lista</button></div>
 
             <ul id="listOfReports"></ul>
             <hr class="rounded">
@@ -302,12 +302,6 @@
         topPage.style.display = '';
       }
 
-      function clearList(){
-        var r1 = document.getElementById("listOfEvents");
-        var r2 = document.getElementById("details");
-        r1.replaceChildren();
-        r2.replaceChildren();
-      }
 </script>
 
 

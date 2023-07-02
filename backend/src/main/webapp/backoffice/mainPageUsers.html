@@ -235,7 +235,7 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfUsers', 'details');">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListUsers('listOfUsers', 'details');">Apagar Lista</button></div>
 
             <ul id="listOfUsers"></ul>
             <hr class="rounded">
@@ -330,13 +330,6 @@
       function bottomFunction() {
         window.scrollTo(0,document.body.scrollHeight);
         topPage.style.display = '';
-      }
-
-      function clearList(){
-        var r1 = document.getElementById("listOfEvents");
-        var r2 = document.getElementById("details");
-        r1.replaceChildren();
-        r2.replaceChildren();
       }
 </script>
 

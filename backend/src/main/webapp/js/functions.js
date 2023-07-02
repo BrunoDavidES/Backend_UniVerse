@@ -295,11 +295,8 @@ function queryEvents(){
 }
 
 function clearListEvents(c1, c2){
-    var r1 = document.getElementById(c1);
-    var r2 = document.getElementById(c2);
-    r1.replaceChildren();
-    r2.replaceChildren();
-    eventsQueryOffset = 0;
+    clearList(c1,c2);
+    queryEventsCursor = "EMPTY";
 }
 
 function validateEvent(){
@@ -550,6 +547,10 @@ function getNews(){
     request.send(JSON.stringify(data));
 }
 
+function clearListNews(c1, c2){
+    clearList(c1,c2);
+    queryNewsCursor = "EMPTY";
+}
 
 var queryNewsCursor = "EMPTY";
 function queryNews(){
@@ -673,6 +674,11 @@ function deleteUser(){
     request.send(JSON.stringify(data));
 }
 
+function clearListUsers(c1, c2){
+    clearList(c1,c2);
+    queryUsersCursor = "EMPTY";
+}
+
 var queryUsersCursor = "EMPTY";
 function queryUsers(){
     var list = document.getElementById("listOfUsers");
@@ -690,7 +696,6 @@ function queryUsers(){
             if ( request.status === 200 ) {
                 const response = JSON.parse(request.responseText);
 
-                var uN;
                 const entities = response.map(function(entity) {
                     return {
                         name: entity.properties.name,
@@ -860,6 +865,11 @@ var id = document.getElementById("idReport").value;
     request.send(JSON.stringify(data));
 }
 
+function clearListReports(c1, c2){
+    clearList(c1,c2);
+    queryReportsCursor = "EMPTY";
+}
+
 var queryReportsCursor = "EMPTY";
 function queryReports(){
     var limit = document.getElementById("listLimitId").value;
@@ -931,6 +941,10 @@ function queryReports(){
     request.send();
 }
 
+function clearListUnresReports(c1, c2){
+    clearList(c1,c2);
+    queryUnresolvedReportsCursor = "EMPTY";
+}
 
 var queryUnresolvedReportsCursor = "EMPTY";
 function queryUnresolvedReports(){
@@ -1002,8 +1016,6 @@ function queryUnresolvedReports(){
     }
     request.send();
 }
-
-
 
 
 function reportStatus(){
@@ -1204,6 +1216,10 @@ function editDepartment(){
     request.send(JSON.stringify(data));
 }
 
+function clearListDepartments(c1, c2){
+    clearList(c1,c2);
+    queryDepartmentsCursor = "EMPTY";
+}
 
 var queryDepartmentsCursor = "EMPTY";
 function queryDepartments(){
@@ -1482,6 +1498,11 @@ function deleteNucleus(){
     request.send();
 }
 
+function clearListNucleus(c1, c2){
+    clearList(c1,c2);
+    queryNucleusCursor = "EMPTY";
+}
+
 var queryNucleusCursor = "EMPTY";
 function queryNucleus(){
     var limit = document.getElementById("listLimitId").value;
@@ -1565,5 +1586,13 @@ function queryNucleus(){
     }
     request.send();
 }
+
+function clearList(c1, c2){
+    var r1 = document.getElementById(c1);
+    var r2 = document.getElementById(c2);
+    r1.replaceChildren();
+    r2.replaceChildren();
+}
+
 
 window.addEventListener('load', loadLoggedUser);

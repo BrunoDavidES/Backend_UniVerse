@@ -214,7 +214,7 @@
                 <input id="dateEnd" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
                 <p class="subtitle" style="display: inline;"> (Data Final) &emsp;</p>
             </label>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearList();">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListNews('listOfNews', 'details');">Apagar Lista</button></div>
 
             <ul id="listOfNews"></ul>
             <hr class="rounded">
@@ -337,13 +337,6 @@
         x2.setMinutes(59);
         x2.setSeconds(59);
         return x2;
-      }
-
-      function clearList(){
-        var r1 = document.getElementById("listOfNews");
-        var r2 = document.getElementById("details");
-        r1.replaceChildren();
-        r2.replaceChildren();
       }
 
        function sortDates(d1, d2){
