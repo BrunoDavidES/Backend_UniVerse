@@ -10,10 +10,7 @@ import models.ForumData;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static utils.Constants.*;
@@ -130,17 +127,18 @@ public class ForumResource {
                 .newKey(decodedToken.getUid());
         Entity userForum = datastore.get(userForumKey);
 
-        if(!userForum.getString("role").equals("ADMIN")) {
+        /*if(!userForum.getString("role").equals("ADMIN")) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
+        }*/
 
         try {
             Date currentDate = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
             String date = dateFormat.format(currentDate);
 
             Map<String, Object> postData = new HashMap<>();
-            postData.put("title", data.getTitle());
+            postData.put("author", decodedToken.getName());
             postData.put("description", data.getDescription());
             postData.put("time", date);
 

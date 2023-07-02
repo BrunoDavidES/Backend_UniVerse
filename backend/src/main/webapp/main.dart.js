@@ -52886,7 +52886,7 @@ return new A.fo(B.aE,s,s,A.af(A.a([A.aXJ(B.SV,B.aif,new A.aMr(this),A.xt(s,s,s,s
 awn(){var s=this.f
 return A.af(A.a([A.cH(new A.Jy(new A.aMw(A.fZ(null,0)),new A.eM(s,A.i(s).i("eM<1>")),null,t.wu),1,null),this.ML()],t.p),B.A,B.h,B.f)},
 ML(){var s=null,r=new A.aMn(this)
-return new A.S(B.bn,A.aF(A.a([A.cH(A.jf(!1,this.d,A.hL(s,s,s,s,s,s,s,s,!0,new A.cJ(4,A.aY(15),B.pT),s,s,s,s,B.n,!0,s,s,s,s,B.a8S,s,s,s,s,s,s,"Message",s,s,s,s,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!1,s,s,s,s,1,!1,s,s,new A.aMm(r),s,s,s,B.Q,s,s),1,s),A.dh(s,s,B.SW,s,r,s,s,s,s)],t.p),B.j,B.h,B.f,s),s)}}
+return new A.S(B.bn,A.aF(A.a([A.cH(A.jf(!1,this.d,A.hL(s,s,s,s,s,s,s,s,!0,new A.cJ(4,A.aY(15),B.pT),s,s,s,s,B.n,!0,s,s,s,s,B.a8S,s,s,s,s,s,s,"Message",s,s,s,s,!1,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!1,s,s,s,s,s,!1,s,s,new A.aMm(r),s,s,s,B.Q,s,s),1,s),A.dh(s,s,B.SW,s,r,s,s,s,s)],t.p),B.j,B.h,B.f,s),s)}}
 A.aMl.prototype={
 $1(a){var s,r,q
 A.cu("Firebase Request: forums/-NZGuFwlRhrbHrrMpOMA/feed/")
@@ -52900,8 +52900,8 @@ A.cu("Firebase Response: "+A.h(q))
 this.a.f.F(0,q)},
 $S:544}
 A.aMk.prototype={
-$2(a,b){var s=J.aA(b),r=s.h(b,"description"),q=s.h(b,"time"),p=s.h(b,"title")
-A.cu("Description: "+A.h(r)+", Time: "+A.h(q)+", Title: "+A.h(p))},
+$2(a,b){var s=J.aA(b),r=s.h(b,"description"),q=s.h(b,"time"),p=s.h(b,"author")
+A.cu("Description: "+A.h(r)+", Time: "+A.h(q)+", Author: "+A.h(p))},
 $S:58}
 A.aMy.prototype={
 $1(a){var s=null
@@ -52949,10 +52949,10 @@ r.toString
 s.f_(r,B.mb,B.bT)},
 $S:5}
 A.aMv.prototype={
-$1(a){var s,r=null,q=a.b,p=J.aA(q),o=p.h(q,"description"),n=p.h(q,"time")
+$1(a){var s,r=null,q=a.b,p=J.aA(q),o=p.h(q,"description"),n=p.h(q,"time"),m=p.h(q,"author")
 p=A.cV(B.cR,2)
 s=A.aY(10)
-return A.U(B.aE,A.a2(A.h(n)+" \n\n"+A.h(o),r,r,r,r,r,r,r,r),B.e,r,r,new A.am(B.n,r,p,s,r,r,B.o),r,r,B.Rt,B.cD,r,r,r)},
+return A.U(B.aE,A.a2(A.h(m)+" - "+A.h(n)+" \n\n"+A.h(o),r,r,r,r,r,r,r,r),B.e,r,r,new A.am(B.n,r,p,s,r,r,B.o),r,r,B.Rt,B.cD,r,r,r)},
 $S:561}
 A.aMn.prototype={
 $0(){var s=this.a.d
