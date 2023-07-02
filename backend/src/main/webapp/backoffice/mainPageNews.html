@@ -29,7 +29,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
                 <a href="#news" class="active">
                     <i class='bx bx-message'></i>
-                    <span class="links_name">Noticias</span>
+                    <span class="links_name">Notícias</span>
                 </a>
             </button>
         </li>
@@ -53,7 +53,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Nucleos</span>
+                    <span class="links_name">Núcleos</span>
                 </a>
             </button>
         </li>
@@ -73,14 +73,6 @@
                 </a>
             </button>
         </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
-                </a>
-            </button>
-        </li>
         <li class="log_out">
             <button onclick="openPopup()">
                 <a href="#logout">
@@ -95,7 +87,7 @@
     <nav>
         <div class="sidebar-button">
             <i class='bx bx-menu sidebarBtn'></i>
-            <span class="home">Noticias</span>
+            <span class="home">Notícias</span>
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
@@ -106,10 +98,11 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'newsAdd', 'newsMod', 'newsDel', 'newsList'); auxListMore(0);" class="active">Adicionar Noticia</button>
-            <button id="editBtn" onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'newsMod', 'newsAdd', 'newsDel', 'newsList'); auxListMore(0);">Modificar Noticia</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList'); auxListMore(0);">Remover Noticia</button>
-            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'newsList', 'newsAdd', 'newsMod', 'newsDel'); auxListMore(1);">Listar Noticias</button>
+            <button id="postBtn" onClick="changeWindow('postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'valBtn','newsAdd', 'newsMod', 'newsDel', 'newsList', 'newsValidate'); auxListMore(0);" class="active">Adicionar Noticia</button>
+            <button id="editBtn" onClick="changeWindow('editBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'valBtn', 'newsMod', 'newsAdd', 'newsDel', 'newsList', 'newsValidate'); auxListMore(0);">Modificar Noticia</button>
+            <button id="valBtn" onClick="changeWindow('valBtn', 'postBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'newsValidate', 'newsList', 'newsAdd', 'newsMod', 'newsDel'); auxListMore(1);">Validar Notícia</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'postBtn', 'editBtn', 'queryBtn', 'valBtn', 'newsDel', 'newsAdd', 'newsMod', 'newsList', 'newsValidate'); auxListMore(0);">Remover Noticia</button>
+            <button id="queryBtn" onClick="changeWindow('queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'valBtn', 'newsList', 'newsAdd', 'newsMod', 'newsDel', 'newsValidate'); auxListMore(1);">Listar Noticias</button>
         </div>
         <br><br>
         <div id="newsAdd">
@@ -125,6 +118,11 @@
                     <input id="author" class="input" type="text" placeholder=" " />
                     <div class="cut"></div>
                     <label for="author" class="placeholder">Autor da Notícia</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPic" accept="image/*" onchange="updateNewsPic()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="News Picture" class="eventPhoto">
                 </div>
                 <div class="input-container2 ic2">
                     <textarea id="text" class="input" cols="40" rows="5"></textarea>
@@ -138,7 +136,7 @@
         <div id="newsMod" style="display: none;">
             <div class="form">
                 <div class="title">Modificar Notícia</div>
-                <div class="subtitle">Vamos obter a notícia e modificalo como quer</div>
+                <div class="subtitle">Vamos obter a notícia e modificá-la</div>
                 <div class="input-container ic1">
                     <input id="idEventMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
@@ -157,6 +155,11 @@
                     <input id="authorMod" class="input" type="text" placeholder=" " />
                     <div class="cut"></div>
                     <label id="authorModLbl" for="author" class="placeholder">Autor da Notícia</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPicMod" accept="image/*" onchange="updateNewsPicMod()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="News Picture" class="eventPhoto">
                 </div>
                 <div class="input-container2 ic2">
                     <textarea id="textMod" class="input" cols="40" rows="5"></textarea>
@@ -164,6 +167,19 @@
                     <label for="text" class="placeholder">Corpo da Notícia</label>
                 </div>
                 <button type="text" class="submit" onclick="editNews()">Modificar</button>
+            </div>
+            <br><br>
+        </div>
+        <div id="newsValidate" style="display: none;">
+            <div class="form">
+                <div class="title">Validar Notícia</div>
+                <div class="subtitle">Vamos validar uma notícia específica!</div>
+                <div class="input-container ic1">
+                    <input id="idEventValidate" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="title" class="placeholder">Id da Notícia</label>
+                </div>
+                <button type="text" class="submit" onclick="validateNews()">Validar Notícia</button>
             </div>
             <br><br>
         </div>
@@ -190,13 +206,22 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select>
+            <br><br>
+            <label>
+                <p class="subtitle" style="display: inline;">Filtrar entre </p>
+                <input id="dateStart" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                <p class="subtitle" style="display: inline;"> (Data Inical) &emsp; e </p> &emsp;
+                <input id="dateEnd" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                <p class="subtitle" style="display: inline;"> (Data Final) &emsp;</p>
+            </label>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearList();">Apagar Lista</button></div>
 
             <ul id="listOfNews"></ul>
             <hr class="rounded">
             <br>
             <div id="details"></div>
             <br>
-            <button class="submit" onclick="queryNews()">Listar</button>
+            <button class="submit" onclick="sortDates(dateStart.value, dateEnd.value);">Listar</button>
         </div>
         <br><br>
     </div>
@@ -209,30 +234,35 @@
     <div class="popup" id="loadingPopup">
         <div class="loading-icon"></div>
         <br>
-        <h3>Espera caralho...</h3>
+        <h3>A carregar...</h3>
     </div>
 </section>
 
 <script src="/js/functions.js"></script>
+<script src="/js/functions2.js"></script>
 <script>
-       function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+       function changeWindow(btn, btn1, btn2, btn3, btn4, div, div1, div2, div3, div4){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
         var gone3 = document.getElementById(div3);
+        var gone4 = document.getElementById(div4);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
         var button4 = document.getElementById(btn3);
+        var button5 = document.getElementById(btn4);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
         gone3.style.display = 'none';
+        gone4.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
         button4.classList.remove("active");
+        button5.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");
@@ -288,6 +318,77 @@
         window.scrollTo(0,document.body.scrollHeight);
         bottomPage.style.display = 'none';
         topPage.style.display = '';
+      }
+
+      function formatDate() {
+        var x = document.getElementById("dateStart").value;
+        x = new Date(x);
+        x.setHours(x.getHours() - x.getHours());
+        return x;
+      }
+
+      function formatDate2() {
+        var x2 = document.getElementById("dateEnd").value;
+        x2 = new Date(x2);
+        x2.setHours(x2.getHours() - x2.getHours());
+        x2.setMinutes(x2.getMinutes() - x2.getMinutes());
+        x2.setSeconds(x2.getSeconds() - x2.getSeconds());
+        x2.setHours(23);
+        x2.setMinutes(59);
+        x2.setSeconds(59);
+        return x2;
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfNews");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
+      }
+
+       function sortDates(d1, d2){
+        if((d1 == '') && (d2 == '')){
+            queryNews();
+            return;
+        }
+        else if( (d1 != '') && (d2 == '')){
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = '3000-12-31T22%3A59%3A59.252Z';
+        }
+        else if( (d1 == '') && (d2 != '')){
+            d1 = '1000-12-31T22%3A59%3A59.252Z';
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        else if(d2 < d1) {
+            alert('A data inicial tem de ser antes da data final');
+        }
+        else{
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        queryNewsWithDates(d1,d2);
+      }
+
+      function updateNewsPic() {
+        let selectedFile = document.getElementById("newsPic").files[0];
+        if(selectedFile.size > 5242880){
+            alert('Ficheiro demasiado pesado (máximo de 5 MB)');
+            document.getElementById("newsPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+      }
+
+      function updateNewsPicMod() {
+        let selectedFile2 = document.getElementById("newsPicMod").files[0];
+        if(selectedFile2.size > 5242880){
+            alert('Ficheiro demasiado pesado (máximo de 5 MB)');
+            document.getElementById("newsPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
       }
 </script>
 

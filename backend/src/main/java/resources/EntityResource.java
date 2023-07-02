@@ -1,16 +1,20 @@
 package resources;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static utils.FirebaseAuth.*;
 import static utils.Constants.*;
+import static utils.FirebaseAuth.authenticateToken;
+import static utils.FirebaseAuth.getRole;
 
 @Path("/entity")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -23,39 +27,42 @@ public class EntityResource {
     @POST
     @Path("/new/{kind}/{key}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getReceivedInbox(@HeaderParam("Authorization") String token,
-                                     @PathParam("kind") String kind,@PathParam("key") String keyName,
-                                     Map<String, String> attributes) {
+    public Response getReceivedInbox(@HeaderParam("Authorization") String token, @PathParam("kind") String kind,@PathParam("key") String keyName, Map<String, String> attributes) {
         LOG.fine("Attempt to create new entity");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
-        if(!getRole(decodedToken).equals(BO)){
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
-            try {
-                Key key = datastore.newKeyFactory().setKind(kind).newKey(keyName);
-                Entity.Builder builder = Entity.newBuilder(key);
-                for(Map.Entry<String, String> attribute : attributes.entrySet()) {
-                    builder.set(attribute.getKey(), attribute.getValue());
-                }
-                Entity entity = builder.build();
-                txn.add(entity);
-                txn.commit();
-
-                LOG.info("Entity Created");
-                return Response.ok().build();
-            } finally {
-                if (txn.isActive()) {
-                    txn.rollback();
-                }
+        try {
+            /*
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(token.getClaim("user").toString());
+            Entity user = txn.get(userKey);
+            */
+            if(!getRole(decodedToken).equals(BO)){
+                txn.rollback();
+                LOG.warning(NICE_TRY);
+                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
             }
+            Key key = datastore.newKeyFactory().setKind(kind).newKey(keyName);
+            Entity.Builder builder = Entity.newBuilder(key);
+            for(Map.Entry<String, String> attribute : attributes.entrySet()) {
+                builder.set(attribute.getKey(), attribute.getValue());
+            }
+            Entity entity = builder.build();
+            txn.add(entity);
+
+            LOG.info("Entity Created");
+            txn.commit();
+            return Response.ok().build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
     }
 
 }

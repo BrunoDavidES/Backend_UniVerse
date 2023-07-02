@@ -1,5 +1,4 @@
 package resources;
-
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 
@@ -19,8 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static utils.FirebaseAuth.*;
 import static utils.Constants.*;
+import static utils.FirebaseAuth.authenticateToken;
+import static utils.FirebaseAuth.getRole;
 
 @Path("/department")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -31,26 +31,32 @@ public class DepartmentResource {
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerDepartment(@HeaderParam("Authorization") String token,
-                                       DepartmentData data) {
+    public Response registerDepartment(@HeaderParam("Authorization") String token, DepartmentData data) {
         LOG.fine("Attempt to register department: " + data.id);
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
         if( !data.validateRegister() ) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
-        if(!getRole(decodedToken).equals(BO)) {
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
 
         Transaction txn = datastore.newTransaction();
         try {
+            String role = getRole(decodedToken);
+            if(!role.equals(BO) && !role.equals(ADMIN)){
+                txn.rollback();
+                LOG.warning(NICE_TRY);
+                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+            }
+
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
+            Entity department = txn.get(departmentKey);
+
             Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
             Entity president = txn.get(presidentKey);
 
@@ -58,34 +64,34 @@ public class DepartmentResource {
                 txn.rollback();
                 LOG.warning(WRONG_PRESIDENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
-            }
-
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
-            Entity department = txn.get(departmentKey);
-
-            if( department != null ) {
+            } else if( department != null ) {
                 txn.rollback();
                 LOG.warning(DEPARTMENT_ALREADY_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(DEPARTMENT_ALREADY_EXISTS).build();
+            } else {
+                department = Entity.newBuilder(departmentKey)
+                        .set("id", data.id)
+                        .set("email", data.email)
+                        .set("name", data.name)
+                        .set("president", data.president)
+                        .set("phone_number", data.phoneNumber)
+                        .set("location", data.location)
+                        .set("fax", data.fax)
+                        .set("time_creation", Timestamp.now())
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+                txn.add(department);
+
+                Entity updatedProfessor = Entity.newBuilder(president)
+                        .set("department", data.id)
+                        .set("department_job", "President")
+                        .build();
+                txn.update(updatedProfessor);
+
+                LOG.info("Department registered " + data.id);
+                txn.commit();
+                return Response.ok(department).build();
             }
-
-            department = Entity.newBuilder(departmentKey)
-                    .set("id", data.id)
-                    .set("email", data.email)
-                    .set("name", data.name)
-                    .set("president", data.president)
-                    .set("phone_number", data.phoneNumber)
-                    .set("address", data.address)
-                    .set("fax", data.fax)
-                    .set("members_list", "")
-                    .set("time_creation", Timestamp.now())
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-            txn.add(department);
-            txn.commit();
-
-            LOG.info("Department registered " + data.id);
-            return Response.ok(department).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -93,38 +99,26 @@ public class DepartmentResource {
         }
     }
 
+
     @POST
     @Path("/modify")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyDepartment(@HeaderParam("Authorization") String token,
-                                     DepartmentData data){
+    public Response modifyDepartment(@HeaderParam("Authorization") String token, DepartmentData data){
         LOG.fine("Attempt to modify department.");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
         if( !data.validateModify()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
-        if(!getRole(decodedToken).equals(BO)) {
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
-            Entity president = txn.get(presidentKey);
-
-            if( president == null ) {
-                txn.rollback();
-                LOG.warning(WRONG_PRESIDENT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
-            }
-
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
             Entity department = txn.get(departmentKey);
 
@@ -135,20 +129,50 @@ public class DepartmentResource {
             }
 
             data.fillGaps(department);
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("email", data.email)
-                    .set("name", data.name)
-                    .set("president", data.president)
-                    .set("phone_number", data.phoneNumber)
-                    .set("address", data.address)
-                    .set("fax", data.fax)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-            txn.update(updatedDepartment);
-            txn.commit();
+            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+            Entity president = txn.get(presidentKey);
 
-            LOG.info(data.id + " edited.");
-            return Response.ok(updatedDepartment).build();
+            String role = getRole(decodedToken);
+            if(!role.equals(BO) && !role.equals(ADMIN)){
+                txn.rollback();
+                LOG.warning(NICE_TRY);
+                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+            }else if( president == null ) {
+                txn.rollback();
+                LOG.warning(WRONG_PRESIDENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
+            }else {
+                String prevPresident = department.getString("president");
+                if ( !data.president.equals( prevPresident )){
+                    Key previousPresidentKey = datastore.newKeyFactory().setKind(USER).newKey(prevPresident);
+
+                    Entity newPreviousPresident = Entity.newBuilder(txn.get(previousPresidentKey))
+                            .set("department_job", "Docente")
+                            .build();
+                    txn.update(newPreviousPresident);
+
+                    Entity newPresident = Entity.newBuilder(presidentKey)
+                            .set("department", data.id)
+                            .set("department_job", "Presidente")
+                            .build();
+                    txn.update(newPresident);
+                }
+
+                Entity updatedDepartment = Entity.newBuilder(department)
+                        .set("email", data.email)
+                        .set("name", data.name)
+                        .set("president", data.president)
+                        .set("phone_number", data.phoneNumber)
+                        .set("location", data.location)
+                        .set("fax", data.fax)
+                        .set("time_lastupdate", Timestamp.now())
+                        .build();
+
+                txn.update(updatedDepartment);
+                LOG.info(data.id + " edited.");
+                txn.commit();
+                return Response.ok(updatedDepartment).build();
+            }
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -158,65 +182,50 @@ public class DepartmentResource {
 
     @DELETE
     @Path("/delete/{id}")
-    public Response deleteDepartment(@HeaderParam("Authorization") String token,
-                                     @PathParam("id") String id){
+    public Response deleteDepartment(@HeaderParam("Authorization") String token, @PathParam("id") String id){
         LOG.fine("Attempt to delete department.");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
-        if(!getRole(decodedToken).equals(BO)) {
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
+
         try {
             Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
             Entity department = txn.get(departmentKey);
 
-            if( department == null ) {
+            String role = getRole(decodedToken);
+            if(!role.equals(BO) && !role.equals(ADMIN)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                txn.rollback();
+                LOG.warning(NICE_TRY);
+                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+            }else if( department == null ) {
                 txn.rollback();
                 LOG.warning(WRONG_DEPARTMENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
-            }
+            } else {
+                Query<Entity> query = Query.newEntityQueryBuilder()
+                        .setKind("User")
+                        .setFilter(StructuredQuery.PropertyFilter.eq("department", id))
+                        .build();
 
-            String list = department.getString("members_list");
-            String userPersonalList;
-            String[] attributes;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(String valuesOfMember : list.split("#")) {
-                if(!valuesOfMember.equals("")) {
-                    attributes = valuesOfMember.split("%");
-
-                    memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                    memberEntity = txn.get(memberKey);
-
-                    if (memberEntity == null) {
-                        txn.rollback();
-                        LOG.warning(WRONG_MEMBER);
-                        return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                    }
-
-                    userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
-                    newUser = Entity.newBuilder(memberEntity)
-                            .set("job_list", userPersonalList)
-                            .set("time_lastupdate", Timestamp.now())
+                QueryResults<Entity> queryResults = datastore.run(query);
+                while (queryResults.hasNext()) {
+                    Entity userEntity = queryResults.next();
+                    userEntity = Entity.newBuilder(userEntity)
+                            .set("department", "")
+                            .set("department_job", "")
                             .build();
-
-                    txn.update(newUser);
+                    txn.update(userEntity);
                 }
+                txn.delete(departmentKey);
+                LOG.info("Department deleted.");
+                txn.commit();
+                return Response.ok(department).build();
             }
-            txn.delete(departmentKey);
-            txn.commit();
-
-            LOG.info("Department deleted.");
-            return Response.ok(department).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
@@ -229,24 +238,21 @@ public class DepartmentResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryDepartment(@HeaderParam("Authorization") String token,
                                     @QueryParam("limit") String limit,
-                                    @QueryParam("offset") String offset, Map<String, String> filters){
+                                    @QueryParam("offset") String cursor, Map<String, String> filters){
         LOG.fine("Attempt to query departments.");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
-        if(!getRole(decodedToken).equals(BO)) {
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
-
-        if( filters == null){
-            filters = new HashMap<>(1);
-        }
+        QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
+        if( filters == null ){
+            filters = new HashMap<>(1);
+        }
         StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
@@ -257,254 +263,26 @@ public class DepartmentResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind(DEPARTMENT)
                 .setFilter(attributeFilter)
-                .setLimit(Integer.parseInt(limit))
-                .setOffset(Integer.parseInt(offset))
-                .build();
-        QueryResults<Entity> queryResults = datastore.run(query);
+                .setLimit(Integer.parseInt(limit));
+
+        if ( !cursor.equals("EMPTY") ){
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
+
+        queryResults = datastore.run(query.build());
+
         List<Entity> results = new ArrayList<>();
+
         queryResults.forEachRemaining(results::add);
 
-        LOG.info("Ides receber um query ó filho!");
+        LOG.info("Query de departamentos pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results)).build();
 
+        return Response.ok(g.toJson(results))
+                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
+                .build();
     }
-
-    @POST
-    @Path("/add/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addMembers(@HeaderParam("Authorization") String token,
-                               @PathParam("id") String id,
-                               DepartmentData data) {
-        LOG.fine("Attempt to add members to the department.");
-
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
-            Entity department = txn.get(departmentKey);
-
-            if( department == null ) {
-                txn.rollback();
-                LOG.warning(WRONG_DEPARTMENT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
-            }
-            if( !getRole(decodedToken).equals(BO) && !department.getString("president").equals(decodedToken.getUid()) ) {
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            }
-
-            String list = department.getString("members_list");
-            String userPersonalList;
-            String[] attributes;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("%");
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                memberEntity = txn.get(memberKey);
-
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning(WRONG_MEMBER);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                }
-
-                if (!list.contains(attributes[1])) {
-                    userPersonalList = memberEntity.getString("job_list");
-                    userPersonalList = userPersonalList.concat("#" + department.getString("id") + "%" + attributes[0]);
-                    newUser = Entity.newBuilder(memberEntity)
-                            .set("job_list", userPersonalList)
-                            .set("time_lastupdate", Timestamp.now())
-                            .build();
-                    txn.update(newUser);
-                    list = list.concat("#" + valuesOfMember);
-                }
-            }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-            txn.update(updatedDepartment);
-            txn.commit();
-
-            LOG.info("Members added.");
-            return Response.ok(updatedDepartment).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @PATCH
-    @Path("/delete/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteMembers(@HeaderParam("Authorization") String token,
-                                  @PathParam("id") String id, DepartmentData data) {
-        LOG.fine("Attempt to remove members from the department.");
-
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
-        if(data.validateList()){
-            LOG.warning("List is empty.");
-            return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
-            Entity department = txn.get(departmentKey);
-
-            if( department == null ) {
-                txn.rollback();
-                LOG.warning(WRONG_DEPARTMENT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
-            }
-            if( !getRole(decodedToken).equals(BO) && !department.getString("president").equals(decodedToken.getUid()) ) {
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            }
-
-            String list = department.getString("members_list");
-            String userPersonalList;
-            String[] attributes;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(String valuesOfMember : data.members) {
-                attributes = valuesOfMember.split("%");
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(attributes[1]);
-                memberEntity = txn.get(memberKey);
-
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning(WRONG_MEMBER);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                }
-
-                userPersonalList = memberEntity.getString("job_list");
-                userPersonalList = userPersonalList.replace("#" + department.getString("id") + "%" + attributes[0], "");
-                newUser = Entity.newBuilder(memberEntity)
-                        .set("job_list", userPersonalList)
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-                txn.update(newUser);
-                list = list.replace("#"+valuesOfMember, "");
-            }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-            txn.update(updatedDepartment);
-            txn.commit();
-
-            LOG.info("Members removed.");
-            return Response.ok(updatedDepartment).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @PATCH
-    @Path("/edit/members/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response editMembers(@HeaderParam("Authorization") String token,
-                                @PathParam("id") String id, DepartmentData data) {
-        LOG.fine("Attempt to edit members of the department.");
-
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
-        if(data.validateList()){
-            LOG.warning("List is empty.");
-            return Response.status(Response.Status.BAD_REQUEST).entity("List is empty").build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(id);
-            Entity department = txn.get(departmentKey);
-
-            if( department == null ) {
-                txn.rollback();
-                LOG.warning(WRONG_DEPARTMENT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
-            }
-            if( !getRole(decodedToken).equals(BO) && !department.getString("president").equals(decodedToken.getUid()) ) {
-                txn.rollback();
-                LOG.warning(NICE_TRY);
-                return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-            }
-
-            String list = department.getString("members_list");
-            String userPersonalList;
-            String[] jobs;
-            String targetJob;
-            String[] attribute;
-            Key memberKey;
-            Entity memberEntity;
-            Entity newUser;
-            for(String valuesOfMember : data.members) {
-                attribute = valuesOfMember.split("%");
-                memberKey = datastore.newKeyFactory().setKind(USER).newKey(attribute[1]);
-                memberEntity = txn.get(memberKey);
-
-                if(memberEntity == null){
-                    txn.rollback();
-                    LOG.warning(WRONG_MEMBER);
-                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_MEMBER).build();
-                }
-
-                userPersonalList = memberEntity.getString("job_list");
-                jobs = userPersonalList.split("#");
-                targetJob = null;
-                for (String job: jobs) {
-                    if (job.contains(department.getString("id"))) {
-                        targetJob = job.split("%")[1];
-                        break;
-                    }
-                }
-                list = list.replace(targetJob +"%"+attribute[1], attribute[0]+"%"+attribute[1]);
-                userPersonalList = userPersonalList.replace(department.getString("id") + "%" + targetJob, department.getString("id") + "%" + attribute[0]);
-                newUser = Entity.newBuilder(memberEntity)
-                        .set("job_list", userPersonalList)
-                        .set("time_lastupdate", Timestamp.now())
-                        .build();
-                txn.update(newUser);
-            }
-            Entity updatedDepartment = Entity.newBuilder(department)
-                    .set("members_list", list)
-                    .set("time_lastupdate", Timestamp.now())
-                    .build();
-            txn.update(updatedDepartment);
-            txn.commit();
-
-            LOG.info("Members edited.");
-            return Response.ok(updatedDepartment).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-
 }

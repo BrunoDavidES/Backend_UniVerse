@@ -22,7 +22,7 @@ public class Constants {
 
     public static final String BO = "BO";
     public static final String D = "D";
-    public static final String A = "A";
+    public static final String ADMIN = "A";
     public static final String ROLE = "role";
     public static final String LAST_UPDATE = "time_lastupdate";
     public static final String USER = "User";
@@ -51,7 +51,9 @@ public class Constants {
     public static final String NICE_TRY = "Nice try but your not a capi person.";
     public static final String PERMISSION_DENIED = "Permission denied.";
     public static final String REPORT_DOES_NOT_EXIST = "Report does not exist.";
-
+    public static final String STATUS_CLAIM = "status";
+    public static final String STUDENT = "S";
+    public static final String TEACHER = "T";
     public static final String DEPARTMENT = "Department";
     public static final String WRONG_PRESIDENT = "President doesn't exists.";
     public static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";

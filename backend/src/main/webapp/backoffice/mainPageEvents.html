@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
+<html lang="pt-PT" dir="ltr" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title> Eventos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
-    <link rel="stylesheet" href="details.css">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -30,7 +29,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
                 <a href="#news">
                     <i class='bx bx-message'></i>
-                    <span class="links_name">Noticias</span>
+                    <span class="links_name">Notícias</span>
                 </a>
             </button>
         </li>
@@ -54,7 +53,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Nucleos</span>
+                    <span class="links_name">Núcleos</span>
                 </a>
             </button>
         </li>
@@ -71,14 +70,6 @@
                 <a href="#dpt">
                     <i class='bx bx-buildings' ></i>
                     <span class="links_name">Departamentos</span>
-                </a>
-            </button>
-        </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
                 </a>
             </button>
         </li>
@@ -109,8 +100,8 @@
         <div class="topnav" id="myTopnav">
             <button id="postBtn" onClick="changeWindow('postBtn', 'validateBtn', 'editBtn', 'deleteBtn', 'queryBtn', 'eventAdd', 'eventValidate', 'eventMod', 'eventDel', 'eventList'); auxListMore(0);" class="active">Adicionar Evento</button>
             <button id="editBtn"  onClick="changeWindow('editBtn', 'validateBtn', 'postBtn', 'deleteBtn', 'queryBtn', 'eventMod', 'eventValidate', 'eventAdd', 'eventDel', 'eventList'); auxListMore(0);">Modificar Evento</button>
-            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList'); auxListMore(0);">Apagar Evento</button>
             <button id="validateBtn" onClick="changeWindow('validateBtn','queryBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventValidate', 'eventList', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(0);">Validar Evento</button>
+            <button id="deleteBtn" onClick="changeWindow('deleteBtn', 'validateBtn', 'postBtn', 'editBtn', 'queryBtn', 'eventDel', 'eventValidate', 'eventAdd', 'eventMod', 'eventList'); auxListMore(0);">Apagar Evento</button>
             <button id="queryBtn" onClick="changeWindow('queryBtn', 'validateBtn', 'postBtn', 'editBtn', 'deleteBtn', 'eventList', 'eventValidate', 'eventAdd', 'eventMod', 'eventDel'); auxListMore(1);">Listar Eventos</button>
         </div>
         <br><br>
@@ -126,7 +117,7 @@
                 <div class="input-container ic2">
                     <input id="startDate" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="startDate" class="placeholder">Data de Inicio</label>
+                    <label for="startDate" class="placeholder">Data de Início</label>
                 </div>
                 <div class="input-container ic2">
                     <input id="endDate" class="input" type="text" placeholder=" "/>
@@ -142,6 +133,11 @@
                     <input id="department" class="input" type="text" placeholder=" "/>
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
+                </div> <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="updateEventPic()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label for="title">Capacidade máxima do Evento: &emsp;</label>
@@ -159,14 +155,14 @@
                         <option value="yes">Sim</option>
                     </select>
                 </div>
-                <button type="text" class="submit" onclick="postEvent()">Adiciona Evento</button>
+                <button type="text" class="submit" onclick="postEvent()">Adicionar Evento</button>
             </div>
             <br><br>
         </div>
         <div id="eventMod" style="display: none;">
             <div class="form">
                 <div class="title">Modificar Evento</div>
-                <div class="subtitle">Vamos obter o evento e modicalo como quer!</div>
+                <div class="subtitle">Vamos obter um evento e modificá-lo</div>
                 <div class="input-container ic1">
                     <input id="idEventMod" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
@@ -184,7 +180,7 @@
                 <div class="input-container ic2">
                     <input id="startDateMod" class="input" type="text" placeholder=" " />
                     <div class="cut"></div>
-                    <label id="startDateModLbl" for="startDate" class="placeholder">Data de Inicio</label>
+                    <label id="startDateModLbl" for="startDate" class="placeholder">Data de Início</label>
                 </div>
                 <div class="input-container ic2">
                     <input id="endDateMod" class="input" type="text" placeholder=" " />
@@ -200,6 +196,11 @@
                     <input id="departmentMod" class="input" type="text" placeholder=" " />
                     <div class="cut cut"></div>
                     <label id="departmentModLbl" for="department" class="placeholder">Departamento</label>
+                </div><br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="updateEventPicMod()"></div>
+                <br>
+                <div style="text-align: center;">
+                    <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label id="capacityLbl" for="title">Capacidade máxima do Evento</label>
@@ -239,7 +240,7 @@
         <div id="eventValidate" style="display: none;">
             <div class="form">
                 <div class="title">Validar Evento</div>
-                <div class="subtitle">Vamos validar um evento especifico!</div>
+                <div class="subtitle">Vamos validar um evento específico!</div>
                 <div class="input-container ic1">
                     <input id="idEventValidate" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
@@ -252,22 +253,33 @@
         <div id="eventList" class="list" style="display: none;">
             <h1 class="title" style="text-align: center;">Listar Eventos</h1>
             <br>
-            <h2 class="subtitle" for="listLimitId" style="display: inline;">Eventos por listagem: &emsp;</h2>
-            <select id="listLimitId" style="width: 80px; display: inline;">
-                <option value=5>5</option>
-                <option value=10>10</option>
-                <option value=15>15</option>
-                <option value=20>20</option>
-            </select>
+            <div style="justify-content: center;">
+                <h2 class="subtitle" for="listLimitId" style="display: inline;">Eventos por listagem: &emsp;</h2>
+                <select id="listLimitId" style="width: 80px; display: inline;">
+                    <option value=5>5</option>
+                    <option value=10>10</option>
+                    <option value=15>15</option>
+                    <option value=20>20</option>
+                </select>
+                <br><br>
+                <label>
+                    <p class="subtitle" style="display: inline;">Filtrar entre </p>
+                    <input id="dateStart" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                    <p class="subtitle" style="display: inline;"> (Data Inicial) &emsp; e </p> &emsp;
+                    <input id="dateEnd" style="background-color: #303245; color: #eee; text-align: center; height: 35px;" type="date"/>
+                    <p class="subtitle" style="display: inline;"> (Data Final) &emsp;</p>
+                </label>
+                <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfEvents', 'details');">Apagar Lista</button></div>
+            </div>
 
-            <ul id="listOfEvents"></ul>
+            <ul id="listOfEvents"> </ul>
             <hr class="rounded">
             <br>
             <div id="details"></div>
             <br>
-            <button class="submit" onclick="loadingPopupOn();queryEvents();loadingPopupOff();">Listar</button>
-            <br><br>
+            <button class="submit" onclick="sortDates(dateStart.value, dateEnd.value);">Listar</button>
         </div>
+        <br><br>
         <div class="popup" id="popup">
             <h3>Está prestes a fazer logout</h3>
             <p>Tem a certeza?</p>
@@ -283,6 +295,7 @@
 </section>
 
 <script src="/js/functions.js"></script>
+<script src="/js/functions2.js"></script>
 <script>
       let loading = document.getElementById("loadingPopup");
 
@@ -369,9 +382,79 @@
 
       function bottomFunction() {
         window.scrollTo(0,document.body.scrollHeight);
-        bottomPage.style.display = 'none';
         topPage.style.display = '';
       }
+
+      function formatDate() {
+        var x = document.getElementById("dateStart").value;
+        x = new Date(x);
+        x.setHours(x.getHours() - x.getHours());
+        return x;
+      }
+
+      function formatDate2() {
+        var x2 = document.getElementById("dateEnd").value;
+        x2 = new Date(x2);
+        x2.setHours(x2.getHours() - x2.getHours());
+        x2.setMinutes(x2.getMinutes() - x2.getMinutes());
+        x2.setSeconds(x2.getSeconds() - x2.getSeconds());
+        x2.setHours(23);
+        x2.setMinutes(59);
+        x2.setSeconds(59);
+        return x2;
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
+      }
+
+      function sortDates(d1, d2){
+        if((d1 == '') && (d2 == '')){
+            queryEvents();
+            return;
+        }
+        else if( (d1 != '') && (d2 == '')){
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = '3000-12-31T22%3A59%3A59.252Z';
+        }
+        else if( (d1 == '') && (d2 != '')){
+            d1 = '1000-12-31T22%3A59%3A59.252Z';
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        else if(d2 < d1) {
+            alert('A data inicial tem de ser antes da data final');
+        }
+        else{
+            d1 = d1.concat('T13%3A00%3A00.192Z');
+            d2 = d2.concat('T22%3A59%3A59.252Z');
+        }
+        queryEventsWithDates(d1,d2);
+      }
+
+    function updateEventPic() {
+        let selectedFile = document.getElementById("eventPic").files[0];
+        if(selectedFile.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("eventPic").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+    }
+
+    function updateEventPicMod() {
+        let selectedFile2 = document.getElementById("eventPicMod").files[0];
+        if(selectedFile2.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("eventPicMod").value = "";
+        }
+        else{
+            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+        }
+    }
 </script>
 
 </body>

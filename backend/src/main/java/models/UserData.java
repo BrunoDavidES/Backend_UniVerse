@@ -1,7 +1,13 @@
 package models;
 
+import com.google.cloud.datastore.Entity;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserData {
-	private static final String ALUNO = "A";
+	private static final String STUDENT = "S";
+	private static final String WORKER = "W";
 	private static final String UNCHECKED = "EMPTY";
 
 	public String username;
@@ -13,8 +19,6 @@ public class UserData {
 	public String password;
 	public String confirmation;
 	public String status;
-
-	public String token;
 
 
 	public UserData() { }
@@ -45,10 +49,10 @@ public class UserData {
 
 	public String getRole() {
 		if(this.email.contains("@campus.fct.unl.pt")) //ver se email é só @fct.unl.pt, e como ver se é proff ou funcionário
-			return ALUNO;
+			return STUDENT;
 
 		if (this.email.contains("@fct.unl.pt"))
-			return UNCHECKED;
+			return WORKER;
 
 		return null;
 	}

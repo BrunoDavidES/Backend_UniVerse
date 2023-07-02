@@ -8,7 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadLoggedUser()">
-<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="queryUnresolvedReports();" id="moreList">Mais <i class='bx bx-book-alt' ></i></button>
+<button onclick="queryReports();" id="moreList2">Mais <i class='bx bx-book-alt' ></i></button>
+<button onclick="topFunction();" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
     <div class="logo-details">
         <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -27,7 +30,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
                 <a href="#news">
                     <i class='bx bx-message'></i>
-                    <span class="links_name">Noticias</span>
+                    <span class="links_name">Notícias</span>
                 </a>
             </button>
         </li>
@@ -51,7 +54,7 @@
             <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
                 <a href="#stats">
                     <i class='bx bx-pie-chart-alt-2' ></i>
-                    <span class="links_name">Nucleos</span>
+                    <span class="links_name">Núcleos</span>
                 </a>
             </button>
         </li>
@@ -68,14 +71,6 @@
                 <a href="#dpt">
                     <i class='bx bx-buildings' ></i>
                     <span class="links_name">Departamentos</span>
-                </a>
-            </button>
-        </li>
-        <li>
-            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
-                <a href="#settings">
-                    <i class='bx bx-cog' ></i>
-                    <span class="links_name">Definições</span>
                 </a>
             </button>
         </li>
@@ -105,32 +100,117 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'resolve', 'unReport', 'reportAll')" class="active">Resolver Report</button>
-            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'unReport', 'resolve', 'reportAll')">Listar reports por resolver</button>
-            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'reportAll', 'resolve', 'unReport')">Listar todos os reports</button>
+            <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll'); auxListMore(0);" class="active">Obter Report</button>
+            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport'); auxListMore(0);">Estado do Report</button>
+            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport'); auxListMore(1);">Listar Reports por resolver</button>
+            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport'); auxListMore(2);">Listar todos os Reports</button>
         </div>
         <br><br>
-        <div id="resolve">
+        <div id="getReport">
             <div class="form">
-                <div class="title">Resolver Conflito</div>
-                <div class="subtitle">Vamos confirmar que um report foi tratado!</div>
+                <div class="title">Obter Report</div>
+                <div class="subtitle">Vamos ver os dados de um report!</div>
                 <div class="input-container ic1">
-                    <input id="idReportValidate" class="input" type="text" placeholder=" "/>
+                    <input id="idReport" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
-                    <label for="idReportValidate" class="placeholder">Id do Report</label>
+                    <label for="idReport" class="placeholder">Id do Report</label>
                 </div>
-                <button type="text" class="submit" onclick="validateEvent()">Marcar como resolvido</button>
+                <button type="text" class="submit" onclick="getReport()">Obter Report</button>
+            </div>
+            <br>
+            <div class="form">
+                <div class="title" id="username">Report</div>
+                <div class="input-container ic1">
+                    <input id="repTitle" class="input" readonly="readonly" type="text" placeholder=""/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Título do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="location" class="input" readonly="readonly" type="text" placeholder=""/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Localização</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="statusRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Status do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="authorRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Autor do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="creationRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Criação do Report</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="lastUpdatedRep" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label class="placeholder">Última atualização do Report</label>
+                </div>
+                <div class="input-container2 ic2">
+                    <textarea id="textRep" class="input" cols="40" rows="5" readonly="readonly"></textarea>
+                    <div class="cut cut"></div>
+                    <label class="placeholder">Corpo do Report</label>
+                </div>
+            </div><br><br>
+        </div>
+        <div id="resolve" style="display: none;">
+            <div class="form">
+                <div class="title">Estado do Report</div>
+                <div class="subtitle">Mudar o estado do Report</div>
+                <div class="input-container ic1">
+                    <input id="idReportStatus" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="idReportStatus" class="placeholder">Id do Report</label>
+                </div><br>
+                <label class="subtitle" for="newStatus">&emsp;Novo estado &emsp; </label>
+                <select style="height:25px; width: 120px; border-radius: 10px; text-align: center;" id="newStatus">
+                    <option value="SEEN">Seen</option>
+                    <option value="RESOLVED">Resolved</option>
+                </select>
+                <button type="text" class="submit" onclick="reportStatus()">Mudar estado</button>
             </div>
         </div>
-        <div id="unReport" style="display: none;">
-            <div class="form">
-                <div class="title">Listar nao resolvidos</div>
-            </div>
+        <div id="unReport" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar os Reports não resolvidos</h1>
+            <br>
+            <h2 class="subtitle" for="unResListLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
+            <select id="unResListLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select><br>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfUnresReports', 'unresDetails');">Apagar Lista</button></div>
+
+            <ul id="listOfUnresReports"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="unresDetails"></div>
+            <br>
+            <button class="submit" onclick="queryUnresolvedReports()">Listar</button>
         </div>
-        <div id="reportAll" style="display: none;">
-            <div class="form">
-                <div class="title">Listar todos</div>
-            </div>
+        <div id="reportAll" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar todos os Reports</h1>
+            <br>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
+            <select id="listLimitId" style="width: 80px; display: inline;">
+                <option value=5>5</option>
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=20>20</option>
+            </select><br>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListEvents('listOfReports', 'details');">Apagar Lista</button></div>
+
+            <ul id="listOfReports"></ul>
+            <hr class="rounded">
+            <br>
+            <div id="details"></div>
+            <br>
+            <button class="submit" onclick="queryReports()">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">
@@ -143,31 +223,24 @@
 
 <script src="/js/functions.js"></script>
 <script>
-      let loading = document.getElementById("loadingPopup");
-
-      function loadingPopupOn(){
-           loading.classList.add("openLoadingPopup");
-      }
-
-      function loadingPopupOff(){
-           loading.classList.remove("openLoadingPopup");
-      }
-
-      function changeWindow(btn, btn1, btn2, div, div1, div2){
+      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
+        var gone3 = document.getElementById(div3);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
+        var button4 = document.getElementById(btn3);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
+        gone3.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
-
+        button4.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");
@@ -191,19 +264,49 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let myList2 = document.getElementById("moreList2");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
+            else if(varAux == 2){
+                myList2.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            myList2.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
       function topFunction() {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+      }
+
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        topPage.style.display = '';
+      }
+
+      function clearList(){
+        var r1 = document.getElementById("listOfEvents");
+        var r2 = document.getElementById("details");
+        r1.replaceChildren();
+        r2.replaceChildren();
       }
 </script>
 

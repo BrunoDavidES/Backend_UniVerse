@@ -87,8 +87,12 @@ public class RegisterResource {
                     .set("email", email)
                     .set("name", name)
                     .set("license_plate", license_plate)
-                    .set("job_list", "")
-                    .set("personal_event_list", "")  //#string%string%string%string#string%...
+                    .set("status", "ACTIVE")
+                    .set("department", "")
+                    .set("department_job", "")
+                    .set("nucleus", "")
+                    .set("nucleus_job", "")
+                    .set("office","")
                     .set("time_lastupdate", Timestamp.now())
                     .build();
             txn.add(user);
