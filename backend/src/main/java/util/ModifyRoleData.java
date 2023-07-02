@@ -21,9 +21,9 @@ public class ModifyRoleData {
 
     public boolean validatePermission(String modifierRole, String targetRole, Entity targetUser) {
 
-        if(this.department == null)
+        if(this.department == null || this.department.equals(""))
             this.department = targetUser.getString("department");
-        if(this.department_job == null)
+        if(this.department_job == null || this.department_job.equals(""))
             this.department_job = targetUser.getString("department_job");
 
         if (modifierRole.equals(ADMIN))

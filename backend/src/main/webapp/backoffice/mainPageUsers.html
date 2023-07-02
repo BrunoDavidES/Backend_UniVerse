@@ -99,7 +99,7 @@
     <div class="home-content">
         <div class="topnav" id="myTopnav">
             <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'usersList'); auxListMore(0);" class="active">Modificar role do User</button>
-            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'usersList'); auxListMore(0);">Obter <perf></perf>il do User</button>
+            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'usersList'); auxListMore(0);">Obter perfil do User</button>
             <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'usersList'); auxListMore(0);">Apagar User</button>
             <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'usersList', 'delUser', 'modRole', 'getProfile'); auxListMore(1);">Listar Users</button>
         </div>
@@ -113,7 +113,7 @@
                     <input id="target" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="target" class="placeholder">Username</label>
-                </div><br>
+                </div><br><br>
                 <div class="child">
                     <select name="roles" class="select" id="newRole">
                         <option selected>Novo estatuto do User</option>
@@ -121,6 +121,21 @@
                         <option id="TI" value="T">Professor/Investigador</option>
                         <option id="S" value="W">Funcionário</option>
                     </select>
+                </div>
+                <div class="input-container ic1">
+                    <input id="newDepartment" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Novo Departamento</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="newJob" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Nova posição no departamento</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="newOffice" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Novo Gabinete</label>
                 </div>
                 <button type="text" class="submit" onclick="modifyUserRole()">Mudar estatuto do user</button>
             </div><br><br>
@@ -145,6 +160,11 @@
                     <label for="target" class="placeholder">Username</label>
                 </div>
                 <div class="input-container ic1">
+                    <input id="emailInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Email</label>
+                </div>
+                <div class="input-container ic1">
                     <input id="nameInfo" class="input" readonly="readonly" type="text" placeholder=""/>
                     <div class="cut"></div>
                     <label for="target" class="placeholder">Name</label>
@@ -155,15 +175,41 @@
                     <label for="target" class="placeholder">Role</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="jobsInfo" class="input" readonly="readonly" type="text"/>
+                    <input id="depInfo" class="input" readonly="readonly" type="text"/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Trabalhos</label>
+                    <label for="target" class="placeholder">Department</label>
                 </div>
                 <div class="input-container ic1">
-                    <input id="emailInfo" class="input" readonly="readonly" type="text"/>
+                    <input id="depInfoJob" class="input" readonly="readonly" type="text"/>
                     <div class="cut"></div>
-                    <label for="target" class="placeholder">Email</label>
+                    <label for="target" class="placeholder">Department Job</label>
                 </div>
+                <div class="input-container ic1">
+                    <input id="nucInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Nucleus</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="nucJobInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Nucleus Job</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="officeInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Office Location</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="licenseeInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">License Plate</label>
+                </div>
+                <div class="input-container ic1">
+                    <input id="statusInfo" class="input" readonly="readonly" type="text"/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Status</label>
+                </div>
+
             </div><br><br>
         </div>
         <div id="delUser" style="display: none;">

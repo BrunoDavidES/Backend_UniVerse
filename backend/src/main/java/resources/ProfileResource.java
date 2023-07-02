@@ -130,17 +130,25 @@ public class ProfileResource {
         if (data.role.equals(STUDENT)){
             data.nucleus = user.getString("nucleus");
             data.nucleus_job = user.getString("nucleus_job");
+        }else {
+            data.nucleus = "";
+            data.nucleus_job = "";
         }
 
         if (data.role.equals(TEACHER)){
             data.office = user.getString("office");
-        }
-        String requesterUsername = String.valueOf(token.getClaim(USER_CLAIM));
-        String requesterRole = String.valueOf(token.getClaim(ROLE));
+        }else
+            data.office = "";
+
+        String requesterUsername = String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", "");
+        String requesterRole = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
 
         if ( requesterUsername.equals(username) || requesterRole.equals(BO) || requesterRole.equals(ADMIN) ){
             data.license_plate = user.getString("license_plate");
             data.status = user.getString("status");
+        }else {
+            data.license_plate = "";
+            data.status = "";
         }
 
 

@@ -23,10 +23,8 @@ function loadLoggedUser() {
             document.getElementById("name").innerHTML = userLogged.name;
             document.getElementById("usernameMail").innerHTML = userLogged.email;
             document.getElementById("role").innerHTML = userLogged.role;
-            var str = userLogged.jobs;
-            str = str.replace(/^#/,'');
-            str = str.replace(/%/g, " - ");
-            document.getElementById("jobs").innerHTML = str + '<br>';
+            document.getElementById("departmentTitle").innerHTML = userLogged.department;
+            document.getElementById("departmentJobTitle").innerHTML = userLogged.department_job;
         }
         else{
             window.location.href = "/backoffice/index.html";
@@ -617,10 +615,16 @@ function queryNews(){
 function modifyUserRole(){
     var target = document.getElementById("target").value;
     var newRole = document.getElementById("newRole").value;
+    var department = document.getElementById("newDepartment").value;
+    var department_job = document.getElementById("newJob").value;
+    var office = document.getElementById("newOffice").value;
 
     var data = {
         "target": target,
-        "newRole": newRole
+        "newRole": newRole,
+        "department": department,
+        "department_job": department_job,
+        "office": office
     };
 
     var request = new XMLHttpRequest();
@@ -693,8 +697,13 @@ function queryUsers(){
                         username: (entity.properties.email.value).split("@")[0],
                         email: entity.properties.email,
                         role: entity.properties.role,
-                        jobs: entity.properties.job_list,
+                        department: entity.properties.department,
+                        department_job: entity.properties.department_job,
+                        nucleus: entity.properties.nucleus,
+                        nucleus_job: entity.properties.nucleus,
                         license_plate: entity.properties.license_plate,
+                        office: entity.properties.office,
+                        status: entity.properties.status,
                         time_creation: entity.properties.time_creation,
                         time_lastupdate: entity.properties.time_lastupdate
                     };
@@ -702,7 +711,7 @@ function queryUsers(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.username.value + " - " + entity.name.value;
+                    listItem.textContent = entity.username + " - " + entity.name.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
@@ -712,18 +721,19 @@ function queryUsers(){
                         details.appendChild(title);
 
                         var description = document.createElement('p');
-                        var jobs = entity.jobs.value;
-                        jobs = jobs.replace();
-                        jobs = jobs.replace(/^#/,'');
-                        jobs = jobs.replace(/%/g, " - ");
                         description.innerHTML = "&emsp;Nome do user: " + entity.name.value +
-                                                "<br> &emsp;Username: " + entity.username.value +
+                                                "<br> &emsp;Username: " + entity.username +
                                                 "<br> &emsp;Email: " + entity.email.value +
                                                 "<br> &emsp;Role: " + entity.role.value +
-                                                "<br> &emsp;Lista de cargos na faculdade: " + jobs.value +
+                                                "<br> &emsp;Departamento: " + entity.department.value +
+                                                "<br> &emsp;Função no departamento: " + entity.department_job.value +
+                                                "<br> &emsp;Escritório: " + entity.office.value +
+                                                "<br> &emsp;Núcleo: " + entity.nucleus.value +
+                                                "<br> &emsp;Função no núcleo: " + entity.nucleus_job.value +
                                                 "<br> &emsp;Matrícula da viatura pessoal: " + entity.license_plate.value +
-                                                "<br> &emsp;Conta criada em: " + (entity.time_creation.value).toString() +
-                                                "<br> &emsp;Último update feito em: " + (entity.time_lastupdate.value).toString();
+                                                "<br> &emsp;Estado da conta: " + entity.status.value +
+                                                "<br> &emsp;Conta criada em: " + new Date(entity.time_creation.value.seconds * 1000).toString(); +
+                                                "<br> &emsp;Último update feito em: " + new Date(entity.time_lastupdate.value.seconds * 1000).toString();
 
                         details.appendChild(description);
 
@@ -763,10 +773,16 @@ function getUser() {
            const response = JSON.parse(request.responseText);
 
            document.getElementById("usernameInfo").value = response.username;
+           document.getElementById("emailInfo").value = response.email;
            document.getElementById("nameInfo").value = response.name;
            document.getElementById("roleInfo").value = response.role;
-           document.getElementById("jobsInfo").value = response.jobs;  //TRATAR DA LISTA DE JOBS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-           document.getElementById("emailInfo").value = response.email;
+           document.getElementById("depInfo").value = response.department;  //TRATAR DA LISTA DE JOBS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+           document.getElementById("depInfoJob").value = response.department_job;
+           document.getElementById("nucInfo").value = response.nucleus;
+           document.getElementById("nucJobInfo").value = response.nucleus_job;
+           document.getElementById("officeInfo").value = response.office;
+           document.getElementById("licenseeInfo").value = response.license_plate;
+           document.getElementById("statusInfo").value = response.status;
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
@@ -1214,7 +1230,6 @@ function queryDepartments(){
                         fax: entity.properties.fax,
                         president: entity.properties.president,
                         phone_number: entity.properties.phone_number,
-                        members_list: entity.properties.members_list,
                         time_creation: entity.properties.time_creation,
                         time_lastUpdated: entity.properties.time_lastupdate    ,
                     };
@@ -1239,7 +1254,6 @@ function queryDepartments(){
                                                 "<br> &emsp;Email: " + entity.email.value +
                                                 "<br> &emsp;Fax: " + entity.fax.value +
                                                 "<br> &emsp;Número de telefone: " + entity.phone_number.value +
-                                                "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
                                                 "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
                                                 "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
 
@@ -1492,7 +1506,6 @@ function queryNucleus(){
                         description: entity.properties.description,
                         email: entity.properties.email,
                         president: entity.properties.president,
-                        members_list: entity.properties.members_list,
                         facebook: entity.properties.facebook,
                         instagram: entity.properties.instagram,
                         twitter: entity.properties.twitter,
@@ -1521,7 +1534,6 @@ function queryNucleus(){
                                                 "<br> &emsp;Descrição: " + entity.description.value +
                                                 "<br> &emsp;Email: " + entity.email.value +
                                                 "<br> &emsp;Presidente: " + entity.president.value +
-                                                "<br> &emsp;Lista de membros: " + entity.members_list.value +    //Mudar formato de print
                                                 "<br> &emsp;Facebook: " + entity.facebook.value +
                                                 "<br> &emsp;Instagram: " + entity.instagram.value +
                                                 "<br> &emsp;Twitter: " + entity.twitter.value +
