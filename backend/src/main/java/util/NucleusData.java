@@ -20,7 +20,6 @@ public class NucleusData {
     public String location;
     public String newName;
 
-    public List<String> members;
 
     public String website;
 

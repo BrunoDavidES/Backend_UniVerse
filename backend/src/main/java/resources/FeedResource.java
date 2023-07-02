@@ -129,7 +129,8 @@ public class FeedResource {
                             .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
-                }else { //construtor de news
+                }else {
+                    //construtor de news
                     // Caso se vá buscar uma notícia de outro site, por parte do backoffice,
                     // e se queira por o author como "Jornal Expresso", por exemplo
                     if (role.equals(BO) && data.authorNameByBO != null && !data.authorNameByBO.equals("")){

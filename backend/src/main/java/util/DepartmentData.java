@@ -11,14 +11,11 @@ public class DepartmentData {
 
 
     public String id;  //acronimo do departamento, exemplo MIEI
-    public List<String> members;
     public String email;
     public String name;
     public String president;
     public String phoneNumber;
-    public LatLng location;
-    public double latitude;
-    public double longitude;
+    public String location;
     public String fax;
 
 
@@ -26,18 +23,14 @@ public class DepartmentData {
 
     public boolean validateRegister() {
 
-        if (id == null || email == null || name == null || president == null || latitude == 0 || longitude == 0 || phoneNumber == null) {
+        if (id == null || email == null || name == null || president == null ||  location == null || phoneNumber == null) {
             return false;
         }
-        this.location = LatLng.of(this.latitude,this.longitude);
         if (!id.matches(".{3,64}")){
             return false;
         }
 
         return email.matches("^[A-Za-z0-9._%+-]+@(fct\\.unl\\.pt)$");
-    }
-    public boolean validateList(){
-        return this.members == null || this.members.isEmpty();
     }
 
     public boolean validateModify() {
@@ -56,10 +49,9 @@ public class DepartmentData {
             this.president = department.getString("president");
         if(this.phoneNumber == null || this.phoneNumber.equals(""))
             this.phoneNumber = department.getString("phoneNumber");
-        if(this.latitude == 0 || this.longitude == 0)
-            this.location = department.getLatLng("location");
-        else
-            this.location = LatLng.of(this.latitude,this.longitude);
+        if(this.location == null || this.location.equals(""))
+            this.location = department.getString("location");
+
         if(this.fax == null || this.fax.equals(""))
             this.fax = department.getString("fax");
     }

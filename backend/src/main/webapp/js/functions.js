@@ -253,36 +253,36 @@ function queryEvents(){
                 var listItem = document.createElement("li");
                 listItem.textContent = entity.title.value + " " + entity.startDate.value + " - " + entity.endDate.value;
                 listItem.addEventListener('click', function() {
-                      var details = document.getElementById('details');
-                      details.innerHTML = '';
+                  var details = document.getElementById('details');
+                  details.innerHTML = '';
 
-                      var title = document.createElement('h2');
-                      title.textContent = entity.title.value;
-                      details.appendChild(title);
+                  var title = document.createElement('h2');
+                  title.textContent = entity.title.value;
+                  details.appendChild(title);
 
-                      var description = document.createElement('p');
-                      description.innerHTML = "&emsp;Nome do evento: " + entity.title.value +
-                                                "<br> &emsp;ID do evento: " + entity.id.value +
-                                                "<br> &emsp;Nome do criador do evento: " + entity.authorName.value +
-                                                "<br> &emsp;Username do criador do evento: " + entity.authorUsername.value +
-                                                "<br> &emsp;Localização: " + entity.location.value +
-                                                "<br> &emsp;Evento público: " + entity.isPublic.value +
-                                                "<br> &emsp;Evento pago: " + entity.isItPaid.value +
-                                                "<br> &emsp;Capacidade: " + entity.capacity.value +
-                                                "<br> &emsp;Início: " + entity.startDate.value +
-                                                "<br> &emsp;Fim: " + entity.endDate.value +
-                                                "<br> &emsp;Departamento organizador: " + entity.department.value +
-                                                "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
+                  var description = document.createElement('p');
+                  description.innerHTML = "&emsp;Nome do evento: " + entity.title.value +
+                                            "<br> &emsp;ID do evento: " + entity.id.value +
+                                            "<br> &emsp;Nome do criador do evento: " + entity.authorName.value +
+                                            "<br> &emsp;Username do criador do evento: " + entity.authorUsername.value +
+                                            "<br> &emsp;Localização: " + entity.location.value +
+                                            "<br> &emsp;Evento público: " + entity.isPublic.value +
+                                            "<br> &emsp;Evento pago: " + entity.isItPaid.value +
+                                            "<br> &emsp;Capacidade: " + entity.capacity.value +
+                                            "<br> &emsp;Início: " + entity.startDate.value +
+                                            "<br> &emsp;Fim: " + entity.endDate.value +
+                                            "<br> &emsp;Departamento organizador: " + entity.department.value +
+                                            "<br> &emsp;Estado de validação pelo Backoffice: " + entity.validated_backoffice.value;
 
-                      details.appendChild(description);
+                  details.appendChild(description);
 
-                      var siblings = Array.from(listItem.parentNode.children);
-                      var currentIndex = siblings.indexOf(listItem);
-                      siblings.slice(currentIndex + 1).forEach(function(sibling) {
-                          sibling.classList.toggle('closed');
-                      });
+                  var siblings = Array.from(listItem.parentNode.children);
+                  var currentIndex = siblings.indexOf(listItem);
+                  siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                      sibling.classList.toggle('closed');
+                  });
 
-                      bottomFunction();
+                  bottomFunction();
 
                 });
 
@@ -1072,7 +1072,7 @@ function getDepartment() {
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/department/query/?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/department/query/?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -1083,7 +1083,7 @@ function getDepartment() {
 
            const entities = response.map(function(entity) {
                return {
-                   address: entity.properties.address,
+                   location: entity.properties.location,
                    email: entity.properties.email,
                    fax: entity.properties.fax,
                    name: entity.properties.name,
@@ -1093,7 +1093,7 @@ function getDepartment() {
            });
 
            entities.forEach(function(entity) {
-               document.getElementById("addressMod").value = entity.address.value;
+               document.getElementById("locationMod").value = entity.location.value;
                document.getElementById("emailMod").value = entity.email.value;
                document.getElementById("faxMod").value = entity.fax.value;
                document.getElementById("nameDptMod").value = entity.name.value;
@@ -1117,8 +1117,8 @@ var data = {
         "email": document.getElementById("email").value,
         "name": document.getElementById("nameDpt").value,
         "president": document.getElementById("presDpt").value,
-         "phoneNumber": document.getElementById("phoneNumber").value,
-        "address": document.getElementById("address").value,
+        "phoneNumber": document.getElementById("phoneNumber").value,
+        "location": document.getElementById("locationDpt").value,
         "fax": document.getElementById("fax").value
 
     };
@@ -1148,19 +1148,19 @@ function editDepartment(){
     var name = document.getElementById("nameDptMod").value;
     var president = document.getElementById("presDptMod").value;
     var phoneNumber = document.getElementById("phoneNumberMod").value;
-    var address = document.getElementById("addressMod").value;
+    var location = document.getElementById("locationMod").value;
     var fax = document.getElementById("faxMod").value;
 
     var data = {
-            "id": id,
-            "email": email,
-            "name": name,
-            "president": president,
-            "phoneNumber": phoneNumber,
-            "address": address,
-            "fax": fax
+        "id": id,
+        "email": email,
+        "name": name,
+        "president": president,
+        "phoneNumber": phoneNumber,
+        "location": location,
+        "fax": fax
 
-        };
+    };
 
     if (email !== "") {
             data["email"] = email;
@@ -1178,8 +1178,8 @@ function editDepartment(){
             data["phoneNumber"] = phoneNumber;
     }
 
-    if (address !== "") {
-            data["address"] = address;
+    if (location !== 0) {
+            data["location"] = location;
     }
 
     if (fax !== "") {
@@ -1225,7 +1225,7 @@ function queryDepartments(){
                     return {
                         name: entity.properties.name,
                         id: entity.properties.id,
-                        address: entity.properties.address,
+                        location: entity.properties.location,
                         email: entity.properties.email,
                         fax: entity.properties.fax,
                         president: entity.properties.president,
@@ -1250,7 +1250,7 @@ function queryDepartments(){
                         description.innerHTML = "&emsp;Nome do Departamento: " + entity.name.value +
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do presidente: " + entity.president.value +
-                                                "<br> &emsp;Endereço: " + entity.address.value +
+                                                "<br> &emsp;Location: " + entity.location.value +
                                                 "<br> &emsp;Email: " + entity.email.value +
                                                 "<br> &emsp;Fax: " + entity.fax.value +
                                                 "<br> &emsp;Número de telefone: " + entity.phone_number.value +
