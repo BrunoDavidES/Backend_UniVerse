@@ -56,6 +56,59 @@ function logout(){
     xmlhttp.send();
 }
 
+
+   var firebaseConfig = {
+          apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
+          authDomain: "universe-fct.firebaseapp.com",
+          databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "universe-fct",
+          storageBucket: "gs://universe-fct.appspot.com",
+          messagingSenderId: "493010584500",
+          appId: "1:493010584500:web:9c958f30725cd60533a8e1",
+          measurementId: "G-XB1FHSZ4M0"
+    };
+            // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+
+function uploadEventPic(filename) {
+    var file = document.getElementById("eventPic").files[0];
+    if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("eventPic").value = "";
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("Eventos/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+    }
+
+}
+
+
+function updateEventPicMod() {
+     var file = document.getElementById("eventPicMod").files[0];
+     if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("eventPic").value = "";
+     }
+     else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("Eventos/" + file.name);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+     }
+}
+
       //FEEDS
 
 //Events
@@ -79,6 +132,7 @@ function postEvent(){
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
+          uploadEventPic(request.responseText);
           console.log("SUCCESS");
       } else if (request.readyState === 4) {
           console.log(request.responseText);

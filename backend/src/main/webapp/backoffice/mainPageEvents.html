@@ -136,9 +136,9 @@
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
                 </div> <br>
-                <input type="file" id="eventPic" accept="image/*">
-                <button onclick="uploadEventPic()">Upload</button>                <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="showPic()"></div>
                 <div style="text-align: center;">
+                    <br>
                     <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
@@ -301,18 +301,6 @@
 <script>
       let loading = document.getElementById("loadingPopup");
 
-        var firebaseConfig = {
-            apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
-          authDomain: "universe-fct.firebaseapp.com",
-          databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "universe-fct",
-          storageBucket: "gs://universe-fct.appspot.com",
-          messagingSenderId: "493010584500",
-          appId: "1:493010584500:web:9c958f30725cd60533a8e1",
-          measurementId: "G-XB1FHSZ4M0"
-          };
-            // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
 
       function loadingPopupOn(){
            loading.classList.add("openLoadingPopup");
@@ -449,39 +437,27 @@
         queryEventsWithDates(d1,d2);
       }
 
-       function uploadEventPic() {
-    var file = document.getElementById("eventPic").files[0];
-    var storageRef = firebase.storage().ref();
-    var eventPicRef = storageRef.child("Eventos/" + file.name);
-
-    eventPicRef.put(file).then(function(snapshot) {
-      console.log("Event picture uploaded successfully!");
-    }).catch(function(error) {
-      console.error("Error uploading event picture:", error);
-    });
-  }
-
-    function updateEventPic() {
+        function showPic() {
         let selectedFile = document.getElementById("eventPic").files[0];
         if(selectedFile.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-            document.getElementById("eventPic").value = "";
+            document.getElementById("newsPic").value = "";
         }
         else{
             document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
         }
-    }
+      }
 
-    function updateEventPicMod() {
+      function showPicMod() {
         let selectedFile2 = document.getElementById("eventPicMod").files[0];
         if(selectedFile2.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-            document.getElementById("eventPicMod").value = "";
+            document.getElementById("newsPic").value = "";
         }
         else{
             document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
         }
-    }
+      }
 </script>
 
 </body>
