@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title> Eventos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-storage.js"></script>
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -134,8 +136,8 @@
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
                 </div> <br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="updateEventPic()"></div>
-                <br>
+                <input type="file" id="eventPic" accept="image/*">
+                <button onclick="uploadEventPic()">Upload</button>                <br>
                 <div style="text-align: center;">
                     <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
@@ -299,6 +301,19 @@
 <script>
       let loading = document.getElementById("loadingPopup");
 
+        var firebaseConfig = {
+            apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
+          authDomain: "universe-fct.firebaseapp.com",
+          databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "universe-fct",
+          storageBucket: "gs://universe-fct.appspot.com",
+          messagingSenderId: "493010584500",
+          appId: "1:493010584500:web:9c958f30725cd60533a8e1",
+          measurementId: "G-XB1FHSZ4M0"
+          };
+            // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
       function loadingPopupOn(){
            loading.classList.add("openLoadingPopup");
       }
@@ -433,6 +448,18 @@
         }
         queryEventsWithDates(d1,d2);
       }
+
+       function uploadEventPic() {
+    var file = document.getElementById("eventPic").files[0];
+    var storageRef = firebase.storage().ref();
+    var eventPicRef = storageRef.child("Eventos/" + file.name);
+
+    eventPicRef.put(file).then(function(snapshot) {
+      console.log("Event picture uploaded successfully!");
+    }).catch(function(error) {
+      console.error("Error uploading event picture:", error);
+    });
+  }
 
     function updateEventPic() {
         let selectedFile = document.getElementById("eventPic").files[0];
