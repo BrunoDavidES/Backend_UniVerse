@@ -602,13 +602,11 @@ function getNews(){
     request.send(JSON.stringify(data));
 }
 
-function clearListNews(c1, c2){
-    clearList(c1,c2);
-    queryNewsCursor = "EMPTY";
-}
-
 var queryNewsCursor = "EMPTY";
 function queryNews(){
+    if (queryNewsCursor == null)
+        queryNewsCursor = "EMPTY";
+
     var list = document.getElementById('listOfNews');
     var limit = parseInt(document.getElementById("listLimitId").value);
     var data = {};
@@ -665,6 +663,11 @@ function queryNews(){
             queryNewsCursor = request.getResponseHeader("X-Cursor");
         }
     }
+}
+
+function clearListNews(c1, c2){
+    clearList(c1,c2);
+    queryNewsCursor = "EMPTY";
 }
 
 //USERS
@@ -736,6 +739,9 @@ function clearListUsers(c1, c2){
 
 var queryUsersCursor = "EMPTY";
 function queryUsers(){
+    if (queryUsersCursor == null){
+        queryUsersCursor = "EMPTY";
+    }
     var list = document.getElementById("listOfUsers");
     var limit = document.getElementById("listLimitId").value;
 
@@ -927,6 +933,10 @@ function clearListReports(c1, c2){
 
 var queryReportsCursor = "EMPTY";
 function queryReports(){
+    if(queryReportsCursor == null){
+        queryReportsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfReports");
 
@@ -1003,6 +1013,10 @@ function clearListUnresReports(c1, c2){
 
 var queryUnresolvedReportsCursor = "EMPTY";
 function queryUnresolvedReports(){
+    if (queryUnresolvedReportsCursor == null){
+        queryUnresolvedReportsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("unResListLimitId").value;
     var list = document.getElementById("listOfUnresReports");
 
@@ -1278,6 +1292,10 @@ function clearListDepartments(c1, c2){
 
 var queryDepartmentsCursor = "EMPTY";
 function queryDepartments(){
+    if (queryDepartmentsCursor == null){
+        queryDepartmentsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfDepartments");
 
@@ -1560,6 +1578,10 @@ function clearListNucleus(c1, c2){
 
 var queryNucleusCursor = "EMPTY";
 function queryNucleus(){
+    if (queryNucleusCursor == null){
+        queryNucleusCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfNucleus");
 
