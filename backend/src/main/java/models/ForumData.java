@@ -1,6 +1,7 @@
 package models;
 
 public class ForumData {
+    private String forumID;
     private String name;
     private String password;
     private String title;
@@ -11,6 +12,14 @@ public class ForumData {
 
     public boolean validate() {
         return name != null;
+    }
+
+    public String getForumID() {
+        return forumID;
+    }
+
+    public void setForumID(String forumID) {
+        this.forumID = forumID;
     }
 
     public String getName() {
