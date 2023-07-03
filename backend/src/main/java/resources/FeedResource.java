@@ -98,11 +98,29 @@ public class FeedResource {
 
             if (kind.equals(NEWS) && !role.equals(BO) & !role.equals(ADMIN) & !role.equals(TEACHER) & !role.equals(STUDENT)){
                 LOG.warning("No permission to post news.");
-                return Response.status(Response.Status.FORBIDDEN).entity("No permission to post news.").build();
+                return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
             Transaction txn = datastore.newTransaction();
             try {
+                if (role.equals(TEACHER)){
+                    Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
+                    Entity teacher = txn.get(teacherKey);
+
+                    if (!teacher.getString("department").equals(data.department)){
+                        LOG.warning("No permission to post an Event in that department");
+                        return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event in that department.").build();
+                    }
+                }
+                else if(!data.department.equals("")){
+                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+                    if (txn.get(departmentKey) == null) {
+                        txn.rollback();
+                        LOG.warning(WRONG_DEPARTMENT);
+                        return Response.status(Response.Status.FORBIDDEN).entity(WRONG_DEPARTMENT).build();
+                    }
+                }
+
                 Key feedKey;
                 Entity entry;
                 String id;
@@ -204,8 +222,17 @@ public class FeedResource {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
-            }else {
+            }
+            else {
+                if(!data.department.equals("")){
+                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+                    if (txn.get(departmentKey) == null){
+                        txn.rollback();
+                        LOG.warning(WRONG_DEPARTMENT);
+                        return Response.status(Response.Status.FORBIDDEN).entity(WRONG_DEPARTMENT).build();
 
+                    }
+                }
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals(EVENT)) { //construtor de eventos
                     newEntry.set("title", data.title)
@@ -230,7 +257,8 @@ public class FeedResource {
                 txn.commit();
                 return Response.ok().build();
             }
-        } finally {
+        }
+        finally {
             if (txn.isActive()) {
                 txn.rollback();
             }

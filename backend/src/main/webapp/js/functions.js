@@ -238,7 +238,7 @@ function getEvent(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -555,7 +555,7 @@ function getNews(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -865,7 +865,7 @@ var id = document.getElementById("idReport").value;
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -1405,7 +1405,7 @@ function getNucleus() {
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {

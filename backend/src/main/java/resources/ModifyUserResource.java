@@ -55,6 +55,7 @@ public class ModifyUserResource {
     private static final String NICE_TRY = "Nice try but your not a capi person.";
     private static final String PERMISSION_DENIED = "Permission denied.";
     private static final String DEPARTMENT = "Department";
+    private static final String NUCLEUS = "Nucleus";
     private static final String WRONG_PRESIDENT = "President doesn't exists.";
     private static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
     private static final String WRONG_DEPARTMENT = "Department does not exist.";
@@ -93,8 +94,8 @@ public class ModifyUserResource {
                 }
             }
             if(!data.nucleus.equals("")){
-                Key nucleustKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.nucleus);
-                Entity nucleus = txn.get(nucleustKey);
+                Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.nucleus);
+                Entity nucleus = txn.get(nucleusKey);
                 if( nucleus == null ) {
                     txn.rollback();
                     LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
@@ -105,7 +106,8 @@ public class ModifyUserResource {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
                 return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim(USER_CLAIM).toString()).build();
-            } else {
+            }
+            else {
                 Entity newUser = Entity.newBuilder(user)
                         .set("name", data.name)
                         .set("status", data.status)
@@ -198,8 +200,10 @@ public class ModifyUserResource {
             }
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(String.valueOf(token.getClaim(USER_CLAIM)).replaceAll("\"", ""));
             Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
+            Entity department = txn.get(departmentKey);
 
             //Falta criar token novo e apagar o antigo
 
@@ -212,7 +216,12 @@ public class ModifyUserResource {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
-            } else {
+            } else
+            if (department == null) {
+                txn.rollback();
+                LOG.warning(WRONG_DEPARTMENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+            }else {
                 Entity.Builder newUser = Entity.newBuilder(target);
 
                 newUser.set("role", data.newRole)
