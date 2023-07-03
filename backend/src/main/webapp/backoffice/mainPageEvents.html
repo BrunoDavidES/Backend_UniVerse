@@ -199,10 +199,10 @@
                     <div class="cut cut"></div>
                     <label id="departmentModLbl" for="department" class="placeholder">Departamento</label>
                 </div><br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="updateEventPicMod()"></div>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="showPicMod()"></div>
                 <br>
                 <div style="text-align: center;">
-                    <img src="" alt="Event Picture" class="eventPhoto">
+                    <img src="" alt="Event Picture" class="eventPhotoMod">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label id="capacityLbl" for="title">Capacidade máxima do Evento</label>
@@ -441,7 +441,7 @@
         let selectedFile = document.getElementById("eventPic").files[0];
         if(selectedFile.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-            document.getElementById("newsPic").value = "";
+            document.getElementById("eventPic").value = "";
         }
         else{
             document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
@@ -452,10 +452,10 @@
         let selectedFile2 = document.getElementById("eventPicMod").files[0];
         if(selectedFile2.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-            document.getElementById("newsPic").value = "";
+            document.getElementById("eventPicMod").value = "";
         }
         else{
-            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+            document.getElementsByClassName("eventPhotoMod")[0].src = URL.createObjectURL(selectedFile2);
         }
       }
 </script>

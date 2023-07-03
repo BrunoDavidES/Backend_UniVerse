@@ -91,15 +91,15 @@ function uploadEventPic(filename) {
 }
 
 
-function updateEventPicMod() {
+function updateEventPicMod(filename) {
      var file = document.getElementById("eventPicMod").files[0];
      if(file.size > 8500000){
         alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-        document.getElementById("eventPic").value = "";
+        document.getElementById("eventPicMod").value = "";
      }
      else{
         var storageRef = firebase.storage().ref();
-        var eventPicRef = storageRef.child("Eventos/" + file.name);
+        var eventPicRef = storageRef.child("Eventos/" + filename);
 
         eventPicRef.put(file).then(function(snapshot) {
             console.log("Event picture uploaded successfully!");
@@ -197,6 +197,7 @@ function editEvent(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
+            updateEventPicMod(id);
             console.log("SUCCESS");
         }
         else if (request.readyState === 4) {
