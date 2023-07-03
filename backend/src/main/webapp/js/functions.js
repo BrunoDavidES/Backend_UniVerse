@@ -537,6 +537,7 @@ function editNews(){
     if (title !== "") {
         data["title"] = title;
     }
+    alert(title);
 
     var request = new XMLHttpRequest();
     request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
@@ -660,7 +661,7 @@ function getNews(){
                         }
                         else {
                             console.log(request.responseText);
-                            alert.log("Wrong ID for News");
+                            alert("Bucket failed");
                         }
                     }
                 }
@@ -668,7 +669,7 @@ function getNews(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("ALGUMA COISA FALHOU");
+                alert("ALGUMA COISA FALHOU");
             }
         }
     }
@@ -984,7 +985,7 @@ var id = document.getElementById("idReport").value;
                         }
                         else {
                             console.log(request.responseText);
-                            alert.log("Wrong ID for News");
+                            alert("Wrong ID for News");
                         }
                     }
                 }
@@ -992,7 +993,7 @@ var id = document.getElementById("idReport").value;
             }
             else {
                 console.log(request.responseText);
-                alert.log("ALGUMA COISA FALHOU");
+                alert("ALGUMA COISA FALHOU");
             }
         }
     }
@@ -1072,7 +1073,7 @@ function queryReports(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
@@ -1152,7 +1153,7 @@ function queryUnresolvedReports(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
@@ -1178,7 +1179,7 @@ function reportStatus(){
             else {
                 console.log(request.responseText);
                 console.log("FAIL");
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     };
@@ -1435,7 +1436,7 @@ function queryDepartments(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
@@ -1448,8 +1449,8 @@ var data = {
         "id": document.getElementById("idNuc").value,
         "name": document.getElementById("nameNuc").value,
         "nucleusEmail": document.getElementById("email").value,
-        "president": document.getElementById("pres").value
-
+        "president": document.getElementById("pres").value,
+        "location":document.getElementById("location").value
     };
 
     if (document.getElementById("description").value !== "") {
@@ -1510,6 +1511,7 @@ function getNucleus() {
                    name: entity.properties.name,
                    email: entity.properties.email,
                    president: entity.properties.president,
+                   location: entity.properties.location,
                    description: entity.properties.description,
                    facebook: entity.properties.facebook,
                    instagram: entity.properties.instagram,
@@ -1524,6 +1526,7 @@ function getNucleus() {
                document.getElementById("nameMod").value = entity.name.value;
                document.getElementById("emailMod").value = entity.email.value;
                document.getElementById("presMod").value = entity.president.value;
+               document.getElementById("locationMod").value = entity.location.value;
                document.getElementById("descriptionMod").value = entity.description.value;
                document.getElementById("facebookMod").value = entity.facebook.value;
                document.getElementById("instagramMod").value = entity.instagram.value;
@@ -1549,6 +1552,7 @@ function editNucleus(){
     var email = document.getElementById("emailMod").value;
     var name = document.getElementById("nameMod").value;
     var president = document.getElementById("presMod").value;
+    var location = document.getElementById("locationMod").value;
     var description = document.getElementById("descriptionMod").value;
     var facebook = document.getElementById("facebookMod").value;
     var instagram = document.getElementById("instagramMod").value;
@@ -1572,6 +1576,10 @@ function editNucleus(){
     if (president !== "") {
             data["president"] = president;
     }
+
+    if (location !== "") {
+                data["location"] = location;
+        }
 
     if (description !== "") {
             data["description"] = description;

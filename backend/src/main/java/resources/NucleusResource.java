@@ -223,7 +223,7 @@ public class NucleusResource {
                         .build();
                 txn.update(newPreviousPresident);
 
-                Entity newPresident = Entity.newBuilder(presidentKey)
+                Entity newPresident = Entity.newBuilder(president)
                         .set("nucleus", data.id)
                         .set("nucleus_job", "Presidente")
                         .build();
