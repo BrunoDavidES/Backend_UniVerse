@@ -121,7 +121,7 @@
                     <div class="cut"></div>
                     <label for="author" class="placeholder">Autor da Notícia</label>
                 </div> <br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPic" accept="image/*" onchange="updateNewsPic()"></div>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPic" accept="image/*" onchange="showPic()"></div>
                 <br>
                 <div style="text-align: center;">
                     <img src="" alt="News Picture" class="eventPhoto">
@@ -158,7 +158,7 @@
                     <div class="cut"></div>
                     <label id="authorModLbl" for="author" class="placeholder">Autor da Notícia</label>
                 </div> <br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPicMod" accept="image/*" onchange="updateNewsPicMod()"></div>
+                <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPicMod" accept="image/*" onchange="showPicMod()"></div>
                 <br>
                 <div style="text-align: center;">
                     <img src="" alt="News Picture" class="eventPhotoMod">
@@ -177,7 +177,7 @@
                 <div class="title">Validar Notícia</div>
                 <div class="subtitle">Vamos validar uma notícia específica!</div>
                 <div class="input-container ic1">
-                    <input id="idEventValidate" class="input" type="text" placeholder=" "/>
+                    <input id="idNewsValidate" class="input" type="text" placeholder=" "/>
                     <div class="cut"></div>
                     <label for="title" class="placeholder">Id da Notícia</label>
                 </div>
@@ -364,7 +364,7 @@
         queryNewsWithDates(d1,d2);
       }
 
-      function updateNewsPic() {
+      function showPic() {
         let selectedFile = document.getElementById("newsPic").files[0];
         if(selectedFile.size > 5242880){
             alert('Ficheiro demasiado pesado (máximo de 5 MB)');
@@ -375,11 +375,11 @@
         }
       }
 
-      function updateNewsPicMod() {
+      function showPicMod() {
         let selectedFile2 = document.getElementById("newsPicMod").files[0];
         if(selectedFile2.size > 5242880){
             alert('Ficheiro demasiado pesado (máximo de 5 MB)');
-            document.getElementById("newsPic").value = "";
+            document.getElementById("newsPicMod").value = "";
         }
         else{
             document.getElementsByClassName("eventPhotoMod")[0].src = URL.createObjectURL(selectedFile2);

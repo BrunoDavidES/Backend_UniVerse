@@ -82,7 +82,7 @@ public class FeedData {
         else if (Integer.parseInt(capacity) < 2) return false;
 
         if (validated_backoffice == null){
-            validated_backoffice = entry.getString("isItPaid");
+            validated_backoffice = entry.getString("validated_backoffice");
         }
         else if (!validated_backoffice.equals("true") && !validated_backoffice.equals("false")) return false;
 

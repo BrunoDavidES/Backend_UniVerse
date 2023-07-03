@@ -243,6 +243,7 @@ public class FeedResource {
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
                     newEntry.set("title", data.title)
+                            .set("validated_backoffice", data.validated_backoffice)
                             .set("time_lastupdated", Timestamp.now());
 
                 }

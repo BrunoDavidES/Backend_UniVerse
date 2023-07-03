@@ -409,7 +409,7 @@ function uploadNewsPic(filename) {
         var eventPicRef = storageRef.child("News/" + filename);
 
         eventPicRef.put(file).then(function(snapshot) {
-            console.log("Event picture uploaded successfully!");
+            console.log("News picture uploaded successfully!");
         }).catch(function(error) {
             console.error("Error uploading event picture:", error);
         });
@@ -429,7 +429,7 @@ function updateNewsPicMod(filename) {
         var eventPicRef = storageRef.child("News/" + filename);
 
         eventPicRef.put(file).then(function(snapshot) {
-            console.log("Event picture uploaded successfully!");
+            console.log("News picture uploaded successfully!");
         }).catch(function(error) {
             console.error("Error uploading event picture:", error);
         });
@@ -544,7 +544,7 @@ function editNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ){
             if (request.status === 200) {
-
+                updateNewsPicMod(id);
                 if ( text !== localStorage.getItem(id) ){
 
                     var bucketPOSTRequest = new XMLHttpRequest();
@@ -554,7 +554,6 @@ function editNews(){
                     bucketPOSTRequest.onreadystatechange  = function() {
                         if (bucketPOSTRequest.readyState == 4){
                             if (bucketPOSTRequest.status == 200){
-                                updateNewsPicMod(id);
                                 console.log("SUCCESS");
                                 localStorage.removeItem(id);
                             }
@@ -591,6 +590,7 @@ function deleteNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ) {
             if ( request.status === 200 ) {
+                deleteNewsPic(id);
                 var bucketDELETERequest = new XMLHttpRequest();
 
                 bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
@@ -599,7 +599,7 @@ function deleteNews(){
                 bucketDELETERequest.onreadystatechange = function() {
                     if ( bucketDELETERequest.readyState === 4 ) {
                         if ( bucketDELETERequest.status === 200 ) {
-                            deleteNewsPic(id);
+
                             console.log("SUCCESS");
                         }
                         else{
