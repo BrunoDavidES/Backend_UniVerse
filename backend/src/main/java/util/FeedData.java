@@ -28,6 +28,8 @@ public class FeedData {
 
     // News only attributes
 
+    public String authorNameByBO;
+
     public boolean validate(String kind) {
         if (title == null)
             return false;
@@ -46,7 +48,6 @@ public class FeedData {
 
         if (kind.equals("News"))
             return true;
-
 
         //Decidir formato das datas
         if (startDate == null){

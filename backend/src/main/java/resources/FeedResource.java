@@ -229,22 +229,13 @@ public class FeedResource {
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
             }
             else {
-                if(!data.department.equals("")){
-                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
-                    if (txn.get(departmentKey) == null){
-                        txn.rollback();
-                        LOG.warning(WRONG_DEPARTMENT);
-                        return Response.status(Response.Status.FORBIDDEN).entity(WRONG_DEPARTMENT).build();
 
-                    }
-                }
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals(EVENT)) { //construtor de eventos
                     newEntry.set("title", data.title)
                             .set("startDate", data.startDate)
                             .set("endDate", data.endDate)
                             .set("location", data.location)
-                            .set("department", data.department)
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
