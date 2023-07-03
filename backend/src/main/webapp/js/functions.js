@@ -477,7 +477,7 @@ function postNews(){
                 bucketRequest.onreadystatechange  = function() {
                     if (bucketRequest.readyState === 4 ) {
                         if (bucketRequest.status === 200 ){
-                            console.alert(request.responseText);
+                            alert(request.responseText);
                             uploadNewsPic(request.responseText);
                             console.log("SUCCESS");
                         }
@@ -491,7 +491,7 @@ function postNews(){
                 bucketRequest.send(document.getElementById("text").value);
             }
             else {
-                console.alert(request.responseText);
+                alert(request.responseText);
                 console.log("FAIL");
             }
         }
