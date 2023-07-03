@@ -2,6 +2,7 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.Transaction;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -77,20 +78,23 @@ public class ForumResource {
             forumsRef.child(forumID).child("updated").setValueAsync(date);
             forumsRef.child(forumID).child("members").child(userID.replace(".", "-")).setValueAsync(memberData);
 
-            memberData.replace("name", data.getName());
-
-            firebaseDatabase.getReference("users")
-                    .child(userID.replace(".", "-"))
-                    .child("forums")
-                    .child(forumID)
-                    .setValueAsync(memberData);
-
             Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
                     .set("password", data.getPassword())
                     .build();
             txn.add(forum);
+
+            Key userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+
+            Entity userForums = Entity.newBuilder(userForumsKey)
+                    .set("name", data.getName())
+                    .set("role", ADMIN)
+                    .build();
+            txn.add(userForums);
             txn.commit();
 
             LOG.info("Forum created");
@@ -120,30 +124,39 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String forumRole = getForumRole(forumID, userID);
-
-        /*
-        if (!forumRole.equals(ADMIN)) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
 
         Transaction txn = datastore.newTransaction();
         try {
-            firebaseDatabase.getReference("forums").child(forumID).removeValueAsync();
+            Key key = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String forumRole = txn.get(key).getString("role");
 
-            List<String> membersIDs = getForumMembers(forumID);
-
-            for(String memberID: membersIDs) {
-                firebaseDatabase.getReference("users")
-                        .child(memberID)
-                        .child("forums")
-                        .child(forumID)
-                        .removeValueAsync();
+            if (!forumRole.equals(ADMIN)) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
 
-            Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
-            txn.delete(forumKey);
+            firebaseDatabase.getReference("forums").child(forumID).removeValueAsync();
+
+            key = datastore.newKeyFactory()
+                    .setKind("Forum")
+                    .newKey(forumID);
+
+            Query<Entity> query = Query.newEntityQueryBuilder()
+                    .setKind("User_Forums")
+                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
+                    .build();
+
+            QueryResults<Entity> results = datastore.run(query);
+            while (results.hasNext()) {
+                Entity entity = results.next();
+                datastore.delete(entity.getKey());
+            }
+
+            key = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
+            txn.delete(key);
             txn.commit();
 
             LOG.info("Forum deleted");
@@ -174,15 +187,21 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String forumRole = getForumRole(forumID, userID);
 
-        /*
-        if (!forumRole.equals(ADMIN)) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key key = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String forumRole = txn.get(key).getString("role");
+            txn.commit();
+
+            if (!forumRole.equals(ADMIN)) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
             Date currentDate = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
@@ -195,8 +214,13 @@ public class ForumResource {
             LOG.info("Forum updated");
             return Response.ok(forumID).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error updating forum");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -215,15 +239,21 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String forumRole = getForumRole(forumID, userID);
 
-        /*
-        if (!forumRole.equals(ADMIN) || !forumRole.equals(ASSISTANT) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key key = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String forumRole = txn.get(key).getString("role");
+            txn.commit();
+
+            if (!forumRole.equals(ADMIN)) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
             Date currentDate = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
@@ -232,17 +262,33 @@ public class ForumResource {
             Map<String, Object> postData = new HashMap<>();
             postData.put("author", decodedToken.getName());
             postData.put("message", data.getPost());
-            postData.put("creation", date);
+            postData.put("posted", date);
 
             DatabaseReference forumRef = firebaseDatabase.getReference("forums").child(forumID).child("feed");
             String postID = forumRef.push().getKey();
             forumRef.child(postID).setValueAsync(postData);
 
+            key = datastore.newKeyFactory()
+                    .setKind("Forum_Posts")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(postID);
+
+            Entity post = Entity.newBuilder(key)
+                    .set("author", userID)
+                    .build();
+            txn.add(post);
+            txn.commit();
+
             LOG.info("Posted to forum");
             return Response.ok(postID).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error posting to forum");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -262,13 +308,21 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String author = getPostAuthor(forumID, postID);
 
-        if(!userID.equals(author)) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key key = datastore.newKeyFactory()
+                    .setKind("Forum_Posts")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(postID);
+            String author = txn.get(key).getString("author");
+            txn.commit();
+
+            if(!userID.equals(author)) {
+                LOG.warning("Author: " + author);
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+            }
+
             Date currentDate = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
@@ -284,8 +338,13 @@ public class ForumResource {
             LOG.info("Edited post");
             return Response.ok(author).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error editing post");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -304,14 +363,26 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String forumRole = getForumRole(forumID, userID);
-        String author = getPostAuthor(forumID, postID);
 
-        if(!userID.equals(author) || !forumRole.equals(ADMIN)) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
-        }
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key key = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String forumRole = txn.get(key).getString("role");
+
+            key = datastore.newKeyFactory()
+                    .setKind("Forum_Posts")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(postID);
+            String author = txn.get(key).getString("author");
+            txn.commit();
+
+            if(!userID.equals(author) || !forumRole.equals(ADMIN)) {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
+            }
+
             firebaseDatabase.getReference("forums")
                     .child(forumID)
                     .child("feed")
@@ -321,8 +392,13 @@ public class ForumResource {
             LOG.info("Removed post");
             return Response.ok(author).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error removing post");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -342,24 +418,36 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String userRole = getForumRole(forumID, userID);
-        String memberRole = getForumRole(forumID, memberID);
 
-        if (!userRole.equals(ADMIN)) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        String promotedRole;
-        if(memberRole.equals("MEMBER")) {
-            promotedRole = "ASSISTANT";
-        } else if(memberRole.equals("ASSISTANT")) {
-            promotedRole = "ADMIN";
-        } else {
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String userRole = txn.get(userForumsKey).getString("role");
+
+            userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(memberID);
+            Entity member = txn.get(userForumsKey);
+            String memberRole = member.getString("role");
+
+            if (!userRole.equals(ADMIN)) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            String promotedRole;
+            if(memberRole.equals("MEMBER")) {
+                promotedRole = "ASSISTANT";
+            } else if(memberRole.equals("ASSISTANT")) {
+                promotedRole = "ADMIN";
+            } else {
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
             firebaseDatabase.getReference("forums")
                     .child(forumID)
                     .child("members")
@@ -367,18 +455,22 @@ public class ForumResource {
                     .child("role")
                     .setValueAsync(promotedRole);
 
-            firebaseDatabase.getReference("users")
-                    .child(userID.replace(".", "-"))
-                    .child("forums")
-                    .child(forumID)
-                    .child("role")
-                    .setValueAsync(promotedRole);
+            member = Entity.newBuilder(member)
+                    .set("role", promotedRole)
+                    .build();
+            txn.put(member);
+            txn.commit();
 
             LOG.info("Member promoted");
             return Response.ok(userRole).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error promoting member");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -398,24 +490,36 @@ public class ForumResource {
         }
 
         String userID = decodedToken.getUid();
-        String userRole = getForumRole(forumID, userID);
-        String memberRole = getForumRole(forumID, memberID);
 
-        if (!userRole.equals(ADMIN)) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        String demotedRole;
-        if(memberRole.equals("ASSISTANT")) {
-            demotedRole = "MEMBER";
-        } else if(memberRole.equals("ADMIN")) {
-            demotedRole = "ASSISTANT";
-        } else {
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
+        Transaction txn = datastore.newTransaction();
         try {
+            Key userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            String userRole = txn.get(userForumsKey).getString("role");
+
+            userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(memberID);
+            Entity member = txn.get(userForumsKey);
+            String memberRole = member.getString("role");
+
+            if (!userRole.equals(ADMIN)) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            String demotedRole;
+            if(memberRole.equals("ASSISTANT")) {
+                demotedRole = "MEMBER";
+            } else if(memberRole.equals("ADMIN")) {
+                demotedRole = "ASSISTANT";
+            } else {
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
             firebaseDatabase.getReference("forums")
                     .child(forumID)
                     .child("members")
@@ -423,18 +527,22 @@ public class ForumResource {
                     .child("role")
                     .setValueAsync(demotedRole);
 
-            firebaseDatabase.getReference("users")
-                    .child(userID.replace(".", "-"))
-                    .child("forums")
-                    .child(forumID)
-                    .child("role")
-                    .setValueAsync(demotedRole);
+            member = Entity.newBuilder(member)
+                    .set("role", demotedRole)
+                    .build();
+            txn.put(member);
+            txn.commit();
 
             LOG.info("Member demoted");
             return Response.ok(userRole).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error demoting member");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -479,7 +587,7 @@ public class ForumResource {
             // NEED TO CHANGE ONLY FOR TESTING
             Map<String, Object> memberData = new HashMap<>();
             memberData.put("name", userName);
-            memberData.put("role", "ADMIN");
+            memberData.put("role", "MEMBER");
             memberData.put("joined", date);
 
             firebaseDatabase.getReference("forums")
@@ -488,13 +596,16 @@ public class ForumResource {
                     .child(userID.replace(".", "-"))
                     .setValueAsync(memberData);
 
-            memberData.replace("name", data.getName());
+            Key userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
 
-            firebaseDatabase.getReference("users")
-                    .child(userID.replace(".", "-"))
-                    .child("forums")
-                    .child(forumID)
-                    .setValueAsync(memberData);
+            Entity userForums = Entity.newBuilder(userForumsKey)
+                    .set("name", data.getName())
+                    .set("role", "MEMBER")
+                    .build();
+            txn.add(userForums);
 
             LOG.info("Member joined forum");
             return Response.ok(forumID).build();
@@ -530,99 +641,31 @@ public class ForumResource {
 
         String userID = decodedToken.getUid();
 
+        Transaction txn = datastore.newTransaction();
         try {
             firebaseDatabase.getReference("forums")
                     .child(forumID).child("members")
                     .child(userID.replace(".", "-"))
                     .removeValueAsync();
 
-            firebaseDatabase.getReference("users")
-                    .child(userID.replace(".", "-"))
-                    .child("forums")
-                    .child(forumID)
-                    .removeValueAsync();
+            Key userForumsKey = datastore.newKeyFactory()
+                    .setKind("User_Forums")
+                    .addAncestors(PathElement.of("Forum", forumID))
+                    .newKey(userID);
+            txn.delete(userForumsKey);
+            txn.commit();
 
             LOG.info("Member left forum");
             return Response.ok(forumID).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error leaving forum");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
-    }
-
-    private String getForumRole(String forumID, String userID) {
-        final String[] role = new String[1];
-
-        firebaseDatabase.getReference("forums")
-                .child(forumID)
-                .child("members")
-                .child(userID.replace(".", "-"))
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            role[0] = dataSnapshot.child("role").getValue(String.class);
-                        } else {
-                            role[0] = null;
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        role[0] = null;
-                    }
-                });
-        return role[0];
-    }
-
-    private List<String> getForumMembers(String forumID) {
-        final List<String> members = new ArrayList<>();
-
-        firebaseDatabase.getReference("forums")
-                .child(forumID)
-                .child("members")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot memberSnapshot : dataSnapshot.getChildren()) {
-                                String memberID = memberSnapshot.getKey();
-                                members.add(memberID);
-
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-        return members;
-    }
-
-    private String getPostAuthor(String forumID, String postID) {
-        final String[] author = new String[1];
-
-        firebaseDatabase.getReference("forums")
-                .child(forumID)
-                .child("feed")
-                .child(postID)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            author[0] = dataSnapshot.child("author").getValue(String.class);
-                        } else {
-                            author[0] = null;
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        author[0] = null;
-                    }
-                });
-        return author[0];
     }
 
 
