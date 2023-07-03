@@ -159,7 +159,7 @@
                 <div class="subtitle" style="margin-left: 10px;">Imagem da Notícia &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="newsPicMod" accept="image/*" onchange="updateNewsPicMod()"></div>
                 <br>
                 <div style="text-align: center;">
-                    <img src="" alt="News Picture" class="eventPhoto">
+                    <img src="" alt="News Picture" class="eventPhotoMod">
                 </div>
                 <div class="input-container2 ic2">
                     <textarea id="textMod" class="input" cols="40" rows="5"></textarea>
@@ -380,7 +380,7 @@
             document.getElementById("newsPic").value = "";
         }
         else{
-            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+            document.getElementsByClassName("eventPhotoMod")[0].src = URL.createObjectURL(selectedFile2);
         }
       }
 </script>

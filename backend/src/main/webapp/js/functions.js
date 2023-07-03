@@ -109,6 +109,21 @@ function updateEventPicMod(filename) {
      }
 }
 
+
+function deleteEventPic(filename) {
+  var storageRef = firebase.storage().ref();
+  var eventPicRef = storageRef.child("Eventos/" + filename);
+
+  eventPicRef
+    .delete()
+    .then(function() {
+      console.log("Event picture deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting event picture:", error);
+    });
+}
+
       //FEEDS
 
 //Events
@@ -208,26 +223,27 @@ function editEvent(){
     };
 }
 
-function deleteEvent(){
-    var id = document.getElementById("idEventDelete").value;
+function deleteEvent() {
+  var id = document.getElementById("idEventDelete").value;
 
-    var request = new XMLHttpRequest();
+  var request = new XMLHttpRequest();
 
-    request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
-    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(null));
-    request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-        }
-        else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
-        }
-    };
+  request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.send(JSON.stringify(null));
+  request.onreadystatechange = function() {
+    if (request.readyState === 4 && request.status === 200) {
+      console.log(request.responseText);
+      deleteEventPic(id); // Call the new function to delete the associated image
+      console.log("SUCCESS");
+    } else if (request.readyState === 4) {
+      console.log(request.responseText);
+      console.log("FAIL");
+      alert(request.responseText);
+    }
+  };
 }
+
 
 function getEvent(){
     var id = document.getElementById("idEventMod").value;
@@ -380,6 +396,63 @@ function validateEvent(){
 }
 
 //News
+
+
+function uploadNewsPic(filename) {
+    var file = document.getElementById("newsPic").files[0];
+    if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("newsPic").value = "";
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("News/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+    }
+
+}
+
+
+function updateNewsPicMod(filename) {
+     var file = document.getElementById("newsPicMod").files[0];
+     if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("newsPicMod").value = "";
+     }
+     else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("News/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+     }
+}
+
+
+function deleteNewsPic(filename) {
+  var storageRef = firebase.storage().ref();
+  var eventPicRef = storageRef.child("News/" + filename);
+
+  eventPicRef
+    .delete()
+    .then(function() {
+      console.log("Event picture deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting event picture:", error);
+    });
+}
+
+
+
 function postNews(){
 
     var data = {
@@ -404,6 +477,8 @@ function postNews(){
                 bucketRequest.onreadystatechange  = function() {
                     if (bucketRequest.readyState === 4 ) {
                         if (bucketRequest.status === 200 ){
+                            console.alert(request.responseText);
+                            uploadNewsPic(request.responseText);
                             console.log("SUCCESS");
                         }
                         else  {
@@ -484,6 +559,7 @@ function editNews(){
                     bucketPOSTRequest.onreadystatechange  = function() {
                         if (bucketPOSTRequest.readyState == 4){
                             if (bucketPOSTRequest.status == 200){
+                                updateNewsPicMod(id);
                                 console.log("SUCCESS");
                                 localStorage.removeItem(id);
                             }
@@ -528,6 +604,7 @@ function deleteNews(){
                 bucketDELETERequest.onreadystatechange = function() {
                     if ( bucketDELETERequest.readyState === 4 ) {
                         if ( bucketDELETERequest.status === 200 ) {
+                            deleteNewsPic(id);
                             console.log("SUCCESS");
                         }
                         else{
