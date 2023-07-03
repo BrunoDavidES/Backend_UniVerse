@@ -247,7 +247,6 @@ public class ForumResource {
                     .addAncestors(PathElement.of("Forum", forumID))
                     .newKey(userID);
             String forumRole = txn.get(key).getString("role");
-            txn.commit();
 
             if (!forumRole.equals(ADMIN)) {
                 LOG.warning(TOKEN_NOT_FOUND);
@@ -584,7 +583,6 @@ public class ForumResource {
             dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
             String date = dateFormat.format(currentDate);
 
-            // NEED TO CHANGE ONLY FOR TESTING
             Map<String, Object> memberData = new HashMap<>();
             memberData.put("name", userName);
             memberData.put("role", "MEMBER");
@@ -602,10 +600,11 @@ public class ForumResource {
                     .newKey(userID);
 
             Entity userForums = Entity.newBuilder(userForumsKey)
-                    .set("name", data.getName())
+                    .set("name", "Test")
                     .set("role", "MEMBER")
                     .build();
             txn.add(userForums);
+            txn.commit();
 
             LOG.info("Member joined forum");
             return Response.ok(forumID).build();
