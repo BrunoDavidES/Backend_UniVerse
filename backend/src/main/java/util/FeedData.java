@@ -27,7 +27,6 @@ public class FeedData {
     public String validated_backoffice;
 
     // News only attributes
-    public String authorNameByBO;
 
     public boolean validate(String kind) {
         if (title == null)
@@ -43,15 +42,11 @@ public class FeedData {
     public boolean validateEdit(Entity entry, String kind){
         if (title == null){
             title = entry.getString("title");
-        }
-        else if (title.equals("")) return false;
-
-        if(authorNameByBO == null){
-            authorNameByBO = entry.getString("authorName");
-        } else if (authorNameByBO.equals("")) return false;
+        } else if (title.equals("")) return false;
 
         if (kind.equals("News"))
             return true;
+
 
         //Decidir formato das datas
         if (startDate == null){

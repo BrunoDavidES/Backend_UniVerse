@@ -527,19 +527,14 @@ function validateNews(){
 
 function editNews(){
 
-    var id = document.getElementById("idEventMod").value;
+    var id = document.getElementById("idNewsMod").value;
     var title = document.getElementById("titleMod").value;
-    var authorName = document.getElementById("authorMod").value;
     var text = document.getElementById("textMod").value;
 
     var data = {};
 
     if (title !== "") {
         data["title"] = title;
-    }
-
-    if (authorName !== ""){
-        data["authorNameByBO"] = authorName;
     }
 
     var request = new XMLHttpRequest();
@@ -624,7 +619,7 @@ function deleteNews(){
 
 
 function getNews(){
-    var id = document.getElementById("idEventMod").value;
+    var id = document.getElementById("idNewsMod").value;
 
     var data = {
         "id":id
