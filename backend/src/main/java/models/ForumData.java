@@ -1,25 +1,16 @@
 package models;
 
 public class ForumData {
-    private String forumID;
     private String name;
     private String password;
-    private String title;
     private String description;
+    private String post;
 
     public ForumData() {
     }
 
     public boolean validate() {
         return name != null;
-    }
-
-    public String getForumID() {
-        return forumID;
-    }
-
-    public void setForumID(String forumID) {
-        this.forumID = forumID;
     }
 
     public String getName() {
@@ -38,19 +29,19 @@ public class ForumData {
         this.password = password;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getPost() {
+        return post;
+    }
+
+    public void setPost(String post) {
+        this.post = post;
     }
 }
