@@ -49,12 +49,12 @@ public class ForumResource {
         String adminName = decodedToken.getName();
         String adminRole = getRole(decodedToken);
 
-        String[] roles = {"ADMIN", "TEACHER", "BO", "D"};
+        /*String[] roles = {"ADMIN", "TEACHER", "BO", "D"};
 
         if (!Arrays.asList(roles).contains(adminRole)) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
+        }*/
 
         Transaction txn = datastore.newTransaction();
         try {
@@ -71,11 +71,11 @@ public class ForumResource {
             String forumID = forumsRef.push().getKey();
             forumsRef.child(forumID).child("name").setValueAsync(data.getName());
             forumsRef.child(forumID).child("creation").setValueAsync(date);
-            forumsRef.child(forumID).child("members").child(adminID).setValueAsync(memberData);
+            forumsRef.child(forumID).child("members").child(adminID.replace(".", "-")).setValueAsync(memberData);
 
             memberData.replace("name", data.getName());
 
-            firebaseDatabase.getReference("users").child(adminID).child("forums").child(forumID).setValueAsync(memberData);
+            firebaseDatabase.getReference("users").child(adminID.replace(".", "-")).child("forums").child(forumID).setValueAsync(memberData);
 
             Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
 
@@ -149,11 +149,11 @@ public class ForumResource {
 
             DatabaseReference forumsRef = firebaseDatabase.getReference("forums");
             String forumID = forumsRef.push().getKey();
-            forumsRef.child(forumID).child("members").child(userID).setValueAsync(memberData);
+            forumsRef.child(forumID).child("members").child(userID.replace(".", "-")).setValueAsync(memberData);
 
             memberData.replace("name", data.getName());
 
-            firebaseDatabase.getReference("users").child(userID).child("forums").child(forumID).setValueAsync(memberData);
+            firebaseDatabase.getReference("users").child(userID.replace(".", "-")).child("forums").child(forumID).setValueAsync(memberData);
 
             Key userForumKey = datastore.newKeyFactory().setKind("User_Forum")
                     .addAncestor(PathElement.of("Forum", forumID))
