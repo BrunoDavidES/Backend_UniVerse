@@ -111,10 +111,7 @@ public class ModifyUserResource {
                 Entity newUser = Entity.newBuilder(user)
                         .set("name", data.name)
                         .set("status", data.status)
-                        .set("department", data.department)
-                        .set("department_job", data.department_job) //VER QUAL O ROLE PARA VER O JOB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         .set("nucleus", data.nucleus)
-                        .set("nucleus_job", data.nucleus_job)
                         .set("license_plate", data.license_plate)
                         .set("time_lastupdate", Timestamp.now())
                         .build();

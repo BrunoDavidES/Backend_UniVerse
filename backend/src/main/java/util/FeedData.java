@@ -16,6 +16,8 @@ public class FeedData {
 
     public String department;
 
+    public String nucleus;
+
     public String isPublic;
 
     public String capacity;
@@ -31,17 +33,8 @@ public class FeedData {
         if (title == null)
             return false;
 
-        if (department == null)
-            this.department = "ᓚᘏᗢ  EMPTY  ᓚᘏᗢ";
-
-        if(isPublic == null)
-            this.isPublic = "No";
-
-        if(isItPaid == null)
-            this.isItPaid = "No";
-
         if(kind.equals("Event")) {
-            return startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
+            return ( (department != null && nucleus == null) || (department == null && nucleus != null) ) && isPublic != null && isItPaid != null && startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
         }
 
         return true;

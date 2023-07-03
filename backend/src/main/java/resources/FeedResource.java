@@ -91,33 +91,37 @@ public class FeedResource {
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
-            if (kind.equals(EVENT) && !role.equals(TEACHER) && !role.equals(BO) && !role.equals(ADMIN)){
+            if (kind.equals(EVENT) && !role.equals(TEACHER) && !role.equals(STUDENT) && !role.equals(BO) && !role.equals(ADMIN)){
                 LOG.warning("No permission to create an event.");
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
-            if (kind.equals(NEWS) && !role.equals(BO) & !role.equals(ADMIN) & !role.equals(TEACHER) & !role.equals(STUDENT)){
+            if (kind.equals(NEWS) && !role.equals(BO) && !role.equals(ADMIN)){
                 LOG.warning("No permission to post news.");
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
             Transaction txn = datastore.newTransaction();
             try {
-                if (role.equals(TEACHER)){
-                    Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
-                    Entity teacher = txn.get(teacherKey);
+                if (kind.equals(EVENT)) {
+                    if (role.equals(TEACHER)) {
+                        Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
+                        Entity teacher = txn.get(teacherKey);
 
-                    if (!teacher.getString("department").equals(data.department)){
-                        LOG.warning("No permission to post an Event in that department");
-                        return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event in that department.").build();
-                    }
-                }
-                else if(!data.department.equals("")){
-                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
-                    if (txn.get(departmentKey) == null) {
-                        txn.rollback();
-                        LOG.warning(WRONG_DEPARTMENT);
-                        return Response.status(Response.Status.FORBIDDEN).entity(WRONG_DEPARTMENT).build();
+                        if (!teacher.getString("department").equals(data.department)) {
+                            txn.rollback();
+                            LOG.warning("No permission to post an Event in that department");
+                            return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event in that department.").build();
+                        }
+                    } else if (role.equals(STUDENT)) {
+                        Key studentKey = datastore.newKeyFactory().setKind(USER).newKey(username);
+                        Entity student = txn.get(studentKey);
+
+                        if (!student.getString("nucleus").equals(data.nucleus) || !student.getString("nucleus_job").equals("President")) {
+                            txn.rollback();
+                            LOG.warning("No permission to post an Event in that nucleus");
+                            return Response.status(Response.Status.FORBIDDEN).entity("No permission to post an Event in that nucleus").build();
+                        }
                     }
                 }
 
@@ -197,6 +201,7 @@ public class FeedResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
+                txn.rollback();
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
@@ -282,6 +287,7 @@ public class FeedResource {
             DecodedJWT token = validator.checkToken(request);
 
             if (token == null) {
+                txn.rollback();
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
