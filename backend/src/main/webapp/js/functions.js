@@ -437,17 +437,23 @@ function updateNewsPicMod(filename) {
 }
 
 
-function deleteNewsPic(filename) {
+function deleteNewsFirebase(filename) {
   var storageRef = firebase.storage().ref();
-  var eventPicRef = storageRef.child("News/" + filename);
+  var newsPicRef = storageRef.child("News/" + filename);
+  var newsBodyRef = newsPic + ".txt";
 
-  eventPicRef
-    .delete()
-    .then(function() {
+  newsPicRef.delete().then(function() {
       console.log("Event picture deleted successfully!");
     })
     .catch(function(error) {
       console.error("Error deleting event picture:", error);
+    });
+
+  newsBodyRef.delete().then(function() {
+      console.log("News text body deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting news text body:", error);
     });
 }
 
@@ -469,9 +475,15 @@ function postNews(){
         if (request.readyState === 4 ) {
             if (request.status === 200){
                 var id = request.responseText;
-                var bucketRequest = new XMLHttpRequest();
 
-                bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true );
+                const textBody = document.getElementById("text").value;
+                const file = new Blob([textBody], { type: 'text/plain;charset=UTF-8' });
+
+                firebase.storage().ref().child("News/" + id + ".txt").put(file);
+                uploadNewsPic(request.responseText);
+/*                var bucketRequest = new XMLHttpRequest();
+
+                bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News/" + id + ".txt", true );
                 bucketRequest.setRequestHeader("Content-Type", "text/plain");
 
                 bucketRequest.onreadystatechange  = function() {
@@ -488,7 +500,7 @@ function postNews(){
                     }
                 };
 
-                bucketRequest.send(document.getElementById("text").value);
+                bucketRequest.send(document.getElementById("text").value); */
             }
             else {
                 alert(request.responseText);
@@ -548,7 +560,7 @@ function editNews(){
                 if ( text !== localStorage.getItem(id) ){
 
                     var bucketPOSTRequest = new XMLHttpRequest();
-                    bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                    bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News/" + id + ".txt");
                     bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
 
                     bucketPOSTRequest.onreadystatechange  = function() {
@@ -590,8 +602,12 @@ function deleteNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                deleteNewsPic(id);
-                var bucketDELETERequest = new XMLHttpRequest();
+                deleteNewsFirebase(id);
+
+/*                deleteNewsPic(id);
+                deleteNewsPic(id + ".txt");
+/*                var bucketDELETERequest = new XMLHttpRequest();
+
 
                 bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
                 bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
@@ -608,7 +624,7 @@ function deleteNews(){
                         }
                     }
                 }
-                bucketDELETERequest.send("");
+                bucketDELETERequest.send(""); */
             } else {
                 console.log("FAIL");
             }
