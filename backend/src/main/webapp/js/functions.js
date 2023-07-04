@@ -57,18 +57,18 @@ function logout(){
 }
 
 
-   var firebaseConfig = {
-          apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
-          authDomain: "universe-fct.firebaseapp.com",
-          databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "universe-fct",
-          storageBucket: "gs://universe-fct.appspot.com",
-          messagingSenderId: "493010584500",
-          appId: "1:493010584500:web:9c958f30725cd60533a8e1",
-          measurementId: "G-XB1FHSZ4M0"
-    };
-            // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+var firebaseConfig = {
+      apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
+      authDomain: "universe-fct.firebaseapp.com",
+      databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "universe-fct",
+      storageBucket: "gs://universe-fct.appspot.com",
+      messagingSenderId: "493010584500",
+      appId: "1:493010584500:web:9c958f30725cd60533a8e1",
+      measurementId: "G-XB1FHSZ4M0"
+};
+        // Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 
 function uploadEventPic(filename) {
@@ -79,7 +79,7 @@ function uploadEventPic(filename) {
     }
     else{
         var storageRef = firebase.storage().ref();
-        var eventPicRef = storageRef.child("Eventos/" + filename);
+        var eventPicRef = storageRef.child("Events/" + filename);
 
         eventPicRef.put(file).then(function(snapshot) {
             console.log("Event picture uploaded successfully!");
@@ -99,7 +99,7 @@ function updateEventPicMod(filename) {
      }
      else{
         var storageRef = firebase.storage().ref();
-        var eventPicRef = storageRef.child("Eventos/" + filename);
+        var eventPicRef = storageRef.child("Events/" + filename);
 
         eventPicRef.put(file).then(function(snapshot) {
             console.log("Event picture uploaded successfully!");
@@ -112,7 +112,7 @@ function updateEventPicMod(filename) {
 
 function deleteEventPic(filename) {
   var storageRef = firebase.storage().ref();
-  var eventPicRef = storageRef.child("Eventos/" + filename);
+  var eventPicRef = storageRef.child("Events/" + filename);
 
   eventPicRef
     .delete()
@@ -727,64 +727,6 @@ function getNews() {
     request.send(JSON.stringify(data));
 }
 
-
-/*
-function getNews(){
-    var id = document.getElementById("idNewsMod").value;
-
-    var data = {
-        "id":id
-    };
-
-    var request = new XMLHttpRequest();
-
-    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=EMPTY", true);
-    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    request.onreadystatechange = function() {
-        if ( request.readyState === 4 ) {
-            if ( request.status === 200 ) {
-                const response = JSON.parse(request.responseText);
-                const entities = response.map( function(entity) {
-                    return {
-                        title: entity.properties.title,
-                        authorName: entity.properties.authorName
-                    }
-                });
-
-                entities.forEach(function(entity) {
-                    document.getElementById("titleModLbl").innerHTML = "Título da Notícia: " + entity.title.value;
-                    document.getElementById("authorModLbl").innerHTML = "Autor da Notícia: " + entity.authorName.value;
-                });
-
-                var bucketGETRequest = new XMLHttpRequest();
-
-                bucketGETRequest.open("GET", "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt");
-                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
-
-                bucketGETRequest.onreadystatechange = function() {
-                    if ( bucketGETRequest.readyState === 4 ) {
-                        if ( bucketGETRequest.status === 200 ) {
-                            localStorage.setItem( id , bucketGETRequest.responseText );
-                            document.getElementById("textMod").value = bucketGETRequest.responseText;
-                        }
-                        else {
-                            console.log(request.responseText);
-                            alert("Bucket failed");
-                        }
-                    }
-                }
-                bucketGETRequest.send();
-            }
-            else {
-                console.log(request.responseText);
-                alert("ALGUMA COISA FALHOU");
-            }
-        }
-    }
-    request.send(JSON.stringify(data));
-}
-*/
 var queryNewsCursor = "EMPTY";
 function queryNews(){
     if (queryNewsCursor == null)
