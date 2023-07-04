@@ -119,7 +119,7 @@ public class ForumResource {
     @DELETE
     @Path("/{forumID}/delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createForum(@HeaderParam("Authorization") String token,
+    public Response deleteForum(@HeaderParam("Authorization") String token,
                                 @PathParam("forumID") String forumID) {
 
         LOG.fine("Attempt to delete forum: " + forumID);
@@ -238,7 +238,7 @@ public class ForumResource {
     @POST
     @Path("/{forumID}/post")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendMessage(@HeaderParam("Authorization") String token,
+    public Response postMessage(@HeaderParam("Authorization") String token,
                                 @PathParam("forumID") String forumID,
                                 ForumData data) {
 
@@ -361,7 +361,7 @@ public class ForumResource {
     @DELETE
     @Path("/{forumID}/{postID}/delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response removePost(@HeaderParam("Authorization") String token,
+    public Response deletePost(@HeaderParam("Authorization") String token,
                              @PathParam("forumID") String forumID,
                              @PathParam("postID") String postID) {
 
