@@ -81,6 +81,7 @@ public class ForumResource {
             Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
+                    .set("name", data.getName())
                     .set("password", data.getPassword())
                     .build();
             txn.add(forum);
@@ -422,7 +423,7 @@ public class ForumResource {
         try {
             Key userForumsKey = datastore.newKeyFactory()
                     .setKind("User_Forums")
-                    .addAncestors(PathElement.of("Forum", forumID))
+                    .addAncestors(PathElement.of("Forum", forumID), PathElement.of("User", userID))
                     .newKey(userID);
             String userRole = txn.get(userForumsKey).getString("role");
 
@@ -594,13 +595,16 @@ public class ForumResource {
                     .child(userID.replace(".", "-"))
                     .setValueAsync(memberData);
 
-            Key userForumsKey = datastore.newKeyFactory()
+            Key key =  datastore.newKeyFactory().setKind("Forum").newKey(forumID);
+            String forumName = txn.get(key).getString("name");
+
+            key = datastore.newKeyFactory()
                     .setKind("User_Forums")
                     .addAncestors(PathElement.of("Forum", forumID))
                     .newKey(userID);
 
-            Entity userForums = Entity.newBuilder(userForumsKey)
-                    .set("name", "Test")
+            Entity userForums = Entity.newBuilder(key)
+                    .set("name", forumName)
                     .set("role", "MEMBER")
                     .build();
             txn.add(userForums);
@@ -622,7 +626,7 @@ public class ForumResource {
     @DELETE
     @Path("/{forumID}/leave")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response joinForum(@HeaderParam("Authorization") String token,
+    public Response leaveForum(@HeaderParam("Authorization") String token,
                               @PathParam("forumID") String forumID) {
 
         LOG.fine("Attempt to leave forum: " + forumID);
