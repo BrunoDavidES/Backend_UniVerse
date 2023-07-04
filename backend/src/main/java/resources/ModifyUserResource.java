@@ -24,15 +24,14 @@ public class ModifyUserResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
 
-
     @POST
     @Path("/attributes")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyAttributes(@HeaderParam("Authorization") String token, ModifyAttributesData data){
+    public Response modifyAttributes(@HeaderParam("Authorization") String token, ModifyAttributesData data) {
         LOG.fine("Attempt to modify user.");
 
         FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
+        if (decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
@@ -42,30 +41,29 @@ public class ModifyUserResource {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
             data.fillGaps(user);
-            if(!data.department.equals("")){
+            if (!data.department.equals("")) {
                 Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
                 Entity department = txn.get(departmentKey);
-                if( department == null ) {
+                if (department == null) {
                     txn.rollback();
                     LOG.warning(WRONG_DEPARTMENT);
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
                 }
             }
-            if(!data.nucleus.equals("")){
+            if (!data.nucleus.equals("")) {
                 Key nucleustKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.nucleus);
                 Entity nucleus = txn.get(nucleustKey);
-                if( nucleus == null ) {
+                if (nucleus == null) {
                     txn.rollback();
                     LOG.warning(NUCLEUS_DOES_NOT_EXISTS);
                     return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_DOES_NOT_EXISTS).build();
                 }
             }
-            if( user == null ) {
+            if (user == null) {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim(USER_CLAIM).toString()).build();
-            }
-            else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + decodedToken.getUid()).build();
+            } else {
                 Entity newUser = Entity.newBuilder(user)
                         .set("name", data.name)
                         .set("status", data.status)
@@ -90,16 +88,16 @@ public class ModifyUserResource {
     @POST
     @Path("/pwd")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyPwd(@HeaderParam("Authorization") String token, ModifyPwdData data){
+    public Response modifyPwd(@HeaderParam("Authorization") String token, ModifyPwdData data) {
         LOG.fine("Attempt to modify pwd.");
 
         FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
+        if (decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
-        if( !data.validatePwd()) {
+        if (!data.validatePwd()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
@@ -109,12 +107,12 @@ public class ModifyUserResource {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
 
-            if( user == null ) {
+            if (user == null) {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(USER_OR_PASSWORD_INCORRECT).build();
             } else {
-                if(user.getString("password").equals(DigestUtils.sha512Hex(data.password)) ) {
+                if (user.getString("password").equals(DigestUtils.sha512Hex(data.password))) {
 
                     Entity newUser = Entity.newBuilder(user)
                             .set("password", DigestUtils.sha512Hex(data.newPwd))
@@ -141,11 +139,11 @@ public class ModifyUserResource {
     @POST
     @Path("/role")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modifyRole(@HeaderParam("Authorization") String token, ModifyRoleData data){
+    public Response modifyRole(@HeaderParam("Authorization") String token, ModifyRoleData data) {
         LOG.fine("Attempt to modify role of: " + data.target + " to " + data.newRole + ".");
 
         FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
+        if (decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
@@ -161,105 +159,103 @@ public class ModifyUserResource {
 
             //Falta criar token novo e apagar o antigo
 
-            if(user == null || target == null) {
+            if (user == null || target == null) {
                 txn.rollback();
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else
-            if( !data.validatePermission(getRole(decodedToken), target.getString(ROLE), target)) {
+            } else if (!data.validatePermission(getRole(decodedToken), target.getString(ROLE), target)) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-            if( !data.validatePermission(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE), target)) {
-                txn.rollback();
-                LOG.warning(PERMISSION_DENIED);
-                return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
-            } else
-            if (department == null) {
-                txn.rollback();
-                LOG.warning(WRONG_DEPARTMENT);
-                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
-            }else {
-                Entity.Builder newUser = Entity.newBuilder(target);
+                if (!data.validatePermission(getRole(decodedToken), target.getString(ROLE), target)) {
+                    txn.rollback();
+                    LOG.warning(PERMISSION_DENIED);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
+                } else if (department == null) {
+                    txn.rollback();
+                    LOG.warning(WRONG_DEPARTMENT);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+                } else {
+                    Entity.Builder newUser = Entity.newBuilder(target);
 
-                newUser.set("role", data.newRole)
-                        .set("department", data.department)
-                        .set("department_job", data.department_job);
+                    newUser.set("role", data.newRole)
+                            .set("department", data.department)
+                            .set("department_job", data.department_job);
 
-                if(data.newRole.equals(TEACHER)){
-                    if(data.office == null)
-                        data.office = "";
-                    newUser.set("nucleus", "")
-                            .set("nucleus_job", "")
-                            .set("office", data.office);
-                }else
-                    newUser.set("office", "");
-                Entity u = newUser.build();
-                txn.update(u);
-                LOG.info(data.target + " role has been updated successfully.");
-                txn.commit();
-                return Response.ok(target).build();
-            }
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @DELETE
-    @Path("/delete")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteUser(@HeaderParam("Authorization") String token, ModifyRoleData data){
-        LOG.fine("Attempt to delete: " + data.target +".");
-
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
-            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
-            Entity user = txn.get(userKey);
-            Entity target = txn.get(targetKey);
-
-            //Falta criar token novo e apagar o antigo
-
-            if(user == null || target == null) {
-                txn.rollback();
-                LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
-                return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else
-            if( !data.validateDelete(getRole(decodedToken), target.getString(ROLE))
-                    && !decodedToken.getUid().equals(data.target)) {
-                txn.rollback();
-                LOG.warning(PERMISSION_DENIED);
-                return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
-            } else {
-                Query<Entity> query = Query.newEntityQueryBuilder()
-                        .setKind("PersonalEvent")
-                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(targetKey))
-                        .build();
-
-                QueryResults<Entity> queryResults = datastore.run(query);
-                Entity memberEntity;
-                while (queryResults.hasNext()) {
-                    memberEntity = queryResults.next();
-                    txn.delete(memberEntity.getKey());
+                    if (data.newRole.equals(TEACHER)) {
+                        if (data.office == null)
+                            data.office = "";
+                        newUser.set("nucleus", "")
+                                .set("nucleus_job", "")
+                                .set("office", data.office);
+                    } else
+                        newUser.set("office", "");
+                    Entity u = newUser.build();
+                    txn.update(u);
+                    LOG.info(data.target + " role has been updated successfully.");
+                    txn.commit();
+                    return Response.ok(target).build();
                 }
-                txn.delete(targetKey);
-                LOG.info("Target deleted.");
-                txn.commit();
-                return Response.ok(target).build();
             }
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
+            } finally{
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
             }
         }
-    }
+
+        @DELETE
+        @Path("/delete")
+        @Consumes(MediaType.APPLICATION_JSON)
+        public Response deleteUser (@HeaderParam("Authorization") String token, ModifyRoleData data){
+            LOG.fine("Attempt to delete: " + data.target + ".");
+
+            FirebaseToken decodedToken = authenticateToken(token);
+            if (decodedToken == null) {
+                LOG.warning(TOKEN_NOT_FOUND);
+                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            }
+
+            Transaction txn = datastore.newTransaction();
+            try {
+                Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
+                Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
+                Entity user = txn.get(userKey);
+                Entity target = txn.get(targetKey);
+
+                //Falta criar token novo e apagar o antigo
+
+                if (user == null || target == null) {
+                    txn.rollback();
+                    LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
+                } else if (!data.validateDelete(getRole(decodedToken), target.getString(ROLE))
+                        && !decodedToken.getUid().equals(data.target)) {
+                    txn.rollback();
+                    LOG.warning(PERMISSION_DENIED);
+                    return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
+                } else {
+                    Query<Entity> query = Query.newEntityQueryBuilder()
+                            .setKind("PersonalEvent")
+                            .setFilter(StructuredQuery.PropertyFilter.hasAncestor(targetKey))
+                            .build();
+
+                    QueryResults<Entity> queryResults = datastore.run(query);
+                    Entity memberEntity;
+                    while (queryResults.hasNext()) {
+                        memberEntity = queryResults.next();
+                        txn.delete(memberEntity.getKey());
+                    }
+                    txn.delete(targetKey);
+                    LOG.info("Target deleted.");
+                    txn.commit();
+                    return Response.ok(target).build();
+                }
+            } finally {
+                if (txn.isActive()) {
+                    txn.rollback();
+                }
+            }
+        }
 }

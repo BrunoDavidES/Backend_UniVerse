@@ -84,9 +84,9 @@ public class RegisterResource {
                 license_plate = UNREGISTERED;
 
             Entity user = Entity.newBuilder(userKey)
-                    .set("email", data.email)
-                    .set("name", data.name)
-                    .set("license_plate", data.license_plate)
+                    .set("email", email)
+                    .set("name", name)
+                    .set("license_plate", license_plate)
                     .set("status", "ACTIVE")
                     .set("department", "")
                     .set("department_job", "")

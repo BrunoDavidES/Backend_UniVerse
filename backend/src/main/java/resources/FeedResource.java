@@ -418,21 +418,7 @@ public class FeedResource {
         }
         StructuredQuery.CompositeFilter attributeFilter;
         QueryResults<Entity> queryResults;
-
-        Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
-        Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
-
-            attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
-                    StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
-
-        String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
-        if(! (role.equals(BO) || role.equals(ADMIN)) ){
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
-        StructuredQuery.CompositeFilter attributeFilter;
-        QueryResults<Entity> queryResults;
-
+        
         Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
         Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
 
