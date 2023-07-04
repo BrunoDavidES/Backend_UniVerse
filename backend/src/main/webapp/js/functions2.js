@@ -3,6 +3,7 @@ function registeredUsers(){
 
     xmlhttp.open("POST", document.location.origin + "/rest/profile/numberOfUsers", true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     xmlhttp.onreadystatechange = function() {
         if(xmlhttp.readyState == 4) {
@@ -23,6 +24,7 @@ function repToSolve(){
 
     xmlhttp.open("GET", document.location.origin + "/rest/reports/unresolved", true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     xmlhttp.onreadystatechange = function() {
         if(xmlhttp.readyState == 4) {
@@ -47,6 +49,7 @@ function newsToSolve(){
 
     xmlhttp.open("POST", document.location.origin + "/rest/feed/numberOf/News", true);
     xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     xmlhttp.onreadystatechange = function() {
         if(xmlhttp.readyState == 4) {
@@ -68,6 +71,8 @@ function queryEventsWithDates(date1, date2){
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event/timeGap/" + date1 + "/" + date2, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify());
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -141,6 +146,8 @@ function queryNewsWithDates(date1, date2){
 
     request.open("POST", document.location.origin + "/rest/feed/query/News/timeGap/" + date1 + "/" + date2, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {

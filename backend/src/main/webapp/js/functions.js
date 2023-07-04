@@ -1,59 +1,42 @@
 function verifyLogin() {
-  var user = localStorage.getItem("userLogged");
-  if(user === ""){
-          window.location.href = "/backoffice/index.html";
-  }
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = "/backoffice/index.html";
+    }
+  });
 }
 
 function loadLoggedUser() {
-    var xmlhttp = new XMLHttpRequest();
-    var user = localStorage.getItem("userLogged");
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      var userId = user.uid;
+      var userRef = firebase.database().ref('users/' + userId);
 
-    if(user === ""){
+      userRef.once('value').then(function(snapshot) {
+        var userLogged = snapshot.val();
+        document.getElementById("name").innerHTML = userLogged.name;
+        document.getElementById("usernameMail").innerHTML = userLogged.email;
+        document.getElementById("role").innerHTML = userLogged.role;
+        document.getElementById("departmentTitle").innerHTML = userLogged.department;
+        document.getElementById("departmentJobTitle").innerHTML = userLogged.department_job;
+      }).catch(function(error) {
+        console.error(error);
         window.location.href = "/backoffice/index.html";
+      });
+    } else {
+      window.location.href = "/backoffice/index.html";
     }
-
-    xmlhttp.open("GET", document.location.origin + "/rest/profile/" + user, true);
-    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    xmlhttp.onreadystatechange = function() {
-      if (xmlhttp.readyState == 4) {
-        if (xmlhttp.status == 200) {
-            var userLogged = JSON.parse(this.responseText);
-            document.getElementById("name").innerHTML = userLogged.name;
-            document.getElementById("usernameMail").innerHTML = userLogged.email;
-            document.getElementById("role").innerHTML = userLogged.role;
-            document.getElementById("departmentTitle").innerHTML = userLogged.department;
-            document.getElementById("departmentJobTitle").innerHTML = userLogged.department_job;
-        }
-        else{
-            window.location.href = "/backoffice/index.html";
-        }
-      }
-    }
-    xmlhttp.send();
+  });
 }
 
-function logout(){
-    var xmlhttp = new XMLHttpRequest();
-
-    xmlhttp.open("POST", document.location.origin + "/rest/logout", true);
-    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-    xmlhttp.onreadystatechange = function() {
-      if(xmlhttp.readyState == 4) {
-        if(xmlhttp.status == 200) {
-          localStorage.setItem("userLogged", "");
-          window.location.href = "/backoffice/index.html";
-        }
-        else{
-          xmlhttp.responseText;
-          window.location.href = "/backoffice/index.html";
-        }
-      }
-    }
-
-    xmlhttp.send();
+function logout() {
+  firebase.auth().signOut().then(function() {
+    localStorage.setItem("userLogged", "");
+    window.location.href = "/backoffice/index.html";
+  }).catch(function(error) {
+    console.error(error);
+    window.location.href = "/backoffice/index.html";
+  });
 }
 
 
@@ -143,6 +126,7 @@ function postEvent(){
 
     request.open("POST", document.location.origin + "/rest/feed/post/Event", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
@@ -208,6 +192,8 @@ function editEvent(){
 
     request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -230,6 +216,8 @@ function deleteEvent() {
 
   request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
   request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
   request.send(JSON.stringify(null));
   request.onreadystatechange = function() {
     if (request.readyState === 4 && request.status === 200) {
@@ -256,6 +244,7 @@ function getEvent(){
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -299,6 +288,8 @@ function queryEvents(){
 
     request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=" + limit + "&offset=" + queryEventsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -381,6 +372,8 @@ function validateEvent(){
 
     request.open("PATCH", document.location.origin + "/rest/feed/edit/Event/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -476,6 +469,8 @@ function postNews(){
 
     request.open("POST", document.location.origin + "/rest/feed/post/News", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
@@ -533,6 +528,8 @@ function validateNews(){
 
     request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -564,6 +561,8 @@ function editNews(){
     var request = new XMLHttpRequest();
     request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
 
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ){
@@ -619,6 +618,8 @@ function deleteNews(){
 
     request.open("DELETE", document.location.origin + "/rest/feed/delete/News/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
 
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ) {
@@ -664,6 +665,8 @@ function getNews() {
 
     request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
 
     request.onreadystatechange = function() {
         if (request.readyState === 4) {
@@ -740,6 +743,8 @@ function queryNews(){
 
     request.open("POST", document.location.origin + "/rest/feed/query/News?limit=" + limit + "&offset=" + queryNewsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -815,6 +820,7 @@ function modifyUserRole(){
 
     request.open("POST", document.location.origin + "/rest/modify/role", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -841,6 +847,7 @@ function deleteUser(){
 
     request.open("DELETE", document.location.origin + "/rest/modify/delete", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -876,6 +883,7 @@ function queryUsers(){
 
     request.open("POST", document.location.origin + "/rest/profile/query?limit=" + limit + "&offset=" + queryUsersCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
@@ -956,6 +964,7 @@ function getUser() {
 
     request.open("GET", document.location.origin + "/rest/profile/" + target, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -998,6 +1007,7 @@ var id = document.getElementById("idReport").value;
 
     request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
         if ( request.readyState === 4 ) {
@@ -1103,6 +1113,7 @@ function queryReports(){
 
     request.open("POST", document.location.origin + "/rest/reports/query?limit="+limit+"&offset="+queryReportsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
@@ -1183,6 +1194,7 @@ function queryUnresolvedReports(){
 
     request.open("POST", document.location.origin + "/rest/reports/query/unresolved?limit="+limit+"&offset=" + queryUnresolvedReportsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
@@ -1254,6 +1266,7 @@ function reportStatus(){
 
     request.open("POST", document.location.origin + "/rest/reports/status/" + id + "/" + status, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4){
@@ -1287,6 +1300,7 @@ function deleteDepartment(){
 
     request.open("DELETE", document.location.origin + "/rest/department/delete/" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1314,6 +1328,7 @@ function getDepartment() {
 
     request.open("POST", document.location.origin + "/rest/department/query/?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1366,6 +1381,7 @@ var data = {
 
     request.open("POST", document.location.origin + "/rest/department/register", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
@@ -1429,6 +1445,7 @@ function editDepartment(){
     var request = new XMLHttpRequest();
     request.open("POST", document.location.origin + "/rest/department/modify", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1462,6 +1479,7 @@ function queryDepartments(){
 
     request.open("POST", document.location.origin + "/rest/department/query?limit="+limit+"&offset="+queryDepartmentsCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
@@ -1558,6 +1576,7 @@ var data = {
 
     request.open("POST", document.location.origin + "/rest/nucleus/register", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
@@ -1584,6 +1603,7 @@ function getNucleus() {
 
     request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1698,6 +1718,7 @@ function editNucleus(){
     var request = new XMLHttpRequest();
     request.open("POST", document.location.origin + "/rest/nucleus/modify", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1721,6 +1742,7 @@ function deleteNucleus(){
 
     request.open("DELETE", document.location.origin + "/rest/nucleus/delete?id=" + id, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
@@ -1756,6 +1778,7 @@ function queryNucleus(){
     //request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
     request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
