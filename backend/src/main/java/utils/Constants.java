@@ -55,6 +55,7 @@ public class Constants {
     public static final String STUDENT = "S";
     public static final String TEACHER = "T";
     public static final String DEPARTMENT = "Department";
+    public static final String NUCLEUS = "Nucleus";
     public static final String WRONG_PRESIDENT = "President doesn't exists.";
     public static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
     public static final String WRONG_DEPARTMENT = "Department does not exist.";

@@ -68,7 +68,7 @@ public class NucleusResource {
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
             }
 
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
+            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.id);
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus != null ) {
@@ -131,7 +131,7 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.id);
+            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.id);
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus == null ) {
@@ -218,7 +218,7 @@ public class NucleusResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key nucleusKey = datastore.newKeyFactory().setKind("Nucleus").newKey(id);
+            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(id);
             Entity nucleus = txn.get(nucleusKey);
 
             String role = getRole(decodedToken);
@@ -288,7 +288,7 @@ public class NucleusResource {
         }
 
         EntityQuery.Builder query = Query.newEntityQueryBuilder()
-                .setKind("Nucleus")
+                .setKind(NUCLEUS)
                 .setFilter(attributeFilter)
                 .setLimit(Integer.parseInt(limit));
 
