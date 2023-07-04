@@ -50,8 +50,13 @@ public class FeedResource {
 
             // Para já, só docentes é q fazem eventos
             // No futuro, pôr presidente da AE e possivelmente dos Nucleos
-            if (kind.equals(EVENT) && !role.equals(TEACHER) && !role.equals(BO) && !role.equals(ADMIN)){
+            if (kind.equals(EVENT) && !role.equals(TEACHER) && !role.equals(STUDENT) && !role.equals(BO) && !role.equals(ADMIN)){
                 LOG.warning("No permission to create an event.");
+                return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
+            }
+
+            if (kind.equals(NEWS) && !role.equals(BO) && !role.equals(ADMIN)){
+                LOG.warning("No permission to post news.");
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
@@ -62,6 +67,28 @@ public class FeedResource {
 
             Transaction txn = datastore.newTransaction();
             try {
+                if (kind.equals(EVENT)) {
+                    if (role.equals(TEACHER)) {
+                        Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
+                        Entity teacher = txn.get(teacherKey);
+
+                        if (!teacher.getString("department").equals(data.department)) {
+                            txn.rollback();
+                            LOG.warning("No permission to post an Event in that department");
+                            return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event in that department.").build();
+                        }
+                    } else if (role.equals(STUDENT)) {
+                        Key studentKey = datastore.newKeyFactory().setKind(USER).newKey(username);
+                        Entity student = txn.get(studentKey);
+
+                        if (!student.getString("nucleus").equals(data.nucleus) || !student.getString("nucleus_job").equals("President")) {
+                            txn.rollback();
+                            LOG.warning("No permission to post an Event in that nucleus");
+                            return Response.status(Response.Status.FORBIDDEN).entity("No permission to post an Event in that nucleus").build();
+                        }
+                    }
+                }
+
                 Key feedKey;
                 Entity entry;
                 String id;
@@ -176,6 +203,7 @@ public class FeedResource {
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
                     newEntry.set("title", data.title)
+                            .set("validated_backoffice", data.validated_backoffice)
                             .set("time_lastupdated", Timestamp.now());
 
                 }
@@ -384,6 +412,20 @@ public class FeedResource {
         }
 
         String role = getRole(decodedToken);
+        if(! (role.equals(BO) || role.equals(ADMIN)) ){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+        }
+        StructuredQuery.CompositeFilter attributeFilter;
+        QueryResults<Entity> queryResults;
+
+        Timestamp firstDateTS = Timestamp.parseTimestamp(firstDate);
+        Timestamp endDateTS = Timestamp.parseTimestamp(endDate);
+
+            attributeFilter = StructuredQuery.CompositeFilter.and(StructuredQuery.PropertyFilter.ge("time_creation", firstDateTS),
+                    StructuredQuery.PropertyFilter.le("time_creation", endDateTS));
+
+        String role = String.valueOf(token.getClaim(ROLE)).replaceAll("\"", "");
         if(! (role.equals(BO) || role.equals(ADMIN)) ){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();

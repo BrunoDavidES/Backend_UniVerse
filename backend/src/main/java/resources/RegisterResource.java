@@ -84,15 +84,16 @@ public class RegisterResource {
                 license_plate = UNREGISTERED;
 
             Entity user = Entity.newBuilder(userKey)
-                    .set("email", email)
-                    .set("name", name)
-                    .set("license_plate", license_plate)
+                    .set("email", data.email)
+                    .set("name", data.name)
+                    .set("license_plate", data.license_plate)
                     .set("status", "ACTIVE")
                     .set("department", "")
                     .set("department_job", "")
                     .set("nucleus", "")
                     .set("nucleus_job", "")
                     .set("office","")
+                    .set("time_creation", Timestamp.now())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
             txn.add(user);

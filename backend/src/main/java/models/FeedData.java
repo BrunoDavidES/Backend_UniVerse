@@ -16,6 +16,8 @@ public class FeedData {
 
     public String department;
 
+    public String nucleus;
+
     public String isPublic;
 
     public String capacity;
@@ -25,23 +27,15 @@ public class FeedData {
     public String validated_backoffice;
 
     // News only attributes
+
     public String authorNameByBO;
 
     public boolean validate(String kind) {
         if (title == null)
             return false;
 
-        if (department == null)
-            this.department = "ᓚᘏᗢ  EMPTY  ᓚᘏᗢ";
-
-        if(isPublic == null)
-            this.isPublic = "No";
-
-        if(isItPaid == null)
-            this.isItPaid = "No";
-
         if(kind.equals("Event")) {
-            return startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
+            return ( (department != null && nucleus == null) || (department == null && nucleus != null) ) && isPublic != null && isItPaid != null && startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
         }
 
         return true;
@@ -50,12 +44,13 @@ public class FeedData {
     public boolean validateEdit(Entity entry, String kind){
         if (title == null){
             title = entry.getString("title");
-        }
-        else if (title.equals("")) return false;
+        } else if (title.equals("")) return false;
 
-        if(authorNameByBO == null){
-            authorNameByBO = entry.getString("authorName");
-        } else if (authorNameByBO.equals("")) return false;
+        if (validated_backoffice == null){
+            validated_backoffice = entry.getString("validated_backoffice");
+        }
+        else if (!validated_backoffice.equals("true") && !validated_backoffice.equals("false")) return false;
+
 
         if (kind.equals("News"))
             return true;
@@ -92,10 +87,6 @@ public class FeedData {
         }
         else if (Integer.parseInt(capacity) < 2) return false;
 
-        if (validated_backoffice == null){
-            validated_backoffice = entry.getString("isItPaid");
-        }
-        else if (!validated_backoffice.equals("true") && !validated_backoffice.equals("false")) return false;
 
 
         if (isItPaid == null){

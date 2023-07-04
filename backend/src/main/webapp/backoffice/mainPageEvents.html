@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title> Eventos FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-storage.js"></script>
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -134,9 +136,9 @@
                     <div class="cut cut"></div>
                     <label for="department" class="placeholder">Departamento</label>
                 </div> <br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="updateEventPic()"></div>
-                <br>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPic" accept="image/*" onchange="showPic()"></div>
                 <div style="text-align: center;">
+                    <br>
                     <img src="" alt="Event Picture" class="eventPhoto">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
@@ -197,10 +199,10 @@
                     <div class="cut cut"></div>
                     <label id="departmentModLbl" for="department" class="placeholder">Departamento</label>
                 </div><br>
-                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="updateEventPicMod()"></div>
+                <div class="subtitle" style="margin-left: 10px;">Imagem do Evento &emsp;<input style="width: 70%; height: 38px;" class="input" type="file" id="eventPicMod" accept="image/*" onchange="showPicMod()"></div>
                 <br>
                 <div style="text-align: center;">
-                    <img src="" alt="Event Picture" class="eventPhoto">
+                    <img src="" alt="Event Picture" class="eventPhotoMod">
                 </div>
                 <div class="subtitle" style="margin-left: 10px; padding: 20px 0px; text-align: center;">
                     <label id="capacityLbl" for="title">Capacidade máxima do Evento</label>
@@ -298,6 +300,7 @@
 <script src="/js/functions2.js"></script>
 <script>
       let loading = document.getElementById("loadingPopup");
+
 
       function loadingPopupOn(){
            loading.classList.add("openLoadingPopup");
@@ -434,7 +437,7 @@
         queryEventsWithDates(d1,d2);
       }
 
-    function updateEventPic() {
+      function showPic() {
         let selectedFile = document.getElementById("eventPic").files[0];
         if(selectedFile.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
@@ -443,18 +446,18 @@
         else{
             document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
         }
-    }
+      }
 
-    function updateEventPicMod() {
+      function showPicMod() {
         let selectedFile2 = document.getElementById("eventPicMod").files[0];
         if(selectedFile2.size > 8500000){
             alert('Ficheiro demasiado pesado (máximo de 8 MB)');
             document.getElementById("eventPicMod").value = "";
         }
         else{
-            document.getElementsByClassName("eventPhoto")[0].src = URL.createObjectURL(selectedFile);
+            document.getElementsByClassName("eventPhotoMod")[0].src = URL.createObjectURL(selectedFile2);
         }
-    }
+      }
 </script>
 
 </body>

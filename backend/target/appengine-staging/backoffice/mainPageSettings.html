@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title> Defenições FCT NOVA</title>
+    <link rel="stylesheet" href="styleMainPage.css">
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body onload="loadLoggedUser()">
+<button onclick="topFunction()" id="myBtn"><i class='bx bx-up-arrow-alt'></i></button>
+<div class="sidebar">
+    <div class="logo-details">
+        <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
+        <span class="logo_name">UniVerse</span>
+    </div>
+    <ul class="nav-links">
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPage.html'">
+                <a href="#">
+                    <i class='bx bx-grid-alt' ></i>
+                    <span class="links_name">Home</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageNews.html'">
+                <a href="#news">
+                    <i class='bx bx-message'></i>
+                    <span class="links_name">Noticias</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageEvents.html'">
+                <a href="#events">
+                    <i class='bx bx-list-ul' ></i>
+                    <span class="links_name">Eventos</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageUsers.html'">
+                <a href="#users">
+                    <i class='bx bx-user' ></i>
+                    <span class="links_name">Users</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageNucleos.html'">
+                <a href="#stats">
+                    <i class='bx bx-pie-chart-alt-2' ></i>
+                    <span class="links_name">Nucleos</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
+                <a href="#reposts">
+                    <i class='bx bx-book-alt' ></i>
+                    <span class="links_name">Reports</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageDepartamentos.html'">
+                <a href="#dpt">
+                    <i class='bx bx-buildings' ></i>
+                    <span class="links_name">Departamentos</span>
+                </a>
+            </button>
+        </li>
+        <li>
+            <button onclick="window.location.href = '/backoffice/mainPageSettings.html'">
+                <a href="#settings" class="active">
+                    <i class='bx bx-cog' ></i>
+                    <span class="links_name">Definições</span>
+                </a>
+            </button>
+        </li>
+        <li class="log_out">
+            <button onclick="openPopup()">
+                <a href="#logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="links_name">Log out</span>
+                </a>
+            </button>
+        </li>
+    </ul>
+</div>
+<section class="home-section">
+    <nav>
+        <div class="sidebar-button">
+            <i class='bx bx-menu sidebarBtn'></i>
+            <span class="home">Definições</span>
+        </div>
+        <h1> Back Office da FCT NOVA</h1>
+        <div class="profile-details" id="auxLogged">
+            <img src="img/profile.jpg" alt="">
+            <span class="admin_name" id="name"></span>
+        </div>
+    </nav>
+
+    <div class="home-content">
+
+    </div>
+    <div class="popup" id="popup" style="">
+        <h3>Está prestes a fazer logout</h3>
+        <p>Tem a certeza?</p>
+        <button type="button" onclick="logout()">Sim</button> &ensp;
+        <button type="button" onclick="closePopup()">Não</button>
+    </div>
+</section>
+
+
+<script src="/js/functions.js"></script>
+<script>
+     let popup = document.getElementById("popup");
+
+      function openPopup(){
+        popup.classList.add("open-popup");
+      }
+
+      function closePopup(){
+        popup.classList.remove("open-popup");
+      }
+
+      let sidebar = document.querySelector(".sidebar");
+      let sidebarBtn = document.querySelector(".sidebarBtn");
+      sidebarBtn.onclick = function() {
+      sidebar.classList.toggle("active");
+      if(sidebar.classList.contains("active")){
+        sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+      }else
+        sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+      }
+
+      let mybutton = document.getElementById("myBtn");
+      window.onscroll = function() {scrollFunction()};
+
+      function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+      }
+
+      function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+      }
+</script>
+
+</body>
+</html>

@@ -1,4 +1,5 @@
 package resources;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreOptions;
 
@@ -9,7 +10,9 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.DepartmentData;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import static utils.FirebaseAuth.getRole;
 public class DepartmentResource {
     private static final Logger LOG = Logger.getLogger(DepartmentResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+
 
     @POST
     @Path("/register")

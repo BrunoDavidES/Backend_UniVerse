@@ -76,6 +76,12 @@ public class NucleusResource {
                 LOG.warning(NUCLEUS_ALREADY_EXISTS);
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_ALREADY_EXISTS).build();
             } else {
+                president = Entity.newBuilder(president)
+                        .set("nucleus", data.id)
+                        .set("nucleus_job", "President")
+                        .build();
+                txn.update(president);
+
                 nucleus = Entity.newBuilder(nucleusKey)
                         .set("email", data.nucleusEmail)
                         .set("name", data.name)
@@ -163,7 +169,7 @@ public class NucleusResource {
                         .build();
                 txn.update(newPreviousPresident);
 
-                Entity newPresident = Entity.newBuilder(presidentKey)
+                Entity newPresident = Entity.newBuilder(president)
                         .set("nucleus", data.id)
                         .set("nucleus_job", "Presidente")
                         .build();

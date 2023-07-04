@@ -63,15 +63,13 @@ public class ModifyUserResource {
             if( user == null ) {
                 txn.rollback();
                 LOG.warning(USER_OR_PASSWORD_INCORRECT);
-                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + decodedToken.getUid()).build();
-            } else {
+                return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + token.getClaim(USER_CLAIM).toString()).build();
+            }
+            else {
                 Entity newUser = Entity.newBuilder(user)
                         .set("name", data.name)
                         .set("status", data.status)
-                        .set("department", data.department)
-                        .set("department_job", data.department_job) //VER QUAL O ROLE PARA VER O JOB !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         .set("nucleus", data.nucleus)
-                        .set("nucleus_job", data.nucleus_job)
                         .set("license_plate", data.license_plate)
                         .set("time_lastupdate", Timestamp.now())
                         .build();
@@ -156,8 +154,10 @@ public class ModifyUserResource {
         try {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
+            Entity department = txn.get(departmentKey);
 
             //Falta criar token novo e apagar o antigo
 
@@ -171,6 +171,16 @@ public class ModifyUserResource {
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
+            if( !data.validatePermission(String.valueOf(token.getClaim(ROLE)).replaceAll("\"", ""), target.getString(ROLE), target)) {
+                txn.rollback();
+                LOG.warning(PERMISSION_DENIED);
+                return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
+            } else
+            if (department == null) {
+                txn.rollback();
+                LOG.warning(WRONG_DEPARTMENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+            }else {
                 Entity.Builder newUser = Entity.newBuilder(target);
 
                 newUser.set("role", data.newRole)

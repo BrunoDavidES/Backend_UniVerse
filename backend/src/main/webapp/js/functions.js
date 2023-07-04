@@ -56,6 +56,74 @@ function logout(){
     xmlhttp.send();
 }
 
+
+var firebaseConfig = {
+      apiKey: "AIzaSyB8lbZJXbOkWNkgRxvzqwhLtgGQf5GmpS4",
+      authDomain: "universe-fct.firebaseapp.com",
+      databaseURL: "https://universe-fct-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "universe-fct",
+      storageBucket: "gs://universe-fct.appspot.com",
+      messagingSenderId: "493010584500",
+      appId: "1:493010584500:web:9c958f30725cd60533a8e1",
+      measurementId: "G-XB1FHSZ4M0"
+};
+        // Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+
+function uploadEventPic(filename) {
+    var file = document.getElementById("eventPic").files[0];
+    if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("eventPic").value = "";
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("Events/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+    }
+
+}
+
+
+function updateEventPicMod(filename) {
+     var file = document.getElementById("eventPicMod").files[0];
+     if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("eventPicMod").value = "";
+     }
+     else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("Events/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("Event picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+     }
+}
+
+
+function deleteEventPic(filename) {
+  var storageRef = firebase.storage().ref();
+  var eventPicRef = storageRef.child("Events/" + filename);
+
+  eventPicRef
+    .delete()
+    .then(function() {
+      console.log("Event picture deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting event picture:", error);
+    });
+}
+
       //FEEDS
 
 //Events
@@ -79,6 +147,7 @@ function postEvent(){
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
+          uploadEventPic(request.responseText);
           console.log("SUCCESS");
       } else if (request.readyState === 4) {
           console.log(request.responseText);
@@ -143,6 +212,7 @@ function editEvent(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
+            updateEventPicMod(id);
             console.log("SUCCESS");
         }
         else if (request.readyState === 4) {
@@ -153,26 +223,27 @@ function editEvent(){
     };
 }
 
-function deleteEvent(){
-    var id = document.getElementById("idEventDelete").value;
+function deleteEvent() {
+  var id = document.getElementById("idEventDelete").value;
 
-    var request = new XMLHttpRequest();
+  var request = new XMLHttpRequest();
 
-    request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
-    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    request.send(JSON.stringify(null));
-    request.onreadystatechange  = function() {
-        if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
-        }
-        else if (request.readyState === 4) {
-            console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
-        }
-    };
+  request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.send(JSON.stringify(null));
+  request.onreadystatechange = function() {
+    if (request.readyState === 4 && request.status === 200) {
+      console.log(request.responseText);
+      deleteEventPic(id); // Call the new function to delete the associated image
+      console.log("SUCCESS");
+    } else if (request.readyState === 4) {
+      console.log(request.responseText);
+      console.log("FAIL");
+      alert(request.responseText);
+    }
+  };
 }
+
 
 function getEvent(){
     var id = document.getElementById("idEventMod").value;
@@ -183,7 +254,7 @@ function getEvent(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/feed/query/Event?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -295,11 +366,8 @@ function queryEvents(){
 }
 
 function clearListEvents(c1, c2){
-    var r1 = document.getElementById(c1);
-    var r2 = document.getElementById(c2);
-    r1.replaceChildren();
-    r2.replaceChildren();
-    eventsQueryOffset = 0;
+    clearList(c1,c2);
+    queryEventsCursor = "EMPTY";
 }
 
 function validateEvent(){
@@ -328,6 +396,75 @@ function validateEvent(){
 }
 
 //News
+
+
+function uploadNewsPic(filename) {
+    var file = document.getElementById("newsPic").files[0];
+    if(file.size > 8500000){
+        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+        document.getElementById("newsPic").value = "";
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("News/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("News picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
+    }
+
+}
+
+
+function updateNewsPicMod(filename) {
+     var file = document.getElementById("newsPicMod").files[0];
+     if (file != null){
+         if(file.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("newsPicMod").value = "";
+         }
+         else{
+            var storageRef = firebase.storage().ref();
+            var eventPicRef = storageRef.child("News/" + filename);
+
+            eventPicRef.put(file).then(function(snapshot) {
+                console.log("News picture uploaded successfully!");
+            }).catch(function(error) {
+                console.error("Error uploading event picture:", error);
+            });
+        }
+    }
+}
+
+
+function deleteNewsPic(filename) {
+  var storageRef = firebase.storage().ref();
+  var newsPicRef = storageRef.child("News/" + filename);
+  var newsTxtRef = storageRef.child("News/" + filename + ".txt");
+
+  newsPicRef
+    .delete()
+    .then(function() {
+      console.log("News picture deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting news picture:", error);
+    });
+
+  newsTxtRef
+    .delete()
+    .then(function() {
+      console.log("News text deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting news text:", error);
+    });
+}
+
+
+
 function postNews(){
 
     var data = {
@@ -344,7 +481,18 @@ function postNews(){
         if (request.readyState === 4 ) {
             if (request.status === 200){
                 var id = request.responseText;
-                var bucketRequest = new XMLHttpRequest();
+                uploadNewsPic(id);
+
+                const file = new Blob([document.getElementById("text").value], {type: 'text/plain;charset=UTF-8'});
+                firebase.storage().ref().child("News/" + id + ".txt").put(file)
+                    .then(function() {
+                          console.log("News text body uploaded successfully!");
+                        })
+                        .catch(function(error) {
+                          console.error("Error putting text body in storage:", error);
+                        });
+
+/*                var bucketRequest = new XMLHttpRequest();
 
                 bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true );
                 bucketRequest.setRequestHeader("Content-Type", "text/plain");
@@ -352,6 +500,8 @@ function postNews(){
                 bucketRequest.onreadystatechange  = function() {
                     if (bucketRequest.readyState === 4 ) {
                         if (bucketRequest.status === 200 ){
+                            alert(request.responseText);
+
                             console.log("SUCCESS");
                         }
                         else  {
@@ -361,10 +511,10 @@ function postNews(){
                     }
                 };
 
-                bucketRequest.send(document.getElementById("text").value);
+                bucketRequest.send(document.getElementById("text").value);*/
             }
             else {
-                console.alert(request.responseText);
+                alert(request.responseText);
                 console.log("FAIL");
             }
         }
@@ -400,9 +550,8 @@ function validateNews(){
 
 function editNews(){
 
-    var id = document.getElementById("idEventMod").value;
+    var id = document.getElementById("idNewsMod").value;
     var title = document.getElementById("titleMod").value;
-    var authorName = document.getElementById("authorMod").value;
     var text = document.getElementById("textMod").value;
 
     var data = {};
@@ -410,10 +559,7 @@ function editNews(){
     if (title !== "") {
         data["title"] = title;
     }
-
-    if (authorName !== ""){
-        data["authorNameByBO"] = authorName;
-    }
+    alert(title);
 
     var request = new XMLHttpRequest();
     request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
@@ -422,10 +568,19 @@ function editNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ){
             if (request.status === 200) {
-
+                updateNewsPicMod(id);
                 if ( text !== localStorage.getItem(id) ){
+                    const file = new Blob([text], {type: 'text/plain;charset=UTF-8'});
+                    firebase.storage().ref().child("News/" + id + ".txt").put(file)
+                        .then(function() {
+                              console.log("News text body uploaded successfully!");
+                            })
+                            .catch(function(error) {
+                              console.error("Error putting text body in storage:", error);
+                            });
+                    updateNewsPicMod(id);
 
-                    var bucketPOSTRequest = new XMLHttpRequest();
+/*                    var bucketPOSTRequest = new XMLHttpRequest();
                     bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
                     bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
 
@@ -441,7 +596,7 @@ function editNews(){
                             }
                         }
                     }
-                    bucketPOSTRequest.send(text);
+                    bucketPOSTRequest.send(text); */
                 }
                 else {
                     console.log("SUCCESS");
@@ -468,7 +623,11 @@ function deleteNews(){
     request.onreadystatechange  = function() {
         if ( request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                var bucketDELETERequest = new XMLHttpRequest();
+                deleteNewsPic(id);
+
+
+
+/*                var bucketDELETERequest = new XMLHttpRequest();
 
                 bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
                 bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
@@ -476,6 +635,7 @@ function deleteNews(){
                 bucketDELETERequest.onreadystatechange = function() {
                     if ( bucketDELETERequest.readyState === 4 ) {
                         if ( bucketDELETERequest.status === 200 ) {
+
                             console.log("SUCCESS");
                         }
                         else{
@@ -484,7 +644,7 @@ function deleteNews(){
                         }
                     }
                 }
-                bucketDELETERequest.send("");
+                bucketDELETERequest.send(""); */
             } else {
                 console.log("FAIL");
             }
@@ -493,28 +653,27 @@ function deleteNews(){
     request.send();
 }
 
-
-function getNews(){
-    var id = document.getElementById("idEventMod").value;
+function getNews() {
+    var id = document.getElementById("idNewsMod").value;
 
     var data = {
-        "id":id
+        "id": id
     };
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
-        if ( request.readyState === 4 ) {
-            if ( request.status === 200 ) {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
                 const response = JSON.parse(request.responseText);
-                const entities = response.map( function(entity) {
+                const entities = response.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         authorName: entity.properties.authorName
-                    }
+                    };
                 });
 
                 entities.forEach(function(entity) {
@@ -522,37 +681,57 @@ function getNews(){
                     document.getElementById("authorModLbl").innerHTML = "Autor da Notícia: " + entity.authorName.value;
                 });
 
-                var bucketGETRequest = new XMLHttpRequest();
+                var storageRef = firebase.storage().ref();
+                //var textFileURL = "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt";
+                var fileRef = storageRef.child('News/' + id + ".txt");
 
-                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
-                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
-
-                bucketGETRequest.onreadystatechange = function() {
-                    if ( bucketGETRequest.readyState === 4 ) {
-                        if ( bucketGETRequest.status === 200 ) {
-                            localStorage.setItem( id , bucketGETRequest.responseText );
-                            document.getElementById("textMod").value = bucketGETRequest.responseText;
-                        }
-                        else {
-                            console.log(request.responseText);
-                            alert.log("Wrong ID for News");
-                        }
+                fileRef.getDownloadURL()
+                  .then(function(url) {
+                    return fetch(url);
+                  })
+                  .then(function(response) {
+                    if (response.ok) {
+                      return response.text();
+                    } else {
+                      throw new Error("Error fetching file. Status: " + response.status);
                     }
-                }
-                bucketGETRequest.send();
-            }
-            else {
+                  })
+                  .then(function(fileContent) {
+                    localStorage.setItem(id, fileContent);
+                    document.getElementById("textMod").value = fileContent;
+                  })
+                  .catch(function(error) {
+                    console.error("Error accessing file:", error);
+                  });
+/*                fetch(textFileURL)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.text();
+                        } else {
+                            throw new Error("Error fetching text file. Status: " + response.status);
+                        }
+                    })
+                    .then(function(text) {
+                        localStorage.setItem(id, text);
+                        document.getElementById("textMod").value = text;
+                    })
+                    .catch(function(error) {
+                        console.error("Error downloading text file:", error);
+                    });*/
+            } else {
                 console.log(request.responseText);
-                alert.log("ALGUMA COISA FALHOU");
+                alert("ALGUMA COISA FALHOU");
             }
         }
-    }
+    };
     request.send(JSON.stringify(data));
 }
 
-
 var queryNewsCursor = "EMPTY";
 function queryNews(){
+    if (queryNewsCursor == null)
+        queryNewsCursor = "EMPTY";
+
     var list = document.getElementById('listOfNews');
     var limit = parseInt(document.getElementById("listLimitId").value);
     var data = {};
@@ -609,6 +788,11 @@ function queryNews(){
             queryNewsCursor = request.getResponseHeader("X-Cursor");
         }
     }
+}
+
+function clearListNews(c1, c2){
+    clearList(c1,c2);
+    queryNewsCursor = "EMPTY";
 }
 
 //USERS
@@ -673,8 +857,16 @@ function deleteUser(){
     request.send(JSON.stringify(data));
 }
 
+function clearListUsers(c1, c2){
+    clearList(c1,c2);
+    queryUsersCursor = "EMPTY";
+}
+
 var queryUsersCursor = "EMPTY";
 function queryUsers(){
+    if (queryUsersCursor == null){
+        queryUsersCursor = "EMPTY";
+    }
     var list = document.getElementById("listOfUsers");
     var limit = document.getElementById("listLimitId").value;
 
@@ -690,7 +882,6 @@ function queryUsers(){
             if ( request.status === 200 ) {
                 const response = JSON.parse(request.responseText);
 
-                var uN;
                 const entities = response.map(function(entity) {
                     return {
                         name: entity.properties.name,
@@ -805,7 +996,7 @@ var id = document.getElementById("idReport").value;
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/reports/query?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -832,7 +1023,41 @@ var id = document.getElementById("idReport").value;
                     document.getElementById("lastUpdatedRep").value = new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
                 });
 
-                var bucketGETRequest = new XMLHttpRequest();
+
+                var storageRef = firebase.storage().ref();
+                var fileRef = storageRef.child('Reports/' + id + ".txt");
+                var imgRef = storageRef.child('Reports/' + id + ".png");
+
+                fileRef.getDownloadURL()
+                  .then(function(url) {
+                    return fetch(url);
+                  })
+                  .then(function(response) {
+                    if (response.ok) {
+                      return response.text();
+                    } else {
+                      throw new Error("Error fetching file. Status: " + response.status);
+                    }
+                  })
+                  .then(function(fileContent) {
+                    localStorage.setItem(id, fileContent);
+                    document.getElementById("textRep").value = fileContent;
+                  })
+                  .catch(function(error) {
+                    console.error("Error accessing file:", error);
+                  });
+
+                imgRef.getDownloadURL()
+                  .then(function(url) {
+                    var reportImage = document.getElementById("reportImage");
+                    reportImage.src = url;
+                  })
+                  .catch(function(error) {
+                    console.error("Error retrieving image:", error);
+                  });
+
+
+/*                var bucketGETRequest = new XMLHttpRequest();
 
                 bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/Report-" + id + ".txt");
                 bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
@@ -845,23 +1070,32 @@ var id = document.getElementById("idReport").value;
                         }
                         else {
                             console.log(request.responseText);
-                            alert.log("Wrong ID for News");
+                            alert("Wrong ID for News");
                         }
                     }
                 }
-                bucketGETRequest.send();
+                bucketGETRequest.send(); */
             }
             else {
                 console.log(request.responseText);
-                alert.log("ALGUMA COISA FALHOU");
+                alert("ALGUMA COISA FALHOU");
             }
         }
     }
     request.send(JSON.stringify(data));
 }
 
+function clearListReports(c1, c2){
+    clearList(c1,c2);
+    queryReportsCursor = "EMPTY";
+}
+
 var queryReportsCursor = "EMPTY";
 function queryReports(){
+    if(queryReportsCursor == null){
+        queryReportsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfReports");
 
@@ -924,16 +1158,24 @@ function queryReports(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
     request.send();
 }
 
+function clearListUnresReports(c1, c2){
+    clearList(c1,c2);
+    queryUnresolvedReportsCursor = "EMPTY";
+}
 
 var queryUnresolvedReportsCursor = "EMPTY";
 function queryUnresolvedReports(){
+    if (queryUnresolvedReportsCursor == null){
+        queryUnresolvedReportsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("unResListLimitId").value;
     var list = document.getElementById("listOfUnresReports");
 
@@ -996,14 +1238,12 @@ function queryUnresolvedReports(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
     request.send();
 }
-
-
 
 
 function reportStatus(){
@@ -1024,7 +1264,7 @@ function reportStatus(){
             else {
                 console.log(request.responseText);
                 console.log("FAIL");
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     };
@@ -1204,9 +1444,17 @@ function editDepartment(){
     request.send(JSON.stringify(data));
 }
 
+function clearListDepartments(c1, c2){
+    clearList(c1,c2);
+    queryDepartmentsCursor = "EMPTY";
+}
 
 var queryDepartmentsCursor = "EMPTY";
 function queryDepartments(){
+    if (queryDepartmentsCursor == null){
+        queryDepartmentsCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfDepartments");
 
@@ -1273,7 +1521,7 @@ function queryDepartments(){
             }
             else {
                 console.log(request.responseText);
-                alert.log("FAIL");
+                alert("FAIL");
             }
         }
     }
@@ -1286,8 +1534,8 @@ var data = {
         "id": document.getElementById("idNuc").value,
         "name": document.getElementById("nameNuc").value,
         "nucleusEmail": document.getElementById("email").value,
-        "president": document.getElementById("pres").value
-
+        "president": document.getElementById("pres").value,
+        "location":document.getElementById("location").value
     };
 
     if (document.getElementById("description").value !== "") {
@@ -1334,7 +1582,7 @@ function getNucleus() {
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=0", true);
+    request.open("POST", document.location.origin + "/rest/nucleus/query/?limit=1&offset=EMPTY", true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     request.onreadystatechange = function() {
@@ -1348,6 +1596,7 @@ function getNucleus() {
                    name: entity.properties.name,
                    email: entity.properties.email,
                    president: entity.properties.president,
+                   location: entity.properties.location,
                    description: entity.properties.description,
                    facebook: entity.properties.facebook,
                    instagram: entity.properties.instagram,
@@ -1362,6 +1611,7 @@ function getNucleus() {
                document.getElementById("nameMod").value = entity.name.value;
                document.getElementById("emailMod").value = entity.email.value;
                document.getElementById("presMod").value = entity.president.value;
+               document.getElementById("locationMod").value = entity.location.value;
                document.getElementById("descriptionMod").value = entity.description.value;
                document.getElementById("facebookMod").value = entity.facebook.value;
                document.getElementById("instagramMod").value = entity.instagram.value;
@@ -1387,6 +1637,7 @@ function editNucleus(){
     var email = document.getElementById("emailMod").value;
     var name = document.getElementById("nameMod").value;
     var president = document.getElementById("presMod").value;
+    var location = document.getElementById("locationMod").value;
     var description = document.getElementById("descriptionMod").value;
     var facebook = document.getElementById("facebookMod").value;
     var instagram = document.getElementById("instagramMod").value;
@@ -1410,6 +1661,10 @@ function editNucleus(){
     if (president !== "") {
             data["president"] = president;
     }
+
+    if (location !== "") {
+                data["location"] = location;
+        }
 
     if (description !== "") {
             data["description"] = description;
@@ -1482,8 +1737,17 @@ function deleteNucleus(){
     request.send();
 }
 
+function clearListNucleus(c1, c2){
+    clearList(c1,c2);
+    queryNucleusCursor = "EMPTY";
+}
+
 var queryNucleusCursor = "EMPTY";
 function queryNucleus(){
+    if (queryNucleusCursor == null){
+        queryNucleusCursor = "EMPTY";
+    }
+
     var limit = document.getElementById("listLimitId").value;
     var list = document.getElementById("listOfNucleus");
 
@@ -1565,5 +1829,13 @@ function queryNucleus(){
     }
     request.send();
 }
+
+function clearList(c1, c2){
+    var r1 = document.getElementById(c1);
+    var r2 = document.getElementById(c2);
+    r1.replaceChildren();
+    r2.replaceChildren();
+}
+
 
 window.addEventListener('load', loadLoggedUser);
