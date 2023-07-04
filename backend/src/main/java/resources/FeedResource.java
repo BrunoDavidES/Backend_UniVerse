@@ -60,10 +60,6 @@ public class FeedResource {
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
-            if (kind.equals(NEWS) && !role.equals(BO) & !role.equals(ADMIN) & !role.equals(TEACHER) & !role.equals(STUDENT)){
-                LOG.warning("No permission to post news.");
-                return Response.status(Response.Status.FORBIDDEN).entity("No permission to post news.").build();
-            }
 
             Transaction txn = datastore.newTransaction();
             try {
@@ -195,7 +191,6 @@ public class FeedResource {
                             .set("startDate", data.startDate)
                             .set("endDate", data.endDate)
                             .set("location", data.location)
-                            .set("department", data.department)
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
