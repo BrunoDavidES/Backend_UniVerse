@@ -1023,7 +1023,41 @@ var id = document.getElementById("idReport").value;
                     document.getElementById("lastUpdatedRep").value = new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
                 });
 
-                var bucketGETRequest = new XMLHttpRequest();
+
+                var storageRef = firebase.storage().ref();
+                var fileRef = storageRef.child('Reports/' + id + ".txt");
+                var imgRef = storageRef.child('Reports/' + id + ".png");
+
+                fileRef.getDownloadURL()
+                  .then(function(url) {
+                    return fetch(url);
+                  })
+                  .then(function(response) {
+                    if (response.ok) {
+                      return response.text();
+                    } else {
+                      throw new Error("Error fetching file. Status: " + response.status);
+                    }
+                  })
+                  .then(function(fileContent) {
+                    localStorage.setItem(id, fileContent);
+                    document.getElementById("textMod").value = fileContent;
+                  })
+                  .catch(function(error) {
+                    console.error("Error accessing file:", error);
+                  });
+
+                imgRef.getDownloadURL()
+                  .then(function(url) {
+                    var reportImage = document.getElementById("reportImage");
+                    reportImage.src = url;
+                  })
+                  .catch(function(error) {
+                    console.error("Error retrieving image:", error);
+                  });
+
+
+/*                var bucketGETRequest = new XMLHttpRequest();
 
                 bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/Report-" + id + ".txt");
                 bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
@@ -1040,7 +1074,7 @@ var id = document.getElementById("idReport").value;
                         }
                     }
                 }
-                bucketGETRequest.send();
+                bucketGETRequest.send(); */
             }
             else {
                 console.log(request.responseText);
