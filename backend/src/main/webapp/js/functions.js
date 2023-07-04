@@ -1041,7 +1041,7 @@ var id = document.getElementById("idReport").value;
                   })
                   .then(function(fileContent) {
                     localStorage.setItem(id, fileContent);
-                    document.getElementById("textMod").value = fileContent;
+                    document.getElementById("textRep").value = fileContent;
                   })
                   .catch(function(error) {
                     console.error("Error accessing file:", error);
