@@ -46,7 +46,8 @@ public class NucleusData {
     }
 
     public boolean validateModify(){
-
+        if(this.nucleusEmail != null &&  !nucleusEmail.matches("^[A-Za-z0-9._%+-]+@(ae+\\.fct\\.unl\\.pt$)"))
+            return false;
         return id != null;
     }
 
