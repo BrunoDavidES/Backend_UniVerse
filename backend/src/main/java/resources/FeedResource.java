@@ -105,6 +105,7 @@ public class FeedResource {
                             .set("endDate", data.endDate)
                             .set("location", data.location)
                             .set("department", data.department)
+                            .set("nucleus", data.nucleus)
                             .set("isPublic", data.isPublic)
                             .set("capacity", data.capacity)
                             .set("isItPaid", data.isItPaid)
