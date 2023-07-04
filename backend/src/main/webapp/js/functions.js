@@ -420,28 +420,40 @@ function uploadNewsPic(filename) {
 
 function updateNewsPicMod(filename) {
      var file = document.getElementById("newsPicMod").files[0];
-     if(file.size > 8500000){
-        alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-        document.getElementById("newsPicMod").value = "";
-     }
-     else{
-        var storageRef = firebase.storage().ref();
-        var eventPicRef = storageRef.child("News/" + filename);
+     if (file != null){
+         if(file.size > 8500000){
+            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+            document.getElementById("newsPicMod").value = "";
+         }
+         else{
+            var storageRef = firebase.storage().ref();
+            var eventPicRef = storageRef.child("News/" + filename);
 
-        eventPicRef.put(file).then(function(snapshot) {
-            console.log("News picture uploaded successfully!");
-        }).catch(function(error) {
-            console.error("Error uploading event picture:", error);
-        });
-     }
+            eventPicRef.put(file).then(function(snapshot) {
+                console.log("News picture uploaded successfully!");
+            }).catch(function(error) {
+                console.error("Error uploading event picture:", error);
+            });
+        }
+    }
 }
 
 
 function deleteNewsPic(filename) {
   var storageRef = firebase.storage().ref();
-  var eventPicRef = storageRef.child("News/" + filename);
+  var newsPicRef = storageRef.child("News/" + filename);
+  var newsTxtRef = storageRef.child("News/" + filename + ".txt");
 
-  eventPicRef
+  newsPicRef
+    .delete()
+    .then(function() {
+      console.log("Event picture deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting event picture:", error);
+    });
+
+  newsTxtRef
     .delete()
     .then(function() {
       console.log("Event picture deleted successfully!");
@@ -558,8 +570,17 @@ function editNews(){
             if (request.status === 200) {
                 updateNewsPicMod(id);
                 if ( text !== localStorage.getItem(id) ){
+                    const file = new Blob([text], {type: 'text/plain;charset=UTF-8'});
+                    firebase.storage().ref().child("News/" + id + ".txt").put(file)
+                        .then(function() {
+                              console.log("News text body uploaded successfully!");
+                            })
+                            .catch(function(error) {
+                              console.error("Error putting text body in storage:", error);
+                            });
+                    updateNewsPicMod(id);
 
-                    var bucketPOSTRequest = new XMLHttpRequest();
+/*                    var bucketPOSTRequest = new XMLHttpRequest();
                     bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
                     bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
 
@@ -575,7 +596,7 @@ function editNews(){
                             }
                         }
                     }
-                    bucketPOSTRequest.send(text);
+                    bucketPOSTRequest.send(text); */
                 }
                 else {
                     console.log("SUCCESS");
@@ -603,7 +624,10 @@ function deleteNews(){
         if ( request.readyState === 4 ) {
             if ( request.status === 200 ) {
                 deleteNewsPic(id);
-                var bucketDELETERequest = new XMLHttpRequest();
+
+
+
+/*                var bucketDELETERequest = new XMLHttpRequest();
 
                 bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
                 bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
@@ -620,7 +644,7 @@ function deleteNews(){
                         }
                     }
                 }
-                bucketDELETERequest.send("");
+                bucketDELETERequest.send(""); */
             } else {
                 console.log("FAIL");
             }
@@ -658,9 +682,28 @@ function getNews() {
                 });
 
                 var storageRef = firebase.storage().ref();
-                var textFileURL = "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt";
+                //var textFileURL = "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt";
+                var fileRef = storageRef.child('News/' + id + ".txt");
 
-                fetch(textFileURL)
+                fileRef.getDownloadURL()
+                  .then(function(url) {
+                    return fetch(url);
+                  })
+                  .then(function(response) {
+                    if (response.ok) {
+                      return response.text();
+                    } else {
+                      throw new Error("Error fetching file. Status: " + response.status);
+                    }
+                  })
+                  .then(function(fileContent) {
+                    localStorage.setItem(id, fileContent);
+                    document.getElementById("textMod").value = fileContent;
+                  })
+                  .catch(function(error) {
+                    console.error("Error accessing file:", error);
+                  });
+/*                fetch(textFileURL)
                     .then(function(response) {
                         if (response.ok) {
                             return response.text();
@@ -674,7 +717,7 @@ function getNews() {
                     })
                     .catch(function(error) {
                         console.error("Error downloading text file:", error);
-                    });
+                    });*/
             } else {
                 console.log(request.responseText);
                 alert("ALGUMA COISA FALHOU");
