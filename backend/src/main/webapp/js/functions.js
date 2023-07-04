@@ -470,7 +470,17 @@ function postNews(){
             if (request.status === 200){
                 var id = request.responseText;
                 uploadNewsPic(id);
-                var bucketRequest = new XMLHttpRequest();
+
+                const file = new Blob([document.getElementById("text").value], {type: 'text/plain;charset=UTF-8'});
+                firebase.storage().ref().child("News/" + id + ".txt").put(file)
+                    .then(function() {
+                          console.log("News text body uploaded successfully!");
+                        })
+                        .catch(function(error) {
+                          console.error("Error putting text body in storage:", error);
+                        });
+
+/*                var bucketRequest = new XMLHttpRequest();
 
                 bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true );
                 bucketRequest.setRequestHeader("Content-Type", "text/plain");
@@ -489,7 +499,7 @@ function postNews(){
                     }
                 };
 
-                bucketRequest.send(document.getElementById("text").value);
+                bucketRequest.send(document.getElementById("text").value);*/
             }
             else {
                 alert(request.responseText);
@@ -619,7 +629,63 @@ function deleteNews(){
     request.send();
 }
 
+function getNews() {
+    var id = document.getElementById("idNewsMod").value;
 
+    var data = {
+        "id": id
+    };
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/feed/query/News?limit=1&offset=EMPTY", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        title: entity.properties.title,
+                        authorName: entity.properties.authorName
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    document.getElementById("titleModLbl").innerHTML = "Título da Notícia: " + entity.title.value;
+                    document.getElementById("authorModLbl").innerHTML = "Autor da Notícia: " + entity.authorName.value;
+                });
+
+                var storageRef = firebase.storage().ref();
+                var textFileURL = "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt";
+
+                fetch(textFileURL)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.text();
+                        } else {
+                            throw new Error("Error fetching text file. Status: " + response.status);
+                        }
+                    })
+                    .then(function(text) {
+                        localStorage.setItem(id, text);
+                        document.getElementById("textMod").value = text;
+                    })
+                    .catch(function(error) {
+                        console.error("Error downloading text file:", error);
+                    });
+            } else {
+                console.log(request.responseText);
+                alert("ALGUMA COISA FALHOU");
+            }
+        }
+    };
+    request.send(JSON.stringify(data));
+}
+
+
+/*
 function getNews(){
     var id = document.getElementById("idNewsMod").value;
 
@@ -650,7 +716,7 @@ function getNews(){
 
                 var bucketGETRequest = new XMLHttpRequest();
 
-                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
+                bucketGETRequest.open("GET", "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt");
                 bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
 
                 bucketGETRequest.onreadystatechange = function() {
@@ -675,7 +741,7 @@ function getNews(){
     }
     request.send(JSON.stringify(data));
 }
-
+*/
 var queryNewsCursor = "EMPTY";
 function queryNews(){
     if (queryNewsCursor == null)
