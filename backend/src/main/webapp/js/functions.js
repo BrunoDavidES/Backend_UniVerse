@@ -447,19 +447,19 @@ function deleteNewsPic(filename) {
   newsPicRef
     .delete()
     .then(function() {
-      console.log("Event picture deleted successfully!");
+      console.log("News picture deleted successfully!");
     })
     .catch(function(error) {
-      console.error("Error deleting event picture:", error);
+      console.error("Error deleting news picture:", error);
     });
 
   newsTxtRef
     .delete()
     .then(function() {
-      console.log("Event picture deleted successfully!");
+      console.log("News text deleted successfully!");
     })
     .catch(function(error) {
-      console.error("Error deleting event picture:", error);
+      console.error("Error deleting news text:", error);
     });
 }
 
