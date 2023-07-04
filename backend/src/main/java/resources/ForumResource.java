@@ -1,11 +1,8 @@
 package resources;
 
-import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.Transaction;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.firebase.auth.*;
 import com.google.firebase.database.*;
 import models.ForumData;
@@ -42,7 +39,7 @@ public class ForumResource {
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
-        if(!data.validate()) {
+        if(!data.validateCreation()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
         }
@@ -73,22 +70,20 @@ public class ForumResource {
             DatabaseReference forumsRef = firebaseDatabase.getReference("forums");
             String forumID = forumsRef.push().getKey();
             forumsRef.child(forumID).child("name").setValueAsync(data.getName());
-            forumsRef.child(forumID).child("description").setValueAsync(data.getDescription());
             forumsRef.child(forumID).child("creation").setValueAsync(date);
-            forumsRef.child(forumID).child("updated").setValueAsync(date);
             forumsRef.child(forumID).child("members").child(userID.replace(".", "-")).setValueAsync(memberData);
 
             memberData.replace("name", data.getName());
 
             firebaseDatabase.getReference("users")
                     .child(userID.replace(".", "-"))
+                    .child("forums")
                     .child(forumID)
                     .setValueAsync(memberData);
 
             Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
-                    .set("name", data.getName())
                     .set("password", data.getPassword())
                     .build();
             txn.add(forum);
@@ -99,7 +94,7 @@ public class ForumResource {
                     .newKey(userID);
 
             Entity userForums = Entity.newBuilder(userForumsKey)
-                    .set("role", ADMIN)
+                    .set("role", "ADMIN")
                     .build();
             txn.add(userForums);
             txn.commit();
@@ -140,7 +135,7 @@ public class ForumResource {
                     .newKey(userID);
             String forumRole = txn.get(key).getString("role");
 
-            if (!forumRole.equals(ADMIN)) {
+            if (!forumRole.equals("ADMIN")) {
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
@@ -162,6 +157,7 @@ public class ForumResource {
                 datastore.delete(entity.getKey());
                 firebaseDatabase.getReference("users")
                         .child(entity.getKey().toString().replace(".", "-"))
+                        .child("forums")
                         .child(forumID)
                         .removeValueAsync();
             }
@@ -206,7 +202,7 @@ public class ForumResource {
                     .newKey(userID);
             String forumRole = txn.get(key).getString("role");
 
-            if (!forumRole.equals(ADMIN)) {
+            if (!forumRole.equals("ADMIN")) {
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
@@ -218,7 +214,7 @@ public class ForumResource {
 
             Map<String, Object> postData = new HashMap<>();
             postData.put("author", decodedToken.getName());
-            postData.put("message", data.getPost());
+            postData.put("message", data.getMessage());
             postData.put("posted", date);
 
             DatabaseReference forumRef = firebaseDatabase.getReference("forums").child(forumID).child("feed");
@@ -289,7 +285,7 @@ public class ForumResource {
                     .child(forumID)
                     .child("feed")
                     .child(postID);
-            postRef.child("message").setValueAsync(data.getPost());
+            postRef.child("message").setValueAsync(data.getMessage());
             postRef.child("edited").setValueAsync(date);
 
             LOG.info("Edited post");
@@ -336,7 +332,7 @@ public class ForumResource {
             String author = txn.get(key).getString("author");
             txn.commit();
 
-            if(!userID.equals(author) || !forumRole.equals(ADMIN)) {
+            if(!userID.equals(author) || !forumRole.equals("ADMIN")) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
             }
 
@@ -391,7 +387,7 @@ public class ForumResource {
             Entity member = txn.get(userForumsKey);
             String memberRole = member.getString("role");
 
-            if (!userRole.equals(ADMIN)) {
+            if (!userRole.equals("ADMIN")) {
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
@@ -415,6 +411,7 @@ public class ForumResource {
 
             firebaseDatabase.getReference("users")
                     .child(memberID.replace(".", "-"))
+                    .child("forums")
                     .child(forumID)
                     .child("role")
                     .setValueAsync(promotedRole);
@@ -470,7 +467,7 @@ public class ForumResource {
             Entity member = txn.get(userForumsKey);
             String memberRole = member.getString("role");
 
-            if (!userRole.equals(ADMIN)) {
+            if (!userRole.equals("ADMIN")) {
                 LOG.warning(TOKEN_NOT_FOUND);
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
@@ -493,6 +490,7 @@ public class ForumResource {
 
             firebaseDatabase.getReference("users")
                     .child(memberID.replace(".", "-"))
+                    .child("forums")
                     .child(forumID)
                     .child("role")
                     .setValueAsync(demotedRole);
@@ -569,19 +567,16 @@ public class ForumResource {
 
             firebaseDatabase.getReference("users")
                     .child(userID.replace(".", "-"))
+                    .child("forums")
                     .child(forumID)
                     .setValueAsync(memberData);
 
-            Key key =  datastore.newKeyFactory().setKind("Forum").newKey(forumID);
-            String forumName = txn.get(key).getString("name");
-
-            key = datastore.newKeyFactory()
+            Key key = datastore.newKeyFactory()
                     .setKind("User_Forums")
                     .addAncestors(PathElement.of("Forum", forumID))
                     .newKey(userID);
 
             Entity userForums = Entity.newBuilder(key)
-                    .set("name", forumName)
                     .set("role", "MEMBER")
                     .build();
             txn.add(userForums);
@@ -630,6 +625,7 @@ public class ForumResource {
 
             firebaseDatabase.getReference("users")
                     .child(userID.replace(".", "-"))
+                    .child("forums")
                     .child(forumID)
                     .removeValueAsync();
 

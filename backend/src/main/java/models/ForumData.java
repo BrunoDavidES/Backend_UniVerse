@@ -3,14 +3,17 @@ package models;
 public class ForumData {
     private String name;
     private String password;
-    private String description;
-    private String post;
+    private String message;
 
     public ForumData() {
     }
 
-    public boolean validate() {
+    public boolean validateCreation() {
         return name != null;
+    }
+
+    public boolean validatePost() {
+        return message != null;
     }
 
     public String getName() {
@@ -29,19 +32,11 @@ public class ForumData {
         this.password = password;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMessage() {
+        return message;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPost() {
-        return post;
-    }
-
-    public void setPost(String post) {
-        this.post = post;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
