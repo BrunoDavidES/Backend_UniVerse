@@ -78,6 +78,13 @@ public class ForumResource {
             forumsRef.child(forumID).child("updated").setValueAsync(date);
             forumsRef.child(forumID).child("members").child(userID.replace(".", "-")).setValueAsync(memberData);
 
+            memberData.replace("name", data.getName());
+
+            firebaseDatabase.getReference("users")
+                    .child(userID.replace(".", "-"))
+                    .child(forumID)
+                    .setValueAsync(memberData);
+
             Key forumKey = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
@@ -92,7 +99,6 @@ public class ForumResource {
                     .newKey(userID);
 
             Entity userForums = Entity.newBuilder(userForumsKey)
-                    .set("name", data.getName())
                     .set("role", ADMIN)
                     .build();
             txn.add(userForums);
@@ -154,6 +160,10 @@ public class ForumResource {
             while (results.hasNext()) {
                 Entity entity = results.next();
                 datastore.delete(entity.getKey());
+                firebaseDatabase.getReference("users")
+                        .child(entity.getKey().toString().replace(".", "-"))
+                        .child(forumID)
+                        .removeValueAsync();
             }
 
             key = datastore.newKeyFactory().setKind("Forum").newKey(forumID);
@@ -455,6 +465,13 @@ public class ForumResource {
                     .child("role")
                     .setValueAsync(promotedRole);
 
+
+            firebaseDatabase.getReference("users")
+                    .child(memberID.replace(".", "-"))
+                    .child(forumID)
+                    .child("role")
+                    .setValueAsync(promotedRole);
+
             member = Entity.newBuilder(member)
                     .set("role", promotedRole)
                     .build();
@@ -527,6 +544,12 @@ public class ForumResource {
                     .child("role")
                     .setValueAsync(demotedRole);
 
+            firebaseDatabase.getReference("users")
+                    .child(memberID.replace(".", "-"))
+                    .child(forumID)
+                    .child("role")
+                    .setValueAsync(demotedRole);
+
             member = Entity.newBuilder(member)
                     .set("role", demotedRole)
                     .build();
@@ -595,6 +618,13 @@ public class ForumResource {
                     .child(userID.replace(".", "-"))
                     .setValueAsync(memberData);
 
+            memberData.replace("name", data.getName());
+
+            firebaseDatabase.getReference("users")
+                    .child(userID.replace(".", "-"))
+                    .child(forumID)
+                    .setValueAsync(memberData);
+
             Key key =  datastore.newKeyFactory().setKind("Forum").newKey(forumID);
             String forumName = txn.get(key).getString("name");
 
@@ -649,6 +679,11 @@ public class ForumResource {
             firebaseDatabase.getReference("forums")
                     .child(forumID).child("members")
                     .child(userID.replace(".", "-"))
+                    .removeValueAsync();
+
+            firebaseDatabase.getReference("users")
+                    .child(userID.replace(".", "-"))
+                    .child(forumID)
                     .removeValueAsync();
 
             Key userForumsKey = datastore.newKeyFactory()
