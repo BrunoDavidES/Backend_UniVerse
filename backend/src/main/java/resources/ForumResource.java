@@ -183,59 +183,6 @@ public class ForumResource {
     }
 
     @POST
-    @Path("/{forumID}/update")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateForum(@HeaderParam("Authorization") String token,
-                                @PathParam("forumID") String forumID,
-                                ForumData data) {
-
-        LOG.fine("Attempt to update forum: " + forumID);
-
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        String userID = decodedToken.getUid();
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key key = datastore.newKeyFactory()
-                    .setKind("User_Forums")
-                    .addAncestors(PathElement.of("Forum", forumID))
-                    .newKey(userID);
-            String forumRole = txn.get(key).getString("role");
-            txn.commit();
-
-            if (!forumRole.equals(ADMIN)) {
-                LOG.warning(TOKEN_NOT_FOUND);
-                return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-            }
-
-            Date currentDate = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
-            String date = dateFormat.format(currentDate);
-
-            DatabaseReference forumRef = firebaseDatabase.getReference("forums").child(forumID);
-            forumRef.child("description").setValueAsync(data.getDescription());
-            forumRef.child("updated").setValueAsync(date);
-
-            LOG.info("Forum updated");
-            return Response.ok(forumID).build();
-        } catch (Exception e) {
-            txn.rollback();
-            LOG.info("Error updating forum");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
-    }
-
-    @POST
     @Path("/{forumID}/post")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response postMessage(@HeaderParam("Authorization") String token,
