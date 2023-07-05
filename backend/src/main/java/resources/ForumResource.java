@@ -169,6 +169,7 @@ public class ForumResource {
             LOG.info("Forum deleted");
             return Response.ok(forumID).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error deleting forum");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
