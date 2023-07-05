@@ -643,8 +643,9 @@
         }
     }
 
-    @media (max-width: 1400px) {
+    @media (max-width: 1420px) {
         .cardResize{
+        visibility:hidden;
             margin-left: 80%;
         }
     }
@@ -655,7 +656,7 @@
         }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 970px) {
         .cardResize{
             visibility: hidden;
         }
