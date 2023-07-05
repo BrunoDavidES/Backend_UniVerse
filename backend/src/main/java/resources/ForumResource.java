@@ -81,6 +81,7 @@ public class ForumResource {
             Key forumKey = datastore.newKeyFactory().setKind(FORUM).newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
+                    .set("name", data.getName())
                     .set("password", data.getPassword())
                     .build();
             txn.add(forum);
@@ -535,7 +536,7 @@ public class ForumResource {
                     .child(userID.replace(".", "-"))
                     .setValueAsync(memberData);
 
-            memberData.replace("name", data.getName());
+            memberData.replace("name", forum.getString("name"));
 
             firebaseDatabase.getReference(USERS)
                     .child(userID.replace(".", "-"))
