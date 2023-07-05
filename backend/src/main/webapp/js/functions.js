@@ -25,10 +25,10 @@ function loadLoggedUser() {
             document.getElementById("role").innerHTML = response.role;
             document.getElementById("departmentTitle").innerHTML = response.department;
             document.getElementById("departmentJobTitle").innerHTML = response.department_job;
+            var pic = document.getElementById("profilePic");
         }
         var storageRef = firebase.storage().ref();
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
-        var pic = document.getElementById("profilePic");
         var miniPic = document.getElementById("miniProfilePic");
         if (sessionStorage.getItem("miniProfilePic") != null){
             miniPic.src = sessionStorage.getItem("miniProfilePic");
@@ -36,7 +36,8 @@ function loadLoggedUser() {
         else{
             imgRef.getDownloadURL()
               .then(function(url) {
-                pic.src = url;
+                if (window.location.href == "/backoffice/mainPage.html")
+                    pic.src = url;
                 miniPic.src = url;
                 sessionStorage.setItem("miniProfilePic", url);
               })
