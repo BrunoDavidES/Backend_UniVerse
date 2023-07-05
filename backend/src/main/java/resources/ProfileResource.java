@@ -41,7 +41,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(username == null){
@@ -117,7 +117,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -139,8 +139,15 @@ public class ProfileResource {
                 eventAux = txn.get(feedKey);
             } while (eventAux != null);
 
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            Entity department = txn.get(departmentKey);
+            if( department == null ) {
+                txn.rollback();
+                LOG.warning(WRONG_DEPARTMENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+            }
             Key eventKey = datastore.newKeyFactory().addAncestor(PathElement.of(USER, decodedToken.getUid())).setKind("PersonalEvent").newKey(id);
-            Entity event = txn.get(eventKey);
+            Entity event;
 
             event = Entity.newBuilder(eventKey)
                     .set("id", id)
@@ -149,6 +156,7 @@ public class ProfileResource {
                     .set("beginningDate", data.beginningDate)
                     .set("hours", data.hours)
                     .set("location", data.location)
+                    .set("department", data.department)
                     .set("time_created", Timestamp.now())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
@@ -173,7 +181,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -198,6 +206,7 @@ public class ProfileResource {
         data.id = event.getString("id");
         data.title = event.getString("title");
         data.username = event.getString("username");
+        data.department = event.getString("department");
         data.beginningDate = event.getString("beginningDate");
         data.hours = event.getString("hours");
         data.location = event.getString("location");
@@ -216,7 +225,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -268,7 +277,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -287,11 +296,19 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            Entity department = txn.get(departmentKey);
+            if( department == null ) {
+                txn.rollback();
+                LOG.warning(WRONG_DEPARTMENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+            }
             Entity updatedEvent = Entity.newBuilder(event)
                     .set("title", data.title)
                     .set("beginningDate", data.beginningDate)
                     .set("hours", data.hours)
                     .set("location", data.location)
+                    .set("department", data.department)
                     .set("time_lastupdate", Timestamp.now())
                     .build();
             txn.update(updatedEvent);
@@ -314,7 +331,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -414,7 +431,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         QueryResults<Entity> queryResults;

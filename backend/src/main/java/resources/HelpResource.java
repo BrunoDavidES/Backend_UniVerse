@@ -33,7 +33,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         /*if(!data.validate()) {
@@ -85,7 +85,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         /*if(!data.validate()) {
@@ -132,7 +132,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(!getRole(decodedToken).equals("EXAMPLE")) {
@@ -182,7 +182,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(!getRole(decodedToken).equals("EXAMPLE")) {
@@ -229,7 +229,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(!getRole(decodedToken).equals("EXAMPLE") && !decodedToken.getUid().equals(userID)) {
@@ -276,7 +276,7 @@ public class HelpResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(!getRole(decodedToken).equals("EXAMPLE")) {

@@ -36,7 +36,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(!data.validateCreation()) {
@@ -81,6 +81,7 @@ public class ForumResource {
             Key forumKey = datastore.newKeyFactory().setKind(FORUM).newKey(forumID);
 
             Entity forum = Entity.newBuilder(forumKey)
+                    .set("name", data.getName())
                     .set("password", data.getPassword())
                     .build();
             txn.add(forum);
@@ -119,7 +120,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String userID = decodedToken.getUid();
@@ -153,6 +154,17 @@ public class ForumResource {
                         .child(FORUMS)
                         .child(forumID)
                         .removeValueAsync();
+            }
+
+            query = Query.newEntityQueryBuilder()
+                    .setKind(USER_FORUMS)
+                    .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
+                    .build();
+
+            results = datastore.run(query);
+            while (results.hasNext()) {
+                Entity entity = results.next();
+                datastore.delete(entity.getKey());
             }
 
             key = datastore.newKeyFactory().setKind(FORUM).newKey(forumID);
@@ -289,6 +301,7 @@ public class ForumResource {
 
         String userID = decodedToken.getUid();
 
+        Transaction txn = datastore.newTransaction();
         try {
             String forumRole = getForumRole(forumID, userID);
             String author = getPostAuthor(forumID, postID);
@@ -296,6 +309,18 @@ public class ForumResource {
             if(!userID.equals(author) || !forumRole.equals(ADMIN)) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid Token").build();
             }
+
+            Key key = datastore.newKeyFactory()
+                    .setKind(FORUM_POSTS)
+                    .addAncestors(PathElement.of(FORUM, forumID))
+                    .newKey(postID);
+            Entity entity = txn.get(key);
+
+            if(entity == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity(TOKEN_NOT_FOUND).build();
+            }
+            txn.delete();
+            txn.commit();
 
             firebaseDatabase.getReference(FORUMS)
                     .child(forumID)
@@ -306,8 +331,13 @@ public class ForumResource {
             LOG.info("Removed post");
             return Response.ok(author).build();
         } catch (Exception e) {
+            txn.rollback();
             LOG.info("Error removing post");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
         }
     }
 
@@ -323,7 +353,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String userID = decodedToken.getUid();
@@ -398,7 +428,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String userID = decodedToken.getUid();
@@ -473,7 +503,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String userID = decodedToken.getUid();
@@ -506,7 +536,7 @@ public class ForumResource {
                     .child(userID.replace(".", "-"))
                     .setValueAsync(memberData);
 
-            memberData.replace("name", data.getName());
+            memberData.replace("name", forum.getString("name"));
 
             firebaseDatabase.getReference(USERS)
                     .child(userID.replace(".", "-"))
@@ -549,7 +579,7 @@ public class ForumResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String userID = decodedToken.getUid();

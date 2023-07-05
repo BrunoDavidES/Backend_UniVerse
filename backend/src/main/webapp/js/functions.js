@@ -189,7 +189,6 @@ function editEvent(){
     var startDate = document.getElementById("startDateMod").value;
     var endDate = document.getElementById("endDateMod").value;
     var location = document.getElementById("locationMod").value;
-    var department = document.getElementById("departmentMod").value;
     var capacity = document.getElementById("capacityMod").value;
     var isPublic = document.getElementById("isPublicMod").value;
     var isItPaid = document.getElementById("isItPaidMod").value;
@@ -210,10 +209,6 @@ function editEvent(){
 
     if (location !== "") {
           data["location"] = location;
-    }
-
-    if (department !== "") {
-          data["department"] = department;
     }
 
     if (isPublic !== "") {
