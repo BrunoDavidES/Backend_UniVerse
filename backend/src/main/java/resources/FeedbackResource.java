@@ -26,7 +26,8 @@ public class FeedbackResource {
     @POST
     @Path("/submit")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response submitFeedback(@HeaderParam("Authorization") String token,  FeedbackData data){
+    public Response submitFeedback(@HeaderParam("Authorization") String token,
+                                   FeedbackData data){
         LOG.fine("Attempt to post feedback.");
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -74,9 +75,9 @@ public class FeedbackResource {
     // TODO check pagination
     @GET
     @Path("/view")
-    public Response editReport(@HeaderParam("Authorization") String token,
-                               @QueryParam("size") int size,
-                               @QueryParam("cursor") String cursor){
+    public Response viewFeedback(@HeaderParam("Authorization") String token,
+                                 @QueryParam("size") int size,
+                                 @QueryParam("cursor") String cursor){
         LOG.fine("Attempt to fetch feedback");
 
         FirebaseToken decodedToken = authenticateToken(token);

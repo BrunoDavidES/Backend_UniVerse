@@ -1,9 +1,9 @@
 package models;
 
-public class FeedbackData {
+public class HelpData {
     private String message;
 
-    public FeedbackData() {}
+    public HelpData() {}
 
     public String getMessage() {
         return message;
