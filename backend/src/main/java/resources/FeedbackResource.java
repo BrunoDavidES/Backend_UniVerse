@@ -33,7 +33,7 @@ public class FeedbackResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         /*if(!data.validate()) {
@@ -83,7 +83,7 @@ public class FeedbackResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         if(getRole(decodedToken) == "EXAMPLE") {
