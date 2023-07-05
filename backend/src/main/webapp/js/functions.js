@@ -29,28 +29,35 @@ function loadLoggedUser() {
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
         var pic = document.getElementById("profilePic");
         var miniPic = document.getElementById("miniProfilePic");
-        imgRef.getDownloadURL()
-          .then(function(url) {
-            pic.src = url;
-            miniPic.src = url;
-          })
-          .catch(function(error) {
-            console.error("Error retrieving image:", error);
-            pic.src = "../img/logo.png";
-            miniPic.src = "../img/logo.png";
-          });
-
+        if (sessionStorage.getItem("miniProfilePic") != null){
+            miniPic.src = sessionStorage.getItem("miniProfilePic");
+        }
+        else{
+            imgRef.getDownloadURL()
+              .then(function(url) {
+                pic.src = url;
+                miniPic.src = url;
+                sessionStorage.setItem("miniProfilePic", url);
+              })
+              .catch(function(error) {
+                console.error("Error retrieving image:", error);
+                pic.src = "../img/logo.png";
+                miniPic.src = "../img/logo.png";
+              });
+        }
         // Check if the role is not "A" or "BO" and redirect if necessary
         if (response.role !== "A" && response.role !== "BO") {
           alert(response.role);
            sessionStorage.removeItem("capiToken");
            sessionStorage.removeItem("userLogged");
+           sessionStorage.removeItem("miniProfilePic");
           window.location.href = "/backoffice/index.html";
         }
       } else {
         console.error(request.responseText);
          sessionStorage.removeItem("capiToken");
          sessionStorage.removeItem("userLogged");
+         sessionStorage.removeItem("miniProfilePic");
         window.location.href = "/backoffice/index.html";
       }
     }
