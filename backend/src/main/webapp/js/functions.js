@@ -20,11 +20,12 @@ function loadLoggedUser() {
         var response = JSON.parse(request.responseText);
 
         document.getElementById("name").innerHTML = response.name;
-        document.getElementById("usernameMail").innerHTML = response.email;
-        document.getElementById("role").innerHTML = response.role;
-        document.getElementById("departmentTitle").innerHTML = response.department;
-        document.getElementById("departmentJobTitle").innerHTML = response.department_job;
-
+        if (window.location.href == "/backoffice/mainPage.html"){
+            document.getElementById("usernameMail").innerHTML = response.email;
+            document.getElementById("role").innerHTML = response.role;
+            document.getElementById("departmentTitle").innerHTML = response.department;
+            document.getElementById("departmentJobTitle").innerHTML = response.department_job;
+        }
         var storageRef = firebase.storage().ref();
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
         var pic = document.getElementById("profilePic");
