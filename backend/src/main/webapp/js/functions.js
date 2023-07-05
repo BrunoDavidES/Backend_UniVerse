@@ -1181,14 +1181,17 @@ function queryReports(){
                         var title = document.createElement('h2');
                         title.textContent = " " + entity.title.value;
                         details.appendChild(title);
-
+                        var updateDate = new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
+                        if(updateDate === null){
+                            updateDate = "";
+                        }
                         var description = document.createElement('p');
                         description.innerHTML = "&emsp;Título do Report: " + entity.title.value +
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
                                                 "<br> &emsp;Localização: " + entity.location.value +
                                                 "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
-                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + updateDate +
                                                 "<br> &emsp;Estado do Report: " + entity.status.value;
 
                         details.appendChild(description);
