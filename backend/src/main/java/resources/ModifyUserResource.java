@@ -2,7 +2,11 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.cloud.firestore.FieldValue;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.auth.UserRecord;
 import models.ModifyAttributesData;
 import models.ModifyPwdData;
 import models.ModifyRoleData;
@@ -11,6 +15,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static utils.Constants.*;
@@ -22,7 +28,7 @@ import static utils.FirebaseAuth.getRole;
 public class ModifyUserResource {
     private static final Logger LOG = Logger.getLogger(ModifyUserResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
-
+    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @POST
     @Path("/attributes")
@@ -84,7 +90,7 @@ public class ModifyUserResource {
             }
         }
     }
-
+/*
     @POST
     @Path("/pwd")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -135,7 +141,7 @@ public class ModifyUserResource {
             }
         }
     }
-
+*/
     @POST
     @Path("/role")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -163,12 +169,12 @@ public class ModifyUserResource {
                 txn.rollback();
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else if (!data.validatePermission(getRole(decodedToken), target.getString(ROLE), target)) {
+            } else if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)), target)) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-                if (!data.validatePermission(getRole(decodedToken), target.getString(ROLE), target)) {
+                if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)), target)) {
                     txn.rollback();
                     LOG.warning(PERMISSION_DENIED);
                     return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
@@ -179,8 +185,14 @@ public class ModifyUserResource {
                 } else {
                     Entity.Builder newUser = Entity.newBuilder(target);
 
-                    newUser.set("role", data.newRole)
-                            .set("department", data.department)
+                    Map<String, Object> customClaims = new HashMap<>();
+                    customClaims.put(ROLE, data.newRole);
+                    customClaims.put(LAST_UPDATE, Timestamp.now());
+                    firebaseAuth.setCustomUserClaims(data.target, customClaims);
+
+                    LOG.info("role: "+data.newRole+", " + getRole(firebaseAuth.getUser(data.target)));
+
+                    newUser.set("department", data.department)
                             .set("department_job", data.department_job);
 
                     if (data.newRole.equals(TEACHER)) {
@@ -198,7 +210,9 @@ public class ModifyUserResource {
                     return Response.ok(target).build();
                 }
             }
-            } finally{
+            } catch (FirebaseAuthException e) {
+            throw new RuntimeException(e);
+        } finally{
                 if (txn.isActive()) {
                     txn.rollback();
                 }
@@ -230,7 +244,7 @@ public class ModifyUserResource {
                     txn.rollback();
                     LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                     return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-                } else if (!data.validateDelete(getRole(decodedToken), target.getString(ROLE))
+                } else if (!data.validateDelete(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)))
                         && !decodedToken.getUid().equals(data.target)) {
                     txn.rollback();
                     LOG.warning(PERMISSION_DENIED);
@@ -252,6 +266,8 @@ public class ModifyUserResource {
                     txn.commit();
                     return Response.ok(target).build();
                 }
+            } catch (FirebaseAuthException e) {
+                throw new RuntimeException(e);
             } finally {
                 if (txn.isActive()) {
                     txn.rollback();

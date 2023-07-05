@@ -15,9 +15,9 @@ public class FirebaseAuth {
         try {
             FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
 
-            if( ! firebaseAuth.getUser(decodedToken.getUid()).isEmailVerified()) {
+           /* if( ! firebaseAuth.getUser(decodedToken.getUid()).isEmailVerified()) {
                 return null;
-            }
+            }*/
             return decodedToken;
         } catch (FirebaseAuthException e) {
             return null;

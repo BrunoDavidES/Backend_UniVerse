@@ -11,7 +11,6 @@ var firebaseConfig = {
         // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-
 document.addEventListener("DOMContentLoaded", function() {
     var loginForm = document.getElementById("loginForm");
     loginForm.addEventListener("submit", function(event) {
@@ -30,17 +29,22 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
         firebase.auth().onAuthStateChanged(function(user) {
-          if (user) {
-            user.getIdToken().then(function(token) {
-              sessionStorage.setItem("capiToken", token);
-            }).catch(function(error) {
-              console.error(error);
-            });
-          }
+            if (user) {
+                user.getIdToken().then(function(token) {
+                    var existingToken = sessionStorage.getItem("capiToken");
+                    if (existingToken) {
+                        sessionStorage.removeItem("capiToken");
+                    }
+                    sessionStorage.setItem("capiToken", token);
+                }).catch(function(error) {
+                    console.error(error);
+                });
+            }
         });
 
     });
 });
+
 
 
 const togglePassword = document.querySelector('#togglePassword');

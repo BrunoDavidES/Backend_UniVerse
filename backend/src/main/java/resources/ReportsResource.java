@@ -185,7 +185,7 @@ public class ReportsResource {
 
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN) ){
+        if(!getRole(decodedToken).equals(BO) && !getRole(decodedToken).equals(ADMIN) ){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
@@ -245,7 +245,7 @@ public class ReportsResource {
 
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN)){
+        if(!getRole(decodedToken).equals(BO) && !getRole(decodedToken).equals(ADMIN)){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
 
@@ -304,7 +304,7 @@ public class ReportsResource {
 
         Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
         Entity user = datastore.get(userKey);
-        if(!user.getString(ROLE).equals(BO) && !user.getString(ROLE).equals(ADMIN)){
+        if(!getRole(decodedToken).equals(BO) && !getRole(decodedToken).equals(ADMIN)){
             LOG.warning(NICE_TRY);
             return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
 
