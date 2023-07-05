@@ -2,6 +2,8 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.PersonalEventsData;
@@ -26,12 +28,14 @@ public class ProfileResource {
 
     public Gson g = new Gson();
 
+    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
     // Talvez adicionar LinkedIn
 
     @GET
     @Path("/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getProfile(@HeaderParam("Authorization") String token, @PathParam("username") String username){
+    public Response getProfile(@HeaderParam("Authorization") String token, @PathParam("username") String username) throws FirebaseAuthException {
         LOG.fine("Attempt to get profile by " + username);
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -71,7 +75,7 @@ public class ProfileResource {
         data.username = username;
         data.name = user.getString("name");
         data.email = user.getString("email");
-        data.role = user.getString("role");
+        data.role = getRole(firebaseAuth.getUser(username));
         data.department = user.getString("department");
         data.department_job = user.getString("department_job");
 
@@ -351,7 +355,7 @@ public class ProfileResource {
         //Verificar, caso for evento privado, se o token é valido
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
+            LOG.warning(TOKEN_NOT_FOUND + " token: " + token);
             return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
         }
 
