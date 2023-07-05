@@ -20,31 +20,35 @@ function loadLoggedUser() {
         var response = JSON.parse(request.responseText);
 
         document.getElementById("name").innerHTML = response.name;
-        if (window.location.href == "/backoffice/mainPage.html"){
+        var pic = null;
+        if (window.location.href === "/backoffice/mainPage.html"){
             document.getElementById("usernameMail").innerHTML = response.email;
             document.getElementById("role").innerHTML = response.role;
             document.getElementById("departmentTitle").innerHTML = response.department;
             document.getElementById("departmentJobTitle").innerHTML = response.department_job;
-            var pic = document.getElementById("profilePic");
+            pic = document.getElementById("profilePic");
         }
         var storageRef = firebase.storage().ref();
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
         var miniPic = document.getElementById("miniProfilePic");
+
         if (sessionStorage.getItem("miniProfilePic") != null){
+            pic.src = sessionStorage.getItem("minProfilePic");
             miniPic.src = sessionStorage.getItem("miniProfilePic");
         }
         else{
             imgRef.getDownloadURL()
               .then(function(url) {
-                if (window.location.href == "/backoffice/mainPage.html")
+                if (window.location.href === "/backoffice/mainPage.html"){
                     pic.src = url;
+                }
                 miniPic.src = url;
                 sessionStorage.setItem("miniProfilePic", url);
               })
               .catch(function(error) {
                 console.error("Error retrieving image:", error);
-                pic.src = "../img/logo.png";
                 miniPic.src = "../img/logo.png";
+                pic.src = "../img/logo.png";
               });
         }
         // Check if the role is not "A" or "BO" and redirect if necessary
