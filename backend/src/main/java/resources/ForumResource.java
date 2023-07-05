@@ -57,10 +57,7 @@ public class ForumResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Date currentDate = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
-            String date = dateFormat.format(currentDate);
+            String date = getCurrentDate();
 
             Map<String, Object> memberData = new HashMap<>();
             memberData.put("name", userName);
@@ -648,6 +645,13 @@ public class ForumResource {
                 txn.rollback();
             }
         }
+    }
+
+    private String getCurrentDate() {
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Lisbon"));
+        return dateFormat.format(currentDate);
     }
 
 
