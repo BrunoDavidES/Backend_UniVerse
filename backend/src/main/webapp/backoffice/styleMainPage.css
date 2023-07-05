@@ -145,7 +145,7 @@
       border: 2px solid #EFEEF1;
       border-radius: 6px;
       height: 50px;
-      min-width: 190px;
+      min-width: 250px;
       padding: 0 15px 0 2px;
     }
     nav .profile-details img{
@@ -633,7 +633,7 @@
       }
 
       .cardResize{
-        margin-left: 70%;
+        visibility: hidden;
       }
     }
 
@@ -654,6 +654,16 @@
             margin-left: 70%;
         }
     }
+
+    @media (max-width: 900px) {
+        .cardResize{
+            visibility: hidden;
+        }
+        .form{
+            margin-bottom:20px;
+        }
+    }
+
 
     @media (max-width: 800px) {
         .cardResize{

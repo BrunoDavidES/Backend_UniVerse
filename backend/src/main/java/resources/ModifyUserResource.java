@@ -183,15 +183,14 @@ public class ModifyUserResource {
                     LOG.warning(WRONG_DEPARTMENT);
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
                 } else {
-                    Entity.Builder newUser = Entity.newBuilder(target);
-
-                    Map<String, Object> customClaims = new HashMap<>();
-                    customClaims.put(ROLE, data.newRole);
-                    customClaims.put(LAST_UPDATE, Timestamp.now());
-                    firebaseAuth.setCustomUserClaims(data.target, customClaims);
-
-                    LOG.info("role: "+data.newRole+", " + getRole(firebaseAuth.getUser(data.target)));
-
+                        Entity.Builder newUser = Entity.newBuilder(target);
+                    if(data.newRole != null && !data.newRole.equals("")) {
+                        Map<String, Object> customClaims = new HashMap<>();
+                        customClaims.put(ROLE, data.newRole);
+                        customClaims.put(LAST_UPDATE, Timestamp.now());
+                        firebaseAuth.setCustomUserClaims(data.target, customClaims);
+                        LOG.info("role: "+data.newRole+", " + getRole(firebaseAuth.getUser(data.target)));
+                    }
                     newUser.set("department", data.department)
                             .set("department_job", data.department_job);
 

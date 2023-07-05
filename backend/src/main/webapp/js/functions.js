@@ -7,32 +7,59 @@ function verifyLogin() {
 }
 
 function loadLoggedUser() {
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-      var userId = user.uid;
-      console.log("USERID: " + userId);
-      var userRef = firebase.database().ref('users/' + userId);
-      console.log("USERREF: " + userRef);
+  var request = new XMLHttpRequest();
+  var token = sessionStorage.getItem("capiToken");
 
-      userRef.once('value').then(function(snapshot) {
-        var userLogged = snapshot.val();
-        console.log("USERLOGGED: " + userLogged);
+  request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.setRequestHeader("Authorization", token);
 
-        //Quando se faz import do database no html, diz q não temos permissão para aceder ao userLogged
-        document.getElementById("name").innerHTML = userLogged.name;
-        document.getElementById("usernameMail").innerHTML = userLogged.email;
-        document.getElementById("role").innerHTML = userLogged.role;
-        document.getElementById("departmentTitle").innerHTML = userLogged.department;
-        document.getElementById("departmentJobTitle").innerHTML = userLogged.department_job;
-      }).catch(function(error) {
-        console.error(error);
+  request.onreadystatechange = function() {
+    if (request.readyState === 4) {
+      if (request.status === 200) {
+        var response = JSON.parse(request.responseText);
+
+        document.getElementById("name").innerHTML = response.name;
+        document.getElementById("usernameMail").innerHTML = response.email;
+        document.getElementById("role").innerHTML = response.role;
+        document.getElementById("departmentTitle").innerHTML = response.department;
+        document.getElementById("departmentJobTitle").innerHTML = response.department_job;
+
+        var storageRef = firebase.storage().ref();
+        var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
+        var pic = document.getElementById("profilePic");
+        var miniPic = document.getElementById("miniProfilePic");
+        imgRef.getDownloadURL()
+          .then(function(url) {
+            pic.src = url;
+            miniPic.src = url;
+          })
+          .catch(function(error) {
+            console.error("Error retrieving image:", error);
+            pic.src = "../img/logo.png";
+            miniPic.src = "../img/logo.png";
+          });
+
+        // Check if the role is not "A" or "BO" and redirect if necessary
+        if (response.role !== "A" && response.role !== "BO") {
+          alert(response.role);
+           sessionStorage.removeItem("capiToken");
+           sessionStorage.removeItem("userLogged");
+          window.location.href = "/backoffice/index.html";
+        }
+      } else {
+        console.error(request.responseText);
+         sessionStorage.removeItem("capiToken");
+         sessionStorage.removeItem("userLogged");
         window.location.href = "/backoffice/index.html";
-      });
-    } else {
-      window.location.href = "/backoffice/index.html";
+      }
     }
-  });
+  };
+
+  request.send();
 }
+
+
 
 function logout() {
   firebase.auth().signOut().then(function() {
@@ -286,6 +313,9 @@ function getEvent(){
 
 var queryEventsCursor = "EMPTY";
 function queryEvents(){
+    if(queryEventsCursor == null){
+        queryEventsCursor = "EMPTY";
+    }
     var list = document.getElementById('listOfEvents');
     var limit = parseInt(document.getElementById("listLimitId").value);
     var data = {};
@@ -813,7 +843,6 @@ function modifyUserRole(){
     var department = document.getElementById("newDepartment").value;
     var department_job = document.getElementById("newJob").value;
     var office = document.getElementById("newOffice").value;
-
     var data = {
         "target": target,
         "newRole": newRole,
@@ -1041,7 +1070,7 @@ var id = document.getElementById("idReport").value;
 
                 var storageRef = firebase.storage().ref();
                 var fileRef = storageRef.child('Reports/' + id + ".txt");
-                var imgRef = storageRef.child('Reports/' + id + ".png");
+                var imgRef = storageRef.child('Reports/' + id);
 
                 fileRef.getDownloadURL()
                   .then(function(url) {

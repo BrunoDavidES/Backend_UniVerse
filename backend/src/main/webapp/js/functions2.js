@@ -65,6 +65,31 @@ function newsToSolve(){
     xmlhttp.send(JSON.stringify(notRes));
 }
 
+function eventsToSolve(){
+     var notRes = {
+        "validated_backoffice": false
+     };
+
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("POST", document.location.origin + "/rest/feed/numberOf/Event", true);
+    xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xmlhttp.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    xmlhttp.onreadystatechange = function() {
+        if(xmlhttp.readyState == 4) {
+            if(xmlhttp.status == 200) {
+                document.getElementById("unresolvedEvents").innerHTML = xmlhttp.responseText;
+            }
+            else{
+                console.log(xmlhttp.responseText);
+            }
+        }
+    }
+
+    xmlhttp.send(JSON.stringify(notRes));
+}
+
 function queryEventsWithDates(date1, date2){
     var list = document.getElementById('listOfEvents');
     var request = new XMLHttpRequest();

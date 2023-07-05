@@ -7,14 +7,16 @@
   <link rel="stylesheet" href="stickyNote.css">
   <link rel="stylesheet" href="clock.css">
   <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-storage.js"></script>
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve(); newsToSolve();">
+<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve(); newsToSolve(); eventsToSolve();">
 <div class="cardResize">
   <div class="card" style="width: 250px;">
-    <img src="../img/logo.png" alt="User Photo" style="width:100%">
+    <img alt="User Photo" id="profilePic" style="width:100%">
     <h1 id="usercard"></h1>
     <p class="title" id="usernameMail"></p>
     <p class="title" id="departmentTitle"></p>
@@ -105,35 +107,41 @@
       <span class="home">Home</span>
     </div>
     <h1> Back Office da FCT NOVA</h1>
-    <div class="profile-details" id="auxLogged">
-      <img src="../img/logo.png" alt="">
+    <div class="profile-details" style="margin-right:14px" id="auxLogged">
+      <img id="miniProfilePic" alt="">
       <span class="admin_name" id="name"></span>
     </div>
   </nav>
 
   <div class="home-content">
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
       <div class="title" style="text-align: center">Users na Aplicação</div>
       <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #0f0; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
-    <br>
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
       <div class="title" style="text-align: center">Users Registados</div>
       <div id="registered" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
-    <br>
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+    <br><br>
+
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
       <div class="title" style="text-align: center">Reports por Resolver</div>
       <div id="unresolvedRep" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bxs-comment-error'></i></div>
     </div>
-    <br>
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
       <div class="title" style="text-align: center">Notícias por Validar</div>
       <div id="unresolvedNews" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bx-news'></i></div>
+    </div>
+    <br><br>
+    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
+      <div class="title" style="text-align: center">Eventos por Validar</div>
+      <div id="unresolvedEvents" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bx-calendar-event'></i></div>
     </div>
   </div>
   <div class="popup" id="popup">
