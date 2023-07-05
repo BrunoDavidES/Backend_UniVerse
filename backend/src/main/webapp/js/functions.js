@@ -10,10 +10,15 @@ function loadLoggedUser() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       var userId = user.uid;
+      console.log("USERID: " + userId);
       var userRef = firebase.database().ref('users/' + userId);
+      console.log("USERREF: " + userRef);
 
       userRef.once('value').then(function(snapshot) {
         var userLogged = snapshot.val();
+        console.log("USERLOGGED: " + userLogged);
+
+        //Quando se faz import do database no html, diz q não temos permissão para aceder ao userLogged
         document.getElementById("name").innerHTML = userLogged.name;
         document.getElementById("usernameMail").innerHTML = userLogged.email;
         document.getElementById("role").innerHTML = userLogged.role;
@@ -31,7 +36,8 @@ function loadLoggedUser() {
 
 function logout() {
   firebase.auth().signOut().then(function() {
-    localStorage.setItem("userLogged", "");
+    sessionStorage.removeItem("userLogged");
+    sessionStorage.removeItem("capiToken");
     window.location.href = "/backoffice/index.html";
   }).catch(function(error) {
     console.error(error);
@@ -923,7 +929,6 @@ function queryUsers(){
                         description.innerHTML = "&emsp;Nome do user: " + entity.name.value +
                                                 "<br> &emsp;Username: " + entity.username +
                                                 "<br> &emsp;Email: " + entity.email.value +
-                                                "<br> &emsp;Role: " + entity.role.value +
                                                 "<br> &emsp;Departamento: " + entity.department.value +
                                                 "<br> &emsp;Função no departamento: " + entity.department_job.value +
                                                 "<br> &emsp;Escritório: " + entity.office.value +

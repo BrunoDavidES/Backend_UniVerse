@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
         firebase.auth().signInWithEmailAndPassword(username, pass)
             .then(function() {
                 document.getElementById("password").value = null;
-                localStorage.setItem("userLogged", username);
+                sessionStorage.setItem("userLogged", username);
                 window.location.href = "/backoffice/mainPage.html";
             })
             .catch(function(error) {
