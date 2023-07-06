@@ -66,6 +66,10 @@ function loadLoggedUser() {
     }
   };
 
+   if(response.role != "A"){
+       document.getElementById("BO").style.display = "none";
+   }
+
   request.send();
 }
 
