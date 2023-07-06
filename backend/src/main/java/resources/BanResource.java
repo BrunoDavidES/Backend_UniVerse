@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import static utils.Constants.*;
 import static utils.FirebaseAuth.authenticateToken;
+import static utils.FirebaseAuth.getRole;
 
 @Path("/{username}")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -29,6 +30,12 @@ public class BanResource {
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        String role = getRole(decodedToken);
+        if(!role.equals(BO) && !role.equals(ADMIN)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
 
         /*if(!data.validate()) {
@@ -62,6 +69,12 @@ public class BanResource {
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        String role = getRole(decodedToken);
+        if(!role.equals(BO) && !role.equals(ADMIN)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
 
         /*if(!data.validate()) {

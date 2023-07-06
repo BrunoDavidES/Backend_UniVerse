@@ -1312,13 +1312,19 @@ function queryUnresolvedReports(){
                         title.textContent = " " + entity.title.value;
                         details.appendChild(title);
 
+                        var updateDateString = "";
+                        if (entity.time_lastUpdated && entity.time_lastUpdated.value && entity.time_lastUpdated.value.seconds) {
+                            var updateDate = entity.time_lastUpdated.value.seconds;
+                            updateDateString = new Date(updateDate * 1000).toString();
+                        }
+
                         var description = document.createElement('p');
                         description.innerHTML = "&emsp;Título do Report: " + entity.title.value +
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
                                                 "<br> &emsp;Localização: " + entity.location.value +
                                                 "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
-                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + updateDateString +
                                                 "<br> &emsp;Estado do Report: " + entity.status.value;
 
                         details.appendChild(description);
