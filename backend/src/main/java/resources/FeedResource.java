@@ -64,6 +64,13 @@ public class FeedResource {
             Transaction txn = datastore.newTransaction();
             try {
                 if (kind.equals(EVENT)) {
+                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+                    Entity department = txn.get(departmentKey);
+                    if( department == null ) {
+                        txn.rollback();
+                        LOG.warning(WRONG_DEPARTMENT);
+                        return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
+                    }
                     if (role.equals(TEACHER)) {
                         Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
                         Entity teacher = txn.get(teacherKey);

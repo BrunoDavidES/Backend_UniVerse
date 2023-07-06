@@ -20,37 +20,50 @@ function loadLoggedUser() {
         var response = JSON.parse(request.responseText);
 
         document.getElementById("name").innerHTML = response.name;
-        document.getElementById("usernameMail").innerHTML = response.email;
-        document.getElementById("role").innerHTML = response.role;
-        document.getElementById("departmentTitle").innerHTML = response.department;
-        document.getElementById("departmentJobTitle").innerHTML = response.department_job;
-
+        var pic = null;
+        if (window.location.href === "/backoffice/mainPage.html"){
+            document.getElementById("usernameMail").innerHTML = response.email;
+            document.getElementById("role").innerHTML = response.role;
+            document.getElementById("departmentTitle").innerHTML = response.department;
+            document.getElementById("departmentJobTitle").innerHTML = response.department_job;
+            pic = document.getElementById("profilePic");
+        }
         var storageRef = firebase.storage().ref();
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
-        var pic = document.getElementById("profilePic");
         var miniPic = document.getElementById("miniProfilePic");
-        imgRef.getDownloadURL()
-          .then(function(url) {
-            pic.src = url;
-            miniPic.src = url;
-          })
-          .catch(function(error) {
-            console.error("Error retrieving image:", error);
-            pic.src = "../img/logo.png";
-            miniPic.src = "../img/logo.png";
-          });
 
+        if (sessionStorage.getItem("miniProfilePic") != null){
+            pic.src = sessionStorage.getItem("minProfilePic");
+            miniPic.src = sessionStorage.getItem("miniProfilePic");
+        }
+        else{
+            imgRef.getDownloadURL()
+              .then(function(url) {
+                if (window.location.href === "/backoffice/mainPage.html"){
+                    pic.src = url;
+                }
+                miniPic.src = url;
+                sessionStorage.setItem("miniProfilePic", url);
+              })
+              .catch(function(error) {
+                console.error("Error retrieving image:", error);
+                miniPic.src = "../img/logo.png";
+                pic.src = "../img/logo.png";
+              });
+        }
         // Check if the role is not "A" or "BO" and redirect if necessary
         if (response.role !== "A" && response.role !== "BO") {
           alert(response.role);
            sessionStorage.removeItem("capiToken");
            sessionStorage.removeItem("userLogged");
+           sessionStorage.removeItem("miniProfilePic");
           window.location.href = "/backoffice/index.html";
         }
       } else {
         console.error(request.responseText);
          sessionStorage.removeItem("capiToken");
          sessionStorage.removeItem("userLogged");
+         sessionStorage.removeItem("miniProfilePic");
         window.location.href = "/backoffice/index.html";
       }
     }
@@ -182,7 +195,6 @@ function editEvent(){
     var startDate = document.getElementById("startDateMod").value;
     var endDate = document.getElementById("endDateMod").value;
     var location = document.getElementById("locationMod").value;
-    var department = document.getElementById("departmentMod").value;
     var capacity = document.getElementById("capacityMod").value;
     var isPublic = document.getElementById("isPublicMod").value;
     var isItPaid = document.getElementById("isItPaidMod").value;
@@ -203,10 +215,6 @@ function editEvent(){
 
     if (location !== "") {
           data["location"] = location;
-    }
-
-    if (department !== "") {
-          data["department"] = department;
     }
 
     if (isPublic !== "") {
@@ -1030,11 +1038,11 @@ function getUser() {
 
 //REPORTS
 
-function getReport(){
-var id = document.getElementById("idReport").value;
+function getReport() {
+    var id = document.getElementById("idReport").value;
 
     var data = {
-        "id":id
+        "id": id
     };
 
     var request = new XMLHttpRequest();
@@ -1044,10 +1052,10 @@ var id = document.getElementById("idReport").value;
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange = function() {
-        if ( request.readyState === 4 ) {
-            if ( request.status === 200 ) {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
                 const response = JSON.parse(request.responseText);
-                const entities = response.map( function(entity) {
+                const entities = response.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         reporter: entity.properties.reporter,
@@ -1064,63 +1072,45 @@ var id = document.getElementById("idReport").value;
                     document.getElementById("authorRep").value = entity.reporter.value;
                     document.getElementById("statusRep").value = entity.status.value;
                     document.getElementById("creationRep").value = new Date(entity.time_creation.value.seconds * 1000).toString();
-                    document.getElementById("lastUpdatedRep").value = new Date(entity.time_lastUpdated.value.seconds * 1000).toString();
-                });
 
+                    var lastUpdatedValue = entity.time_lastUpdated && entity.time_lastUpdated.value && entity.time_lastUpdated.value.seconds;
+                    document.getElementById("lastUpdatedRep").value = lastUpdatedValue ? new Date(lastUpdatedValue * 1000).toString() : "";
+                });
 
                 var storageRef = firebase.storage().ref();
                 var fileRef = storageRef.child('Reports/' + id + ".txt");
                 var imgRef = storageRef.child('Reports/' + id);
 
                 fileRef.getDownloadURL()
-                  .then(function(url) {
-                    return fetch(url);
-                  })
-                  .then(function(response) {
-                    if (response.ok) {
-                      return response.text();
-                    } else {
-                      throw new Error("Error fetching file. Status: " + response.status);
-                    }
-                  })
-                  .then(function(fileContent) {
-                    localStorage.setItem(id, fileContent);
-                    document.getElementById("textRep").value = fileContent;
-                  })
-                  .catch(function(error) {
-                    console.error("Error accessing file:", error);
-                  });
+                    .then(function(url) {
+                        return fetch(url);
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.text();
+                        } else {
+                            throw new Error("Error fetching file. Status: " + response.status);
+                        }
+                    })
+                    .then(function(fileContent) {
+                        localStorage.setItem(id, fileContent);
+                        document.getElementById("textRep").value = fileContent;
+                    })
+                    .catch(function(error) {
+                        console.error("Error accessing file:", error);
+                    });
 
                 imgRef.getDownloadURL()
-                  .then(function(url) {
-                    var reportImage = document.getElementById("reportImage");
-                    reportImage.src = url;
-                  })
-                  .catch(function(error) {
-                    console.error("Error retrieving image:", error);
-                  });
+                    .then(function(url) {
+                        var reportImage = document.getElementById("reportImage");
+                        reportImage.src = url;
+                    })
+                    .catch(function(error) {
+                        console.error("Error retrieving image:", error);
+                    });
 
-
-/*                var bucketGETRequest = new XMLHttpRequest();
-
-                bucketGETRequest.open("GET", "/gcs/universe-fct.appspot.com/Report-" + id + ".txt");
-                bucketGETRequest.setRequestHeader("Content-Type", "text/plain");
-
-                bucketGETRequest.onreadystatechange = function() {
-                    if ( bucketGETRequest.readyState === 4 ) {
-                        if ( bucketGETRequest.status === 200 ) {
-                            localStorage.setItem( id , bucketGETRequest.responseText );
-                            document.getElementById("textRep").value = bucketGETRequest.responseText;
-                        }
-                        else {
-                            console.log(request.responseText);
-                            alert("Wrong ID for News");
-                        }
-                    }
-                }
-                bucketGETRequest.send(); */
-            }
-            else {
+                /* ... rest of the code ... */
+            } else {
                 console.log(request.responseText);
                 alert("ALGUMA COISA FALHOU");
             }
@@ -1128,6 +1118,7 @@ var id = document.getElementById("idReport").value;
     }
     request.send(JSON.stringify(data));
 }
+
 
 function clearListReports(c1, c2){
     clearList(c1,c2);
@@ -1178,13 +1169,19 @@ function queryReports(){
                         title.textContent = " " + entity.title.value;
                         details.appendChild(title);
 
+                        var updateDateString = "";
+                        if (entity.time_lastUpdated && entity.time_lastUpdated.value && entity.time_lastUpdated.value.seconds) {
+                            var updateDate = entity.time_lastUpdated.value.seconds;
+                            updateDateString = new Date(updateDate * 1000).toString();
+                        }
+
                         var description = document.createElement('p');
                         description.innerHTML = "&emsp;Título do Report: " + entity.title.value +
                                                 "<br> &emsp;ID: " + entity.id.value +
                                                 "<br> &emsp;Username do utilizador que fez o report: " + entity.reporter.value +
                                                 "<br> &emsp;Localização: " + entity.location.value +
                                                 "<br> &emsp;Criado em: " + new Date(entity.time_creation.value.seconds * 1000).toString() +
-                                                "<br> &emsp;Última modificação: " + new Date(entity.time_lastUpdated.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Última modificação: " + updateDateString +
                                                 "<br> &emsp;Estado do Report: " + entity.status.value;
 
                         details.appendChild(description);

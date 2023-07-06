@@ -80,11 +80,6 @@ public class FeedData {
         }
         else if (location.equals("")) return false;
 
-        if (department == null){
-            department = entry.getString("department");
-        }
-        else if (department.equals("")) return false;
-
         if (isPublic == null){
             isPublic = entry.getString("isPublic");
         }
