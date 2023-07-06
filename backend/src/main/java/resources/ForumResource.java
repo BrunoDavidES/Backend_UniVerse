@@ -145,12 +145,14 @@ public class ForumResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
                     .build();
 
-            QueryResults<Entity> results = datastore.run(query);
+            QueryResults<Entity> results = txn.run(query);
             while (results.hasNext()) {
                 Entity entity = results.next();
-                datastore.delete(entity.getKey());
+                txn.delete(entity.getKey());
+                LOG.warning(entity.getKey().getName());
+                LOG.warning(entity.getKey().getNameOrId().toString());
                 firebaseDatabase.getReference(USERS)
-                        .child(entity.getKey().toString().replace(".", "-"))
+                        .child(entity.getKey().getName().replace(".", "-"))
                         .child(FORUMS)
                         .child(forumID)
                         .removeValueAsync();
@@ -161,10 +163,10 @@ public class ForumResource {
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
                     .build();
 
-            results = datastore.run(query);
+            results = txn.run(query);
             while (results.hasNext()) {
                 Entity entity = results.next();
-                datastore.delete(entity.getKey());
+                txn.delete(entity.getKey());
             }
 
             key = datastore.newKeyFactory().setKind(FORUM).newKey(forumID);
