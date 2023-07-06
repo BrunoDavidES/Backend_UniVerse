@@ -101,10 +101,11 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'modRole', 'getProfile', 'delUser', 'usersList'); auxListMore(0);" class="active">Modificar role do User</button>
-            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'usersList'); auxListMore(0);">Obter perfil do User</button>
-            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'delUser', 'getProfile', 'modRole', 'usersList'); auxListMore(0);">Apagar User</button>
-            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'usersList', 'delUser', 'modRole', 'getProfile'); auxListMore(1);">Listar Users</button>
+            <button id="modRoleBtn" onClick="changeWindow('modRoleBtn', 'getProfileBtn', 'delUserBtn', 'listBtn', 'susBtn', 'modRole', 'getProfile', 'delUser', 'usersList', 'susUser'); auxListMore(0);" class="active">Modificar role do User</button>
+            <button id="getProfileBtn" onClick="changeWindow('getProfileBtn', 'modRoleBtn', 'delUserBtn', 'susBtn', 'listBtn', 'getProfile', 'delUser', 'modRole', 'usersList', 'susUser'); auxListMore(0);">Obter perfil do User</button>
+            <button id="susBtn" onClick="changeWindow('susBtn', 'getProfileBtn', 'modRoleBtn', 'delUserBtn', 'listBtn', 'susUser', 'getProfile', 'delUser', 'modRole', 'usersList'); auxListMore(0);">Suspender/Reativar Conta</button>
+            <button id="delUserBtn" onClick="changeWindow('delUserBtn', 'modRoleBtn', 'getProfileBtn', 'listBtn', 'susBtn', 'delUser', 'getProfile', 'modRole', 'usersList', 'susUser'); auxListMore(0);">Apagar User</button>
+            <button id="listBtn"  onClick="changeWindow('listBtn', 'delUserBtn', 'modRoleBtn', 'getProfileBtn', 'susBtn', 'usersList', 'delUser', 'modRole', 'getProfile', 'susUser'); auxListMore(1);">Listar Users</button>
         </div>
 
         <br><br>
@@ -216,6 +217,26 @@
 
             </div><br><br>
         </div>
+        <div id="susUser" style="display: none;">
+            <div class="form">
+                <div class="title">Suspender Conta</div>
+                <div class="input-container ic1">
+                    <input id="suspendUser" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Username a suspender</label>
+                </div>
+                <button type="text" class="submit" onclick="">Suspender conta</button>
+            </div> <br>
+            <div class="form">
+                <div class="title">Reativar Conta</div>
+                <div class="input-container ic1">
+                    <input id="suspendUser2" class="input" type="text" placeholder=" "/>
+                    <div class="cut"></div>
+                    <label for="target" class="placeholder">Username a reativar</label>
+                </div>
+                <button type="text" class="submit" onclick="">Reativar conta</button>
+            </div>
+        </div>
         <div id="delUser" style="display: none;">
             <div class="form">
                 <div class="title">Apagar User</div>
@@ -261,24 +282,28 @@
 
 <script src="/js/functions.js"></script>
 <script>
-      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+      function changeWindow(btn, btn1, btn2, btn3, btn4, div, div1, div2, div3, div4){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
         var gone2 = document.getElementById(div2);
         var gone3 = document.getElementById(div3);
+        var gone4 = document.getElementById(div4);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
         var button3 = document.getElementById(btn2);
         var button4 = document.getElementById(btn3);
+        var button5 = document.getElementById(btn4);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
         gone2.style.display = 'none';
         gone3.style.display = 'none';
+        gone4.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
         button3.classList.remove("active");
         button4.classList.remove("active");
+        button5.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");
