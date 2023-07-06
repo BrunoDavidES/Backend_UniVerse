@@ -66,15 +66,10 @@ function loadLoggedUser() {
     }
   };
 
-   if(response.role != "A"){
-       document.getElementById("BO").style.display = "none";
-   }
-
   request.send();
 }
 
 function loadUpperRightInfo(){
-    document.getElementById("name").innerHTML = sessionStorage.getItem("loggedUser");
     var cachePic = sessionStorage.getItem("miniProfilePic");
     var miniPic = document.getElementById("miniProfilePic");
     if (cachePic === null){
@@ -83,8 +78,67 @@ function loadUpperRightInfo(){
     else{
         miniPic.src = cachePic;
     }
+
+    var request = new XMLHttpRequest();
+    request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                var response = JSON.parse(request.responseText);
+
+                document.getElementById("name").innerHTML = response.name;
+
+                if (response.role !== "A" && response.role !== "BO") {
+                    alert(response.role);
+                    sessionStorage.removeItem("capiToken");
+                    sessionStorage.removeItem("userLogged");
+                    sessionStorage.removeItem("miniProfilePic");
+                    window.location.href = "/backoffice/index.html";
+                }
+            }
+            else {
+                console.log(request.responseText);
+                sessionStorage.removeItem("capiToken");
+                sessionStorage.removeItem("userLogged");
+                sessionStorage.removeItem("miniProfilePic");
+                window.location.href = "/backoffice/index.html";
+            }
+        }
+    }
+
+    request.send();
 }
 
+function hideRoleOption(){
+    var request = new XMLHttpRequest();
+
+    request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                var response = JSON.parse(request.responseText);
+
+                if (response.role === "BO"){
+                    document.getElementById("BO").style.display = "none";
+                }
+            }
+            else{
+                alert(response.role);
+                sessionStorage.removeItem("capiToken");
+                sessionStorage.removeItem("userLogged");
+                sessionStorage.removeItem("miniProfilePic");
+                window.location.href = "/backoffice/index.html";
+            }
+        }
+    }
+    request.send();
+}
 
 
 function logout() {
@@ -1958,4 +2012,4 @@ function clearList(c1, c2){
 }
 
 
-window.addEventListener('load', loadLoggedUser);
+//window.addEventListener('load', loadLoggedUser);
