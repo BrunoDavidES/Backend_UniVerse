@@ -52,7 +52,7 @@ public class BanResource {
     }
 
     @POST
-    @Path("/ban")
+    @Path("/unban")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response unbanUser(@HeaderParam("Authorization") String token,
                               @PathParam("username") String username) {
