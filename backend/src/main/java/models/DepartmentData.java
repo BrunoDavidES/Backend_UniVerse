@@ -51,7 +51,6 @@ public class DepartmentData {
             this.phoneNumber = department.getString("phoneNumber");
         if(this.location == null || this.location.equals(""))
             this.location = department.getString("location");
-
         if(this.fax == null || this.fax.equals(""))
             this.fax = department.getString("fax");
     }

@@ -947,7 +947,7 @@ function modifyUserRole(){
 }
 
 function deleteUser(){
-    var target = document.getElementById("target").value;
+    var target = document.getElementById("targetDelUser").value;
 
     var data = {
         "target": target
@@ -1220,6 +1220,7 @@ function getReport() {
                         reportImage.src = url;
                     })
                     .catch(function(error) {
+                        reportImage.src = "";
                         console.error("Error retrieving image:", error);
                     });
 
@@ -1706,22 +1707,6 @@ var data = {
         "president": document.getElementById("pres").value,
         "location":document.getElementById("location").value
     };
-
-    if (document.getElementById("description").value !== "") {
-                data["description"] = document.getElementById("description").value;
-    }
-
-    if (document.getElementById("facebook").value !== "") {
-                data["facebook"] = document.getElementById("facebook").value;
-    }
-
-    if (document.getElementById("instagram").value !== "") {
-                data["instagram"] = document.getElementById("instagram").value;
-    }
-
-    if (document.getElementById("linkedin").value !== "") {
-                data["linkedIn"] = document.getElementById("linkedin").value;
-    }
 
     var request = new XMLHttpRequest();
 

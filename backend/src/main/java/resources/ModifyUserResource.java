@@ -261,6 +261,7 @@ public class ModifyUserResource {
                         txn.delete(memberEntity.getKey());
                     }
                     txn.delete(targetKey);
+                    firebaseAuth.deleteUser(data.target);
                     LOG.info("Target deleted.");
                     txn.commit();
                     return Response.ok(target).build();

@@ -155,7 +155,7 @@ public class DepartmentResource {
                             .build();
                     txn.update(newPreviousPresident);
 
-                    Entity newPresident = Entity.newBuilder(presidentKey)
+                    Entity newPresident = Entity.newBuilder(president)
                             .set("department", data.id)
                             .set("department_job", "Presidente")
                             .build();
