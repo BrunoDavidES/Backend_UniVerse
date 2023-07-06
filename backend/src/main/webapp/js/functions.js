@@ -20,28 +20,24 @@ function loadLoggedUser() {
         var response = JSON.parse(request.responseText);
 
         document.getElementById("name").innerHTML = response.name;
-        var pic = null;
-        if (window.location.href === "/backoffice/mainPage.html"){
-            document.getElementById("usernameMail").innerHTML = response.email;
-            document.getElementById("role").innerHTML = response.role;
-            document.getElementById("departmentTitle").innerHTML = response.department;
-            document.getElementById("departmentJobTitle").innerHTML = response.department_job;
-            pic = document.getElementById("profilePic");
-        }
+        document.getElementById("usernameMail").innerHTML = response.email;
+        document.getElementById("role").innerHTML = response.role;
+        document.getElementById("departmentTitle").innerHTML = response.department;
+        document.getElementById("departmentJobTitle").innerHTML = response.department_job;
+
         var storageRef = firebase.storage().ref();
         var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
         var miniPic = document.getElementById("miniProfilePic");
+        var pic = document.getElementById("profilePic");
 
-        if (sessionStorage.getItem("miniProfilePic") != null){
+        if (sessionStorage.getItem("miniProfilePic") !== null){
             pic.src = sessionStorage.getItem("minProfilePic");
             miniPic.src = sessionStorage.getItem("miniProfilePic");
         }
         else{
             imgRef.getDownloadURL()
               .then(function(url) {
-                if (window.location.href === "/backoffice/mainPage.html"){
-                    pic.src = url;
-                }
+                pic.src = url;
                 miniPic.src = url;
                 sessionStorage.setItem("miniProfilePic", url);
               })
@@ -53,23 +49,36 @@ function loadLoggedUser() {
         }
         // Check if the role is not "A" or "BO" and redirect if necessary
         if (response.role !== "A" && response.role !== "BO") {
-          alert(response.role);
-           sessionStorage.removeItem("capiToken");
-           sessionStorage.removeItem("userLogged");
-           sessionStorage.removeItem("miniProfilePic");
-          window.location.href = "/backoffice/index.html";
+            alert(response.role);
+            sessionStorage.removeItem("capiToken");
+            sessionStorage.removeItem("userLogged");
+            sessionStorage.removeItem("miniProfilePic");
+            window.location.href = "/backoffice/index.html";
         }
-      } else {
+      }
+      else {
         console.error(request.responseText);
-         sessionStorage.removeItem("capiToken");
-         sessionStorage.removeItem("userLogged");
-         sessionStorage.removeItem("miniProfilePic");
+        sessionStorage.removeItem("capiToken");
+        sessionStorage.removeItem("userLogged");
+        sessionStorage.removeItem("miniProfilePic");
         window.location.href = "/backoffice/index.html";
       }
     }
   };
 
   request.send();
+}
+
+function loadUpperRightInfo(){
+    document.getElementById("name").innerHTML = sessionStorage.getItem("loggedUser");
+    var cachePic = sessionStorage.getItem("miniProfilePic");
+    var miniPic = document.getElementById("miniProfilePic");
+    if (cachePic === null){
+        miniPic.src = "../img/logo.png";
+    }
+    else{
+        miniPic.src = cachePic;
+    }
 }
 
 
@@ -1033,6 +1042,53 @@ function getUser() {
         }
     };
 
+    request.send();
+}
+
+
+function banAccount(){
+    var username = document.getElementById("suspendUser").value;
+
+    var request = new XMLHttpRequest();
+    request.open("POST", document.location.origin + "/rest/" + username + "/ban");
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 ) {
+            if ( request.status === 200 ) {
+                 console.log("SUCCESS");
+                 alert("Account of user " + username + " has been successfully banned");
+            }
+            else{
+                console.log(request.responseText);
+                alert("Error banning account of user " + username);
+            }
+        }
+    }
+    request.send();
+}
+
+function reactivateAccount() {
+    var username = document.getElementById("reactivateUser").value;
+
+    var request = new XMLHttpRequest();
+    request.open("POST", document.location.origin + "/rest/" + username + "/unban");
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 ) {
+            if ( request.status === 200 ) {
+                 console.log("SUCCESS");
+                 alert("Account of user " + username + " has been successfully reactivated");
+            }
+            else{
+                console.log(request.responseText);
+                alert("Error reactivating account of user " + username);
+            }
+        }
+    }
     request.send();
 }
 
