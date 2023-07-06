@@ -210,14 +210,12 @@ public class ForumResource {
 
             String date = getCurrentDate();
 
-            Map<String, Object> postData = new HashMap<>();
-            postData.put("author", decodedToken.getName());
-            postData.put("message", data.getMessage());
-            postData.put("posted", date);
-
             DatabaseReference forumRef = firebaseDatabase.getReference(FORUMS).child(forumID).child("feed");
             String postID = forumRef.push().getKey();
-            forumRef.child(postID).setValueAsync(postData);
+            forumRef.child(postID).child("author").child("username").setValueAsync(decodedToken.getUid());
+            forumRef.child(postID).child("author").child("name").setValueAsync(decodedToken.getName());
+            forumRef.child(postID).child("message").setValueAsync(data.getMessage());
+            forumRef.child(postID).child("posted").setValueAsync(date);
 
             Key key = datastore.newKeyFactory()
                     .setKind(FORUM_POSTS)
