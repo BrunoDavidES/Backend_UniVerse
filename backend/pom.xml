@@ -10,7 +10,7 @@
 
     <packaging>war</packaging>
 
-    <name>ADCAvIndv</name>
+    <name>Universe-FCT-NOVA</name>
     <description>ADC 2023 Project</description>
 
     <properties>
