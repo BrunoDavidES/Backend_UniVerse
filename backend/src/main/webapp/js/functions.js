@@ -49,22 +49,16 @@ function loadLoggedUser() {
         }
         // Check if the role is not "A" or "BO" and redirect if necessary
         if (response.role !== "A" && response.role !== "BO") {
-            alert(response.role);
+            alert("User not allowed!");
             sessionStorage.clear();
-            //localStorage.clear();
-            //sessionStorage.removeItem("capiToken");
-            //sessionStorage.removeItem("userLogged");
-            //sessionStorage.removeItem("miniProfilePic");
+
             window.location.href = "/backoffice/index.html";
         }
       }
       else {
         console.error(request.responseText);
         sessionStorage.clear();
-        //localStorage.clear();
-        //sessionStorage.removeItem("capiToken");
-        //sessionStorage.removeItem("userLogged");
-        //sessionStorage.removeItem("miniProfilePic");
+
         window.location.href = "/backoffice/index.html";
       }
     }
@@ -96,7 +90,7 @@ function loadUpperRightInfo(){
                 document.getElementById("name").innerHTML = response.name;
 
                 if (response.role !== "A" && response.role !== "BO") {
-                    alert(response.role);
+                    alert("User not allowed!");
                     sessionStorage.removeItem("capiToken");
                     sessionStorage.removeItem("userLogged");
                     sessionStorage.removeItem("miniProfilePic");
@@ -135,10 +129,7 @@ function hideRoleOption(){
             else{
                 alert(response.role);
                 sessionStorage.clear();
-                //localStorage.clear();
-                //sessionStorage.removeItem("capiToken");
-                //sessionStorage.removeItem("userLogged");
-                //sessionStorage.removeItem("miniProfilePic");
+
                 window.location.href = "/backoffice/index.html";
             }
         }
@@ -264,14 +255,13 @@ function postEvent(){
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
-      if (request.readyState === 4 && request.status === 200) {
-          console.log(request.responseText);
-          uploadEventPic(request.responseText);
-          console.log("SUCCESS");
-      } else if (request.readyState === 4) {
-          console.log(request.responseText);
-          alert(request.responseText);
-          console.log("FAIL");
+        if (request.readyState === 4 && request.status === 200) {
+            uploadEventPic(request.responseText);
+            alert.log("SUCCESS");
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert.log("FAIL");
       }
     };
 
@@ -327,39 +317,35 @@ function editEvent(){
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
             updateEventPicMod(id);
-            console.log("SUCCESS");
+            alert.log("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert.log("FAIL");
         }
     };
 }
 
 function deleteEvent() {
-  var id = document.getElementById("idEventDelete").value;
+    var id = document.getElementById("idEventDelete").value;
 
-  var request = new XMLHttpRequest();
+    var request = new XMLHttpRequest();
 
-  request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
-  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+    request.open("DELETE", document.location.origin + "/rest/feed/delete/Event/" + id, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
-  request.send(JSON.stringify(null));
-  request.onreadystatechange = function() {
-    if (request.readyState === 4 && request.status === 200) {
-      console.log(request.responseText);
-      deleteEventPic(id); // Call the new function to delete the associated image
-      console.log("SUCCESS");
-    } else if (request.readyState === 4) {
-      console.log(request.responseText);
-      console.log("FAIL");
-      alert(request.responseText);
-    }
-  };
+    request.send(JSON.stringify(null));
+    request.onreadystatechange = function() {
+        if (request.readyState === 4 && request.status === 200) {
+            deleteEventPic(id);
+            alert.log("SUCCESS");
+        } else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert.log("FAIL");
+        }
+    };
 }
 
 
@@ -510,13 +496,11 @@ function validateEvent(){
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
+            alert.log("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert.log("FAIL");
         }
     };
 }
@@ -633,27 +617,6 @@ function postNews(){
                         .catch(function(error) {
                           console.error("Error putting text body in storage:", error);
                         });
-
-/*                var bucketRequest = new XMLHttpRequest();
-
-                bucketRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true );
-                bucketRequest.setRequestHeader("Content-Type", "text/plain");
-
-                bucketRequest.onreadystatechange  = function() {
-                    if (bucketRequest.readyState === 4 ) {
-                        if (bucketRequest.status === 200 ){
-                            alert(request.responseText);
-
-                            console.log("SUCCESS");
-                        }
-                        else  {
-                            console.log("News entity created but error uploading text body to bucket");
-                            alert("News entity created but error uploading text body to bucket");
-                        }
-                    }
-                };
-
-                bucketRequest.send(document.getElementById("text").value);*/
             }
             else {
                 alert(request.responseText);
@@ -680,13 +643,11 @@ function validateNews(){
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
+            alert.log("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert.log("FAIL");
         }
     };
 }
@@ -727,13 +688,11 @@ function editNews(){
                             });
                     updateNewsPicMod(id);
                 }
-                else {
-                    console.log("SUCCESS");
-                }
+                console.log("SUCCESS");
             }
             else {
                 console.log(request.responseText);
-                alert("ALGUMA COISA FALHOU");
+                alert("FAIL");
             }
         }
     };
@@ -756,10 +715,15 @@ function deleteNews(){
             if ( request.status === 200 ) {
                 deleteNewsPic(id);
                 sessionStorage.removeItem(id);
+                alert("SUCCESS")
             } else {
                 console.log("FAIL");
             }
-        };
+        }
+        else {
+            console.log(request.responseText);
+            alert("FAIL");
+        }
     }
     request.send();
 }
@@ -795,7 +759,6 @@ function getNews() {
                 });
 
                 var storageRef = firebase.storage().ref();
-                //var textFileURL = "https://storage.googleapis.com/universe-fct.appspot.com/News/" + id + ".txt";
                 var fileRef = storageRef.child('News/' + id + ".txt");
 
                 fileRef.getDownloadURL()
@@ -816,24 +779,9 @@ function getNews() {
                   .catch(function(error) {
                     console.error("Error accessing file:", error);
                   });
-/*                fetch(textFileURL)
-                    .then(function(response) {
-                        if (response.ok) {
-                            return response.text();
-                        } else {
-                            throw new Error("Error fetching text file. Status: " + response.status);
-                        }
-                    })
-                    .then(function(text) {
-                        localStorage.setItem(id, text);
-                        document.getElementById("textMod").value = text;
-                    })
-                    .catch(function(error) {
-                        console.error("Error downloading text file:", error);
-                    });*/
             } else {
                 console.log(request.responseText);
-                alert("ALGUMA COISA FALHOU");
+                alert("FAIL");
             }
         }
     };
@@ -933,13 +881,11 @@ function modifyUserRole(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
+            alert.log("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert.log("FAIL");
         }
     };
     request.send(JSON.stringify(data));
@@ -960,13 +906,11 @@ function deleteUser(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
+            alert.log("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert.log("FAIL");
         }
     };
 
@@ -1058,7 +1002,7 @@ function queryUsers(){
             }
             else {
                 alert("FAIL");
-                console.log("FAIL");
+                console.log(request.responseText);
             }
         }
     }
@@ -1084,7 +1028,7 @@ function getUser() {
            document.getElementById("emailInfo").value = response.email;
            document.getElementById("nameInfo").value = response.name;
            document.getElementById("roleInfo").value = response.role;
-           document.getElementById("depInfo").value = response.department;  //TRATAR DA LISTA DE JOBS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+           document.getElementById("depInfo").value = response.department;
            document.getElementById("depInfoJob").value = response.department_job;
            document.getElementById("nucInfo").value = response.nucleus;
            document.getElementById("nucJobInfo").value = response.nucleus_job;
@@ -1092,10 +1036,10 @@ function getUser() {
            document.getElementById("licenseeInfo").value = response.license_plate;
            document.getElementById("statusInfo").value = response.status;
 
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert(request.responseText);
-            console.log("FAIL");
+            alert("FAIL");
         }
     };
 
@@ -1114,12 +1058,11 @@ function banAccount(){
     request.onreadystatechange = function() {
         if (request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                 console.log("SUCCESS");
-                 alert("Account of user " + username + " has been successfully banned");
+                 alert.log("SUCCESS");
             }
             else{
-                console.log(request.responseText);
-                alert("Error banning account of user " + username);
+                alert.log("FAIL");
+                console.log(request.responseText)
             }
         }
     }
@@ -1137,12 +1080,11 @@ function reactivateAccount() {
     request.onreadystatechange = function() {
         if (request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                 console.log("SUCCESS");
-                 alert("Account of user " + username + " has been successfully reactivated");
+                 alert.log("SUCCESS");
             }
             else{
+                alert.log("FAIL");
                 console.log(request.responseText);
-                alert("Error reactivating account of user " + username);
             }
         }
     }
@@ -1221,11 +1163,9 @@ function getReport() {
                         reportImage.src = "";
                         console.error("Error retrieving image:", error);
                     });
-
-                /* ... rest of the code ... */
             } else {
                 console.log(request.responseText);
-                alert("ALGUMA COISA FALHOU");
+                alert("FAIL");
             }
         }
     }
@@ -1421,12 +1361,10 @@ function reportStatus(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4){
             if (request.status === 200) {
-                console.log("SUCCESS");
                 alert("SUCCESS");
             }
             else {
                 console.log(request.responseText);
-                console.log("FAIL");
                 alert("FAIL");
             }
         }
@@ -1455,12 +1393,11 @@ function deleteDepartment(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             console.log(request.responseText);
-            console.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert("FAIL");
         }
     };
 
@@ -1482,8 +1419,6 @@ function getDepartment() {
 
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
-           console.log(request.responseText);
-           console.log("SUCCESS");
            const response = JSON.parse(request.responseText);
 
            const entities = response.map(function(entity) {
@@ -1508,8 +1443,7 @@ function getDepartment() {
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert(request.responseText);
-            console.log("FAIL");
+            alert("FAIL");
         }
     };
 
@@ -1517,7 +1451,7 @@ function getDepartment() {
 }
 
 function postDepartment(){
-var data = {
+    var data = {
         "id": document.getElementById("idDpt").value,
         "email": document.getElementById("email").value,
         "name": document.getElementById("nameDpt").value,
@@ -1536,11 +1470,10 @@ var data = {
     request.onreadystatechange  = function() {
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
-          console.log("SUCCESS");
+          alert("SUCCESS");
       } else if (request.readyState === 4) {
           console.log(request.responseText);
-          alert(request.responseText);
-          console.log("FAIL");
+          alert("FAIL");
       }
     };
 
@@ -1565,7 +1498,6 @@ function editDepartment(){
         "phoneNumber": phoneNumber,
         "location": location,
         "fax": fax
-
     };
 
     if (email !== "") {
@@ -1599,13 +1531,12 @@ function editDepartment(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-                  console.log(request.responseText);
-                  console.log("SUCCESS");
-              } else if (request.readyState === 4) {
-                  console.log(request.responseText);
-                  alert(request.responseText);
-                  console.log("FAIL");
-              }
+              alert("SUCCESS");
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert("FAIL");
+        }
     };
 
     request.send(JSON.stringify(data));
@@ -1713,13 +1644,12 @@ var data = {
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
     request.onreadystatechange  = function() {
-      if (request.readyState === 4 && request.status === 200) {
+        if (request.readyState === 4 && request.status === 200) {
+          alert("SUCCESS");
+        }
+        else if (request.readyState === 4) {
           console.log(request.responseText);
-          console.log("SUCCESS");
-      } else if (request.readyState === 4) {
-          console.log(request.responseText);
-          alert(request.responseText);
-          console.log("FAIL");
+          alert("FAIL");
       }
     };
 
@@ -1777,8 +1707,7 @@ function getNucleus() {
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert(request.responseText);
-            console.log("FAIL");
+            alert("FAIL");
         }
     };
 
@@ -1856,13 +1785,12 @@ function editNucleus(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-                  console.log(request.responseText);
-                  console.log("SUCCESS");
-              } else if (request.readyState === 4) {
-                  console.log(request.responseText);
-                  alert(request.responseText);
-                  console.log("FAIL");
-              }
+            alert("SUCCESS");
+        }
+        else if (request.readyState === 4) {
+            console.log(request.responseText);
+            alert("FAIL");
+        }
     };
 
     request.send(JSON.stringify(data));
@@ -1880,13 +1808,11 @@ function deleteNucleus(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            console.log(request.responseText);
-            console.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            console.log("FAIL");
-            alert(request.responseText);
+            alert("FAIL");
         }
     };
 
@@ -1909,7 +1835,6 @@ function queryNucleus(){
 
     var request = new XMLHttpRequest();
 
-    //request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
     request.open("POST", document.location.origin + "/rest/nucleus/query?limit="+limit+"&offset="+queryNucleusCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
@@ -2007,6 +1932,7 @@ function getHojeNaFCT(){
       })
       .catch(function(error) {
         console.error("Error accessing file:", error);
+        alert("FAIL");
       });
 }
 
@@ -2021,6 +1947,7 @@ function updateHojeNaFCT(){
         })
         .catch(function(error) {
             console.error("Error putting text body in storage:", error);
+            alert("FAIL");
         });
 }
 
@@ -2031,6 +1958,3 @@ function clearList(c1, c2){
     r1.replaceChildren();
     r2.replaceChildren();
 }
-
-
-//window.addEventListener('load', loadLoggedUser);
