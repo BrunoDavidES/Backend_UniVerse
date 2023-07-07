@@ -325,9 +325,7 @@ public class FeedResource {
             query.setStartCursor(Cursor.fromUrlSafe(cursor));
         }
 
-        if (kind.equals(NEWS)){
-            query.setOrderBy(StructuredQuery.OrderBy.desc("time_creation"));
-        }
+        query.setOrderBy(StructuredQuery.OrderBy.desc("time_creation"));
 
         queryResults = datastore.run(query.build());
 
