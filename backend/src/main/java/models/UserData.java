@@ -31,9 +31,14 @@ public class UserData {
 		if (!email.matches("^[A-Za-z0-9._%+-]+@(fct\\.unl\\.pt|campus\\.fct\\.unl\\.pt)$")) {
 			return false;
 		}
+
+		/* TESTE DO BRUNO
 		if (!password.matches("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{6,64}")) {
 			return false;
 		}
+
+		*/
+
 		this.username = email.split("@")[0];
 		return password.equals(confirmation);
 	}

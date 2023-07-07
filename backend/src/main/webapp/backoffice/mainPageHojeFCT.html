@@ -1,33 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
+<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8">
-  <title> BackOffice FCT NOVA</title>
+  <title> HOJE na FCT NOVA</title>
   <link rel="stylesheet" href="styleMainPage.css">
-  <link rel="stylesheet" href="stickyNote.css">
-  <link rel="stylesheet" href="clock.css">
   <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-storage.js"></script>
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve(); newsToSolve(); eventsToSolve();">
-<div class="cardResize">
-  <div class="card" style="width: 250px;">
-    <img alt="User Photo" id="profilePic" style="width:100%">
-    <h1 id="usercard"></h1>
-    <p class="title" id="usernameMail"></p>
-    <p class="title" id="departmentTitle"></p>
-    <p class="title" id="departmentJobTitle"></p>
-    <p class="title" id="role"></p>
-    <p class="title2">FCT NOVA</p>
-  </div>
-</div>
-<button onclick="topFunction()" id="myBtn" style="bottom: 90px;">Topo<i class='bx bx-up-arrow-alt'></i></button>
-<div id="clock"></div>
-<div id="data"></div>
+<body onload="loadUpperRightInfo();hideRoleOption();">
+<button onclick="queryEvents();" id="moreList">Mais <i class='bx bx-user-plus'></i></button>
+<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
   <div class="logo-details">
     <i> <img src="../img/logo.png" alt="UNIVERSE logo" width="45" height="45"> </i>
@@ -36,7 +22,7 @@
   <ul class="nav-links">
     <li>
       <button onclick="window.location.href = '/backoffice/mainPage.html'">
-        <a href="#" class="active">
+        <a href="#">
           <i class='bx bx-grid-alt' ></i>
           <span class="links_name">Home</span>
         </a>
@@ -44,7 +30,7 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageHojeFCT.html'">
-        <a href="#hojeFCT">
+        <a href="#hojeFCT" class="active">
           <i class='bx bx-info-circle'></i>
           <span class="links_name">Hoje na FCT</span>
         </a>
@@ -112,57 +98,42 @@
   <nav>
     <div class="sidebar-button">
       <i class='bx bx-menu sidebarBtn'></i>
-      <span class="home">Home</span>
+      <span class="home">Hoje na FCT</span>
     </div>
     <h1> Back Office da FCT NOVA</h1>
-    <div class="profile-details" style="margin-right:14px" id="auxLogged">
+    <div class="profile-details" id="auxLogged">
       <img id="miniProfilePic" alt="">
       <span class="admin_name" id="name"></span>
     </div>
   </nav>
 
   <div class="home-content">
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
-      <div class="title" style="text-align: center">Users na Aplicação</div>
-      <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #0f0; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
+    <div id="susUser">
+      <div class="form">
+        <div class="title">Hoje na FCT</div>
+        <div class="input-container2 ic2">
+          <textarea id="hojeFCT" class="input" cols="40" rows="5" maxlength="100"></textarea>
+          <div class="cut cut"></div>
+          <label for="hojeFCT" class="placeholder">Corpo de Hoje na FCT</label>
+        </div>
+        <button type="text" class="submit" onclick="getHojeNaFCT()">Buscar conteúdo de Hoje na FCT</button>
+        <button type="text" class="submit" onclick="updateHojeNaFCT()">Alterar o conteúdo de Hoje na FCT</button>
+      </div> <br>
     </div>
-
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
-      <div class="title" style="text-align: center">Users Registados</div>
-      <div id="registered" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #eee; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
-    </div>
-    <br><br>
-
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
-      <div class="title" style="text-align: center">Reports por Resolver</div>
-      <div id="unresolvedRep" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bxs-comment-error'></i></div>
-    </div>
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
-      <div class="title" style="text-align: center">Notícias por Validar</div>
-      <div id="unresolvedNews" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bx-news'></i></div>
-    </div>
-    <br><br>
-    <div class="form" style="width: 400px; margin-left: 5%; text-align: center;">
-      <div class="title" style="text-align: center">Eventos por Validar</div>
-      <div id="unresolvedEvents" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
-      <div style="color: #d00; text-align: center; font-size: 40px; display: inline-block;">&nbsp;<i class='bx bx-calendar-event'></i></div>
-    </div>
-  </div>
-  <div class="popup" id="popup">
+  <div class="popup" id="popup" style="">
     <h3>Está prestes a fazer logout</h3>
     <p>Tem a certeza?</p>
-    <button type="button" onclick="logout()">Sim</button>
+    <button type="button" onclick="logout()">Sim</button> &ensp;
     <button type="button" onclick="closePopup()">Não</button>
+  </div>
   </div>
 </section>
 
+
+
 <script src="/js/functions.js"></script>
-<script src="/js/functions2.js"></script>
 <script>
+
       let popup = document.getElementById("popup");
 
       function openPopup(){
@@ -184,13 +155,16 @@
       }
 
       let mybutton = document.getElementById("myBtn");
+      let mybuttondwn = document.getElementById("myBtnDown");
       window.onscroll = function() {scrollFunction()};
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
+            mybuttondwn.style.display = "block";
         } else {
             mybutton.style.display = "none";
+            mybuttondwn.style.display = "none";
         }
       }
 
@@ -199,38 +173,12 @@
         document.documentElement.scrollTop = 0;
       }
 
-    setInterval(showTime, 1000);
-        function showTime() {
-        	let time = new Date();
-        	let hour = time.getHours();
-        	let min = time.getMinutes();
-        	let sec = time.getSeconds();
-
-        	min = min < 10 ? "0" + min : min;
-        	sec = sec < 10 ? "0" + sec : sec;
-
-        	hAux = hour < 10 ? "0" : 0;
-
-        	let currentTime = hAux + hour + ":"
-        		+ min + ":" + sec;
-
-        	document.getElementById("clock")
-        		.innerHTML = currentTime;
-        }
-
-        showTime();
-
-        const date = new Date();
-
-        const options = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        };
-
-        document.getElementById("data").innerHTML = date.toLocaleString('pt-PT', options);
+      function bottomFunction() {
+        window.scrollTo(0,document.body.scrollHeight);
+        topPage.style.display = '';
+      }
 </script>
+
 
 </body>
 </html>

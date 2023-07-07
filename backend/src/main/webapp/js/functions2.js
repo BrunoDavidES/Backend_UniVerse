@@ -42,7 +42,7 @@ function repToSolve(){
 
 function newsToSolve(){
      var notRes = {
-        "validated_backoffice": false
+        "validated_backoffice": "false"
      };
 
     var xmlhttp = new XMLHttpRequest();
