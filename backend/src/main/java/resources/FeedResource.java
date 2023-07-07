@@ -317,7 +317,7 @@ public class FeedResource {
             filters.put("validated_backoffice", "true");
         }
 
-        EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind(kind);
+        EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind(kind).setLimit(Integer.parseInt(limit));
 
         LOG.info("Ponto 4");
         QueryResults<Entity> queryResults;
