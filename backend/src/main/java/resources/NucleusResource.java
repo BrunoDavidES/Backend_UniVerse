@@ -36,7 +36,7 @@ public class NucleusResource {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(@HeaderParam("Authorization") String token, NucleusData data) {
-        LOG.fine("Attempt to create a nucleus by: " + data.president);
+        LOG.fine("Attempt to create a nucleus by: " + data.getPresident());
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
@@ -51,7 +51,7 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.getPresident());
             Entity president = txn.get(presidentKey);
 
             if (president == null){
@@ -68,7 +68,7 @@ public class NucleusResource {
                 return Response.status(Response.Status.FORBIDDEN).entity(PERMISSION_DENIED).build();
             }
 
-            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.id);
+            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.getId());
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus != null ) {
@@ -77,17 +77,17 @@ public class NucleusResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(NUCLEUS_ALREADY_EXISTS).build();
             } else {
                 president = Entity.newBuilder(president)
-                        .set("nucleus", data.id)
+                        .set("nucleus", data.getId())
                         .set("nucleus_job", "President")
                         .build();
                 txn.update(president);
 
                 nucleus = Entity.newBuilder(nucleusKey)
-                        .set("email", data.nucleusEmail)
-                        .set("name", data.name)
-                        .set("id", data.id)
-                        .set("location", data.location)
-                        .set("president", data.president)
+                        .set("email", data.getNucleusEmail())
+                        .set("name", data.getName())
+                        .set("id", data.getId())
+                        .set("location", data.getLocation())
+                        .set("president", data.getPresident())
                         .set("website", "")
                         .set("instagram", "")
                         .set("twitter", "")
@@ -100,7 +100,7 @@ public class NucleusResource {
                         .build();
                 txn.add(nucleus);
 
-                LOG.info("Nucleus registered: " + data.id + "| " + data.name);
+                LOG.info("Nucleus registered: " + data.getId() + "| " + data.getName());
                 txn.commit();
                 return Response.ok(nucleus).entity("Nucleus registered").build();
             }
@@ -131,7 +131,7 @@ public class NucleusResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.id);
+            Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(data.getId());
             Entity nucleus = txn.get(nucleusKey);
 
             if( nucleus == null ) {
@@ -152,8 +152,8 @@ public class NucleusResource {
 
             data.fillGaps(nucleus);
 
-            if (!modifierUsername.equals(data.president)){
-                Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+            if (!modifierUsername.equals(data.getPresident())){
+                Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.getPresident());
                 Entity president = txn.get(presidentKey);
 
                 if (president == null){
@@ -170,31 +170,31 @@ public class NucleusResource {
                 txn.update(newPreviousPresident);
 
                 Entity newPresident = Entity.newBuilder(president)
-                        .set("nucleus", data.id)
+                        .set("nucleus", data.getId())
                         .set("nucleus_job", "Presidente")
                         .build();
                 txn.update(newPresident);
             }
 
             Entity newNucleus = Entity.newBuilder(nucleus)
-                    .set("name", data.newName)
-                    .set("id", data.id)
-                    .set("location", data.location)
-                    .set("president", data.president)
-                    .set("email", data.nucleusEmail)
-                    .set("website", data.website)
-                    .set("instagram", data.instagram)
-                    .set("twitter", data.twitter)
-                    .set("facebook", data.facebook)
-                    .set("youtube", data.youtube)
-                    .set("linkedIn", data.linkedIn)
-                    .set("description", data.description)
+                    .set("name", data.getNewName())
+                    .set("id", data.getId())
+                    .set("location", data.getLocation())
+                    .set("president", data.getPresident())
+                    .set("email", data.getNucleusEmail())
+                    .set("website", data.getWebsite())
+                    .set("instagram", data.getInstagram())
+                    .set("twitter", data.getTwitter())
+                    .set("facebook", data.getFacebook())
+                    .set("youtube", data.getYoutube())
+                    .set("linkedIn", data.getLinkedIn())
+                    .set("description", data.getDescription())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
 
             txn.update(newNucleus);
 
-            LOG.info("Nucleus " + data.name + " has been edited.");
+            LOG.info("Nucleus " + data.getName() + " has been edited.");
             txn.commit();
             return Response.ok(newNucleus).entity("Nucleus edited successfully").build();
         } finally {

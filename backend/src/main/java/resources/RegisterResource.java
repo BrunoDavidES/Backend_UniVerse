@@ -30,7 +30,7 @@ public class RegisterResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(UserData data) throws Exception {
-        LOG.fine("Attempt to register user: " + data.username);
+        LOG.fine("Attempt to register user: " + data.getUsername());
 
         if (!data.validateRegister()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
@@ -38,32 +38,32 @@ public class RegisterResource {
         }
 
         // Firebase Register
-        Response response = firebaseRegister(data.username, data.email, data.password, data.name, data.getRole());
+        Response response = firebaseRegister(data);
         if(response.getStatus() == Response.Status.OK.getStatusCode()) {
 
             // Datastore Register
-            response = datastoreRegister(data.username, data.email, data.name);
+            response = datastoreRegister(data);
             if (response.getStatus() != Response.Status.OK.getStatusCode()) {
-                firebaseAuth.deleteUser(data.username);
+                firebaseAuth.deleteUser(data.getUsername());
             }
         }
 
         return response;
     }
 
-    private Response firebaseRegister(String username, String email, String password, String name, String role) {
+    private Response firebaseRegister(UserData data) {
         try {
             UserRecord userRecord = firebaseAuth.createUser( new CreateRequest()
-                    .setUid(username)
-                    .setEmail(email)
+                    .setUid(data.getUsername())
+                    .setEmail(data.getEmail())
                     .setEmailVerified(false)
-                    .setPassword(password)
-                    .setDisplayName(name)
+                    .setPassword(data.getPassword())
+                    .setDisplayName(data.getName())
                     .setDisabled(false)
             );
 
             Map<String, Object> customClaims = new HashMap<>();
-            customClaims.put(ROLE, role);
+            customClaims.put(ROLE, data.getRole());
             customClaims.put(LAST_UPDATE, Timestamp.now());
             firebaseAuth.setCustomUserClaims(userRecord.getUid(), customClaims);
 
@@ -75,14 +75,14 @@ public class RegisterResource {
         }
     }
 
-    private Response datastoreRegister(String username, String email, String name) {
+    private Response datastoreRegister(UserData data) {
         Transaction txn = datastore.newTransaction();
         try {
-            Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
+            Key userKey = datastore.newKeyFactory().setKind("User").newKey(data.getUsername());
 
             Entity user = Entity.newBuilder(userKey)
-                    .set("email", email)
-                    .set("name", name)
+                    .set("email", data.getEmail())
+                    .set("name", data.getName())
                     .set("phone", "")
                     .set("license_plate", "")
                     .set("status", "ACTIVE")
@@ -98,7 +98,7 @@ public class RegisterResource {
                     .build();
             txn.add(user);
 
-            LOG.info("User registered in datastore " + username);
+            LOG.info("User registered in datastore " + data.getUsername());
             txn.commit();
             return Response.ok(user).build();
         } finally {

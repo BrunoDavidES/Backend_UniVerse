@@ -1,25 +1,16 @@
 package models;
 
-import com.google.cloud.datastore.Entity;
-
-import java.util.HashMap;
-import java.util.Map;
+import static utils.Constants.*;
 
 public class UserData {
-	private static final String STUDENT = "S";
-	private static final String WORKER = "W";
-	private static final String UNCHECKED = "EMPTY";
-
-	public String username;
-	public String[] multipleEmails;
-
-	public String license_plate;
-	public String email;
-	public String name;
-	public String password;
-	public String confirmation;
-	public String status;
-
+	private String username;
+	private String[] multipleEmails;
+	private String license_plate;
+	private String email;
+	private String name;
+	private String password;
+	private String confirmation;
+	private String status;
 
 	public UserData() { }
 
@@ -43,10 +34,6 @@ public class UserData {
 		return password.equals(confirmation);
 	}
 
-	public String[] getEmails() {
-		return multipleEmails;
-	}
-
 	public boolean validateLogin() {
 
 		return username != null && password != null;
@@ -61,4 +48,38 @@ public class UserData {
 
 		return null;
 	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String[] getMultipleEmails() {
+		return multipleEmails;
+	}
+
+	public String getLicense_plate() {
+		return license_plate;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getConfirmation() {
+		return confirmation;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+
 }

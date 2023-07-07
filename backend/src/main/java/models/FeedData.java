@@ -3,32 +3,25 @@ package models;
 import com.google.cloud.datastore.*;
 
 public class FeedData {
-
     // News and Event attributes
-    public String title;
+    private String title;
 
     // Event only attributes
-    public String startDate;
-
-    public String endDate;
-
-    public String location;
-
-    public String department;
-
-    public String nucleus;
-
-    public String isPublic;
-
-    public String capacity;
-
-    public String isItPaid;
-
-    public String validated_backoffice;
+    private String startDate;
+    private String endDate;
+    private String location;
+    private String department;
+    private String nucleus;
+    private String isPublic;
+    private String capacity;
+    private String isItPaid;
+    private String validated_backoffice;
 
     // News only attributes
-
     public String authorNameByBO;
+
+    public FeedData() {
+    }
 
     public boolean validate(String kind) {
         if (title == null)
@@ -100,5 +93,50 @@ public class FeedData {
         return isItPaid.equals("no") || isItPaid.equals("yes");
 
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getNucleus() {
+        return nucleus;
+    }
+
+    public String getIsPublic() {
+        return isPublic;
+    }
+
+    public String getCapacity() {
+        return capacity;
+    }
+
+    public String getIsItPaid() {
+        return isItPaid;
+    }
+
+    public String getValidated_backoffice() {
+        return validated_backoffice;
+    }
+
+    public String getAuthorNameByBO() {
+        return authorNameByBO;
+    }
+
 
 }

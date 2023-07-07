@@ -7,36 +7,25 @@ import java.util.List;
 
 public class NucleusData {
     // Create
-    public String name;
+    private String name;
 
     // Aronym ex: ninf
-    public String id;
-
-    public String president;
-
-    public String nucleusEmail;
+    private String id;
+    private String president;
+    private String nucleusEmail;
 
     // Modify
-    public String location;
-    public String newName;
-
-
-    public String website;
-
-    public String instagram;
-
-    public String twitter;
-
-    public String facebook;
-
-    public String youtube;
-
-    public String linkedIn;
-
-    public String description;
+    private String location;
+    private String newName;
+    private String website;
+    private String instagram;
+    private String twitter;
+    private String facebook;
+    private String youtube;
+    private String linkedIn;
+    private String description;
 
     public NucleusData(){}
-
 
     public boolean validateRegister() {
         if (name == null || id == null || president == null || nucleusEmail == null) {
@@ -65,4 +54,58 @@ public class NucleusData {
         if (linkedIn == null || linkedIn.equals("")) linkedIn = nucleus.getString("linkedIn");
         if (description == null || description.equals("")) description = nucleus.getString("description");
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getPresident() {
+        return president;
+    }
+
+    public String getNucleusEmail() {
+        return nucleusEmail;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getInstagram() {
+        return instagram;
+    }
+
+    public String getTwitter() {
+        return twitter;
+    }
+
+    public String getFacebook() {
+        return facebook;
+    }
+
+    public String getYoutube() {
+        return youtube;
+    }
+
+    public String getLinkedIn() {
+        return linkedIn;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+
 }

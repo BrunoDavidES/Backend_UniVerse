@@ -3,17 +3,19 @@ package models;
 import com.google.cloud.datastore.Entity;
 
 public class ModifyAttributesData {
+    private String name;
+    private String phone;
+    private String status;
+    private String privacy;
+    private String license_plate;
+    private String linkedin;
+    private String department;
+    private String department_job;
+    private String nucleus;
+    private String nucleus_job;
 
-    public String name;
-    public String phone;
-    public String status;
-    public String privacy;
-    public String license_plate;
-    public String linkedin;
-    public String department;
-    public String department_job;
-    public String nucleus;
-    public String nucleus_job;
+    public ModifyAttributesData() {
+    }
 
     public void fillGaps(Entity targetUser) {
         if(this.name == null)
@@ -37,4 +39,46 @@ public class ModifyAttributesData {
         if(this.nucleus_job == null)
             this.nucleus_job = targetUser.getString("nucleus_job");
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public String getLicense_plate() {
+        return license_plate;
+    }
+
+    public String getLinkedin() {
+        return linkedin;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getDepartment_job() {
+        return department_job;
+    }
+
+    public String getNucleus() {
+        return nucleus;
+    }
+
+    public String getNucleus_job() {
+        return nucleus_job;
+    }
+
+
 }

@@ -53,10 +53,10 @@ public class ReportsResource {
 
             Entity.Builder builder = Entity.newBuilder(reportKey);
 
-            builder.set("title", data.title)
+            builder.set("title", data.getTitle())
                     .set("id", id)
                     .set("reporter", String.valueOf(decodedToken.getUid()))
-                    .set("location", data.location)
+                    .set("location", data.getLocation())
                     .set("status", STATUS_UNSEEN)
                     .set("time_creation", Timestamp.now());
 

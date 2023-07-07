@@ -36,7 +36,7 @@ public class DepartmentResource {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerDepartment(@HeaderParam("Authorization") String token, DepartmentData data) {
-        LOG.fine("Attempt to register department: " + data.id);
+        LOG.fine("Attempt to register department: " + data.getId());
 
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
@@ -58,10 +58,10 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
             }
 
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getId());
             Entity department = txn.get(departmentKey);
 
-            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.getPresident());
             Entity president = txn.get(presidentKey);
 
             if( president == null ) {
@@ -74,25 +74,25 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(DEPARTMENT_ALREADY_EXISTS).build();
             } else {
                 department = Entity.newBuilder(departmentKey)
-                        .set("id", data.id)
-                        .set("email", data.email)
-                        .set("name", data.name)
-                        .set("president", data.president)
-                        .set("phone_number", data.phoneNumber)
-                        .set("location", data.location)
-                        .set("fax", data.fax)
+                        .set("id", data.getId())
+                        .set("email", data.getEmail())
+                        .set("name", data.getName())
+                        .set("president", data.getPresident())
+                        .set("phone_number", data.getPhoneNumber())
+                        .set("location", data.getLocation())
+                        .set("fax", data.getFax())
                         .set("time_creation", Timestamp.now())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
                 txn.add(department);
 
                 Entity updatedProfessor = Entity.newBuilder(president)
-                        .set("department", data.id)
+                        .set("department", data.getId())
                         .set("department_job", "President")
                         .build();
                 txn.update(updatedProfessor);
 
-                LOG.info("Department registered " + data.id);
+                LOG.info("Department registered " + data.getId());
                 txn.commit();
                 return Response.ok(department).build();
             }
@@ -123,7 +123,7 @@ public class DepartmentResource {
 
         Transaction txn = datastore.newTransaction();
         try {
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.id);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getId());
             Entity department = txn.get(departmentKey);
 
             if( department == null ) {
@@ -133,7 +133,7 @@ public class DepartmentResource {
             }
 
             data.fillGaps(department);
-            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.president);
+            Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.getPresident());
             Entity president = txn.get(presidentKey);
 
             String role = getRole(decodedToken);
@@ -147,7 +147,7 @@ public class DepartmentResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
             }else {
                 String prevPresident = department.getString("president");
-                if ( !data.president.equals( prevPresident )){
+                if ( !data.getPresident().equals( prevPresident )){
                     Key previousPresidentKey = datastore.newKeyFactory().setKind(USER).newKey(prevPresident);
 
                     Entity newPreviousPresident = Entity.newBuilder(txn.get(previousPresidentKey))
@@ -156,24 +156,24 @@ public class DepartmentResource {
                     txn.update(newPreviousPresident);
 
                     Entity newPresident = Entity.newBuilder(president)
-                            .set("department", data.id)
+                            .set("department", data.getId())
                             .set("department_job", "Presidente")
                             .build();
                     txn.update(newPresident);
                 }
 
                 Entity updatedDepartment = Entity.newBuilder(department)
-                        .set("email", data.email)
-                        .set("name", data.name)
-                        .set("president", data.president)
-                        .set("phone_number", data.phoneNumber)
-                        .set("location", data.location)
-                        .set("fax", data.fax)
+                        .set("email", data.getEmail())
+                        .set("name", data.getName())
+                        .set("president", data.getPresident())
+                        .set("phone_number", data.getPhoneNumber())
+                        .set("location", data.getLocation())
+                        .set("fax", data.getFax())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
 
                 txn.update(updatedDepartment);
-                LOG.info(data.id + " edited.");
+                LOG.info(data.getId() + " edited.");
                 txn.commit();
                 return Response.ok(updatedDepartment).build();
             }

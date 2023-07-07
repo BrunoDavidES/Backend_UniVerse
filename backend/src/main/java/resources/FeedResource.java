@@ -65,7 +65,7 @@ public class FeedResource {
             Transaction txn = datastore.newTransaction();
             try {
                 if (kind.equals(EVENT)) {
-                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getDepartment());
                     Entity department = txn.get(departmentKey);
                     if( department == null ) {
                         txn.rollback();
@@ -76,7 +76,7 @@ public class FeedResource {
                         Key teacherKey = datastore.newKeyFactory().setKind(USER).newKey(username);
                         Entity teacher = txn.get(teacherKey);
 
-                        if (!teacher.getString("department").equals(data.department)) {
+                        if (!teacher.getString("department").equals(data.getDepartment())) {
                             txn.rollback();
                             LOG.warning("No permission to post an Event in that department");
                             return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event in that department.").build();
@@ -85,7 +85,7 @@ public class FeedResource {
                         Key studentKey = datastore.newKeyFactory().setKind(USER).newKey(username);
                         Entity student = txn.get(studentKey);
 
-                        if (!student.getString("nucleus").equals(data.nucleus) || !student.getString("nucleus_job").equals("President")) {
+                        if (!student.getString("nucleus").equals(data.getNucleus()) || !student.getString("nucleus_job").equals("President")) {
                             txn.rollback();
                             LOG.warning("No permission to post an Event in that nucleus");
                             return Response.status(Response.Status.FORBIDDEN).entity("No permission to post an Event in that nucleus").build();
@@ -100,7 +100,7 @@ public class FeedResource {
                     if (kind.equals(NEWS))
                         id = (Long.MAX_VALUE - Instant.now().getEpochSecond())+ UUID.randomUUID().toString();
                     else {
-                        String[] temp = data.startDate.split("-");
+                        String[] temp = data.getStartDate().split("-");
                         Calendar c = Calendar.getInstance();
                         c.set(Integer.parseInt(temp[2]), Integer.parseInt(temp[1]), Integer.parseInt(temp[0]));
                         //Sem o MAX_VALUE, listava primeiro os mais antigos
@@ -115,17 +115,17 @@ public class FeedResource {
                 if (kind.equals(EVENT)) { //construtor de eventos
 
                     builder.set("id", id)
-                            .set("title", data.title)
+                            .set("title", data.getTitle())
                             .set("authorName", name)
                             .set("authorUsername", username)
-                            .set("startDate", data.startDate)
-                            .set("endDate", data.endDate)
-                            .set("location", data.location)
-                            .set("department", data.department)
-                            .set("nucleus", data.nucleus)
-                            .set("isPublic", data.isPublic)
-                            .set("capacity", data.capacity)
-                            .set("isItPaid", data.isItPaid)
+                            .set("startDate", data.getStartDate())
+                            .set("endDate", data.getEndDate())
+                            .set("location", data.getLocation())
+                            .set("department", data.getDepartment())
+                            .set("nucleus", data.getNucleus())
+                            .set("isPublic", data.getIsPublic())
+                            .set("capacity", data.getCapacity())
+                            .set("isItPaid", data.getIsItPaid())
                             .set("validated_backoffice", "false")
                             .set("time_creation", Timestamp.now());
 
@@ -137,7 +137,7 @@ public class FeedResource {
                         name = data.authorNameByBO;
                     }
                     builder.set("id", id)
-                            .set("title", data.title)
+                            .set("title", data.getTitle())
                             .set("authorName", name)
                             .set("authorUsername", username)
                             .set("validated_backoffice", "false")
@@ -147,7 +147,7 @@ public class FeedResource {
                 entry = builder.build();
 
                 txn.add(entry);
-                LOG.info(kind + " posted " + data.title + "; id: " + id);
+                LOG.info(kind + " posted " + data.getTitle() + "; id: " + id);
                 txn.commit();
                 return Response.ok(id).build();
             } finally {
@@ -205,25 +205,25 @@ public class FeedResource {
 
                 Entity.Builder newEntry = Entity.newBuilder(entry);
                 if (kind.equals(EVENT)) { //construtor de eventos
-                    newEntry.set("title", data.title)
-                            .set("startDate", data.startDate)
-                            .set("endDate", data.endDate)
-                            .set("location", data.location)
-                            .set("isPublic", data.isPublic)
-                            .set("capacity", data.capacity)
-                            .set("isItPaid", data.isItPaid)
-                            .set("validated_backoffice", data.validated_backoffice)
+                    newEntry.set("title", data.getTitle())
+                            .set("startDate", data.getStartDate())
+                            .set("endDate", data.getEndDate())
+                            .set("location", data.getLocation())
+                            .set("isPublic", data.getIsPublic())
+                            .set("capacity", data.getCapacity())
+                            .set("isItPaid", data.getIsItPaid())
+                            .set("validated_backoffice", data.getValidated_backoffice())
                             .set("time_lastupdated", Timestamp.now());
                 }else { //construtor de news
-                    newEntry.set("title", data.title)
-                            .set("validated_backoffice", data.validated_backoffice)
+                    newEntry.set("title", data.getTitle())
+                            .set("validated_backoffice", data.getValidated_backoffice())
                             .set("time_lastupdated", Timestamp.now());
 
                 }
                 Entity updatedEntryEntry = newEntry.build();
                 txn.update(updatedEntryEntry);
 
-                LOG.info(kind + " edited " + data.title + "; id: " + id);
+                LOG.info(kind + " edited " + data.getTitle() + "; id: " + id);
                 txn.commit();
                 return Response.ok().build();
             }

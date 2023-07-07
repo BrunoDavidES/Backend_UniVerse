@@ -2,20 +2,13 @@ package models;
 
 import com.google.cloud.datastore.Entity;
 
+import static utils.Constants.*;
+
 public class ModifyRoleData {
-    private static final String BO = "BO";
-    private static final String TEACHER = "T";
-    private static final String WORKER = "W";
-    private static final String STUDENT = "S";
-    private static final String ADMIN = "A";
-
-    public String target;
-
-    public String newRole;
-
-    public String office;
-
-    public String department;
+    private String target;
+    private String newRole;
+    private String office;
+    private String department;
 
     public String department_job;
 
@@ -37,4 +30,30 @@ public class ModifyRoleData {
     public boolean validateDelete(String modifierRole, String targetRole) {
         return modifierRole.equals(ADMIN) || (modifierRole.equals(BO) && !targetRole.equals(BO) && !targetRole.equals(ADMIN));
     }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public String getNewRole() {
+        return newRole;
+    }
+
+    public String getOffice() {
+        return office;
+    }
+
+    public void setOffice(String office) {
+        this.office = office;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getDepartment_job() {
+        return department_job;
+    }
+
+
 }

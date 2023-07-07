@@ -9,6 +9,7 @@ public class Constants {
     public static final String ASSISTANT = "ASS";
     public static final String STUDENT = "S";
     public static final String TEACHER = "T";
+    public static final String WORKER = "W";
 
     // Datastore kinds
     public static final String FORUM = "Forum";

@@ -47,8 +47,8 @@ public class ModifyUserResource {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
             Entity user = txn.get(userKey);
             data.fillGaps(user);
-            if (!data.department.equals("")) {
-                Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            if (!data.getDepartment().equals("")) {
+                Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getDepartment());
                 Entity department = txn.get(departmentKey);
                 if (department == null) {
                     txn.rollback();
@@ -56,8 +56,8 @@ public class ModifyUserResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
                 }
             }
-            if (!data.nucleus.equals("")) {
-                Key nucleustKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.nucleus);
+            if (!data.getNucleus().equals("")) {
+                Key nucleustKey = datastore.newKeyFactory().setKind("Nucleus").newKey(data.getNucleus());
                 Entity nucleus = txn.get(nucleustKey);
                 if (nucleus == null) {
                     txn.rollback();
@@ -71,13 +71,13 @@ public class ModifyUserResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity("User or password incorrect " + decodedToken.getUid()).build();
             } else {
                 Entity newUser = Entity.newBuilder(user)
-                        .set("name", data.name)
-                        .set("phone", data.phone)
-                        .set("status", data.status)
-                        .set("privacy", data.privacy)
-                        .set("nucleus", data.nucleus)
-                        .set("license_plate", data.license_plate)
-                        .set("linkedin", data.linkedin)
+                        .set("name", data.getName())
+                        .set("phone", data.getPhone())
+                        .set("status", data.getStatus())
+                        .set("privacy", data.getPrivacy())
+                        .set("nucleus", data.getNucleus())
+                        .set("license_plate", data.getLicense_plate())
+                        .set("linkedin", data.getLinkedin())
                         .set("time_lastupdate", Timestamp.now())
                         .build();
 
@@ -150,7 +150,7 @@ public class ModifyUserResource {
     @Path("/role")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response modifyRole(@HeaderParam("Authorization") String token, ModifyRoleData data) {
-        LOG.fine("Attempt to modify role of: " + data.target + " to " + data.newRole + ".");
+        LOG.fine("Attempt to modify role of: " + data.getTarget() + " to " + data.getNewRole() + ".");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if (decodedToken == null) {
@@ -161,8 +161,8 @@ public class ModifyUserResource {
         Transaction txn = datastore.newTransaction();
         try {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
-            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.getTarget());
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getDepartment());
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
             Entity department = txn.get(departmentKey);
@@ -173,12 +173,12 @@ public class ModifyUserResource {
                 txn.rollback();
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)), target)) {
+            } else if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.getTarget())), target)) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
             } else {
-                if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)), target)) {
+                if (!data.validatePermission(getRole(decodedToken), getRole(firebaseAuth.getUser(data.getTarget())), target)) {
                     txn.rollback();
                     LOG.warning(PERMISSION_DENIED);
                     return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
@@ -188,27 +188,27 @@ public class ModifyUserResource {
                     return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
                 } else {
                     Entity.Builder newUser = Entity.newBuilder(target);
-                    if (data.newRole != null && !data.newRole.equals("")) {
+                    if (data.getNewRole() != null && !data.getNewRole().equals("")) {
                         Map<String, Object> customClaims = new HashMap<>();
-                        customClaims.put(ROLE, data.newRole);
+                        customClaims.put(ROLE, data.getNewRole());
                         customClaims.put(LAST_UPDATE, Timestamp.now());
-                        firebaseAuth.setCustomUserClaims(data.target, customClaims);
-                        LOG.info("role: " + data.newRole + ", " + getRole(firebaseAuth.getUser(data.target)));
+                        firebaseAuth.setCustomUserClaims(data.getTarget(), customClaims);
+                        LOG.info("role: " + data.getNewRole() + ", " + getRole(firebaseAuth.getUser(data.getTarget())));
                     }
-                    newUser.set("department", data.department)
+                    newUser.set("department", data.getDepartment())
                             .set("department_job", data.department_job);
 
-                    if (data.newRole.equals(TEACHER)) {
-                        if (data.office == null)
-                            data.office = "";
+                    if (data.getNewRole().equals(TEACHER)) {
+                        if (data.getOffice() == null)
+                            data.setOffice("");
                         newUser.set("nucleus", "")
                                 .set("nucleus_job", "")
-                                .set("office", data.office);
+                                .set("office", data.getOffice());
                     } else
                         newUser.set("office", "");
                     Entity u = newUser.build();
                     txn.update(u);
-                    LOG.info(data.target + " role has been updated successfully.");
+                    LOG.info(data.getTarget() + " role has been updated successfully.");
                     txn.commit();
                     return Response.ok(target).build();
                 }
@@ -226,7 +226,7 @@ public class ModifyUserResource {
     @Path("/delete")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUser(@HeaderParam("Authorization") String token, ModifyRoleData data) {
-        LOG.fine("Attempt to delete: " + data.target + ".");
+        LOG.fine("Attempt to delete: " + data.getTarget() + ".");
 
         FirebaseToken decodedToken = authenticateToken(token);
         if (decodedToken == null) {
@@ -237,7 +237,7 @@ public class ModifyUserResource {
         Transaction txn = datastore.newTransaction();
         try {
             Key userKey = datastore.newKeyFactory().setKind(USER).newKey(decodedToken.getUid());
-            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.target);
+            Key targetKey = datastore.newKeyFactory().setKind(USER).newKey(data.getTarget());
             Entity user = txn.get(userKey);
             Entity target = txn.get(targetKey);
 
@@ -247,8 +247,8 @@ public class ModifyUserResource {
                 txn.rollback();
                 LOG.warning(ONE_OF_THE_USERS_DOES_NOT_EXIST);
                 return Response.status(Response.Status.BAD_REQUEST).entity(ONE_OF_THE_USERS_DOES_NOT_EXIST).build();
-            } else if (!data.validateDelete(getRole(decodedToken), getRole(firebaseAuth.getUser(data.target)))
-                    && !decodedToken.getUid().equals(data.target)) {
+            } else if (!data.validateDelete(getRole(decodedToken), getRole(firebaseAuth.getUser(data.getTarget())))
+                    && !decodedToken.getUid().equals(data.getTarget())) {
                 txn.rollback();
                 LOG.warning(PERMISSION_DENIED);
                 return Response.status(Response.Status.BAD_REQUEST).entity(PERMISSION_DENIED).build();
@@ -265,7 +265,7 @@ public class ModifyUserResource {
                     txn.delete(memberEntity.getKey());
                 }
                 txn.delete(targetKey);
-                firebaseAuth.deleteUser(data.target);
+                firebaseAuth.deleteUser(data.getTarget());
                 LOG.info("Target deleted.");
                 txn.commit();
                 return Response.ok(target).build();

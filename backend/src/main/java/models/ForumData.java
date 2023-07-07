@@ -39,4 +39,6 @@ public class ForumData {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
 }

@@ -1,9 +1,10 @@
 package models;
 
 public class ModifyPwdData {
-    public String password;
-    public String newPwd;
-    public String confirmation;
+    private String password;
+    private String newPwd;
+    private String confirmation;
+
     public ModifyPwdData() { }
 
     public boolean validatePwd() {
@@ -15,4 +16,18 @@ public class ModifyPwdData {
         }
         return newPwd.equals(confirmation);
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getNewPwd() {
+        return newPwd;
+    }
+
+    public String getConfirmation() {
+        return confirmation;
+    }
+
+
 }

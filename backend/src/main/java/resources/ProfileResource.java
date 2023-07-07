@@ -72,37 +72,36 @@ public class ProfileResource {
             }
         }
 
-        data.username = username;
-        data.name = user.getString("name");
-        data.email = user.getString("email");
-        data.role = getRole(firebaseAuth.getUser(username));
-        data.department = user.getString("department");
-        data.department_job = user.getString("department_job");
+        data.setUsername(username);
+        data.setName(user.getString("name"));
+        data.setEmail(user.getString("email"));
+        data.setRole(getRole(firebaseAuth.getUser(username)));
+        data.setDepartment(user.getString("department"));
+        data.setDepartment_job(user.getString("department_job"));
 
-        if (data.role.equals(STUDENT)){
-            data.nucleus = user.getString("nucleus");
-            data.nucleus_job = user.getString("nucleus_job");
-        }else {
-            data.nucleus = "";
-            data.nucleus_job = "";
+        if (data.getRole().equals(STUDENT)){
+            data.setNucleus(user.getString("nucleus"));
+            data.setNucleus_job(user.getString("nucleus_job"));
+        } else {
+            data.setNucleus("");
+            data.setNucleus_job("");
         }
 
-        if (data.role.equals(TEACHER)){
-            data.office = user.getString("office");
-        }else
-            data.office = "";
+        if (data.getRole().equals(TEACHER)){
+            data.setOffice(user.getString("office"));
+        } else
+            data.setOffice("");
 
         String requesterUsername = decodedToken.getUid();
         String requesterRole = getRole(decodedToken);
 
         if ( requesterUsername.equals(username) || requesterRole.equals(BO) || requesterRole.equals(ADMIN) ){
-            data.license_plate = user.getString("license_plate");
-            data.status = user.getString("status");
-        }else {
-            data.license_plate = "";
-            data.status = "";
+            data.setLicense_plate(user.getString("license_plate"));
+            data.setStatus(user.getString("status"));
+        } else {
+            data.setLicense_plate("");;
+            data.setStatus("");
         }
-
 
         LOG.fine("Profile successfully gotten");
         return Response.ok(g.toJson(data)).build();
@@ -139,7 +138,7 @@ public class ProfileResource {
                 eventAux = txn.get(feedKey);
             } while (eventAux != null);
 
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getDepartment());
             Entity department = txn.get(departmentKey);
             if( department == null ) {
                 txn.rollback();
@@ -151,12 +150,12 @@ public class ProfileResource {
 
             event = Entity.newBuilder(eventKey)
                     .set("id", id)
-                    .set("title", data.title)
-                    .set("username", data.username)
-                    .set("beginningDate", data.beginningDate)
-                    .set("hours", data.hours)
-                    .set("location", data.location)
-                    .set("department", data.department)
+                    .set("title", data.getTitle())
+                    .set("username", data.getUsername())
+                    .set("beginningDate", data.getBeginningDate())
+                    .set("hours", data.getHours())
+                    .set("location", data.getLocation())
+                    .set("department", data.getDepartment())
                     .set("time_created", Timestamp.now())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
@@ -203,13 +202,13 @@ public class ProfileResource {
 
         PersonalEventsData data = new PersonalEventsData();
         // Enquanto não virmos quais os atributos a devolver em cada caso, vamos dar poucos
-        data.id = event.getString("id");
-        data.title = event.getString("title");
-        data.username = event.getString("username");
-        data.department = event.getString("department");
-        data.beginningDate = event.getString("beginningDate");
-        data.hours = event.getString("hours");
-        data.location = event.getString("location");
+        data.setId(event.getString("id"));
+        data.setTitle(event.getString("title"));
+        data.setUsername(event.getString("username"));
+        data.setDepartment(event.getString("department"));
+        data.setBeginningDate(event.getString("beginningDate"));
+        data.setHours(event.getString("hours"));
+        data.setLocation(event.getString("location"));
 
         LOG.fine("Personal event successfully obtained.");
         return Response.ok(g.toJson(data)).build();
@@ -252,12 +251,12 @@ public class ProfileResource {
             memberEntity = queryResults.next();
             if(memberEntity.getString("beginningDate").contains("-" + monthAndYear)){
                 PersonalEventsData data = new PersonalEventsData();
-                data.id = memberEntity.getString("id");
-                data.title = memberEntity.getString("title");
-                data.username = memberEntity.getString("username");
-                data.beginningDate = memberEntity.getString("beginningDate");
-                data.hours = memberEntity.getString("hours");
-                data.location = memberEntity.getString("location");
+                data.setId(memberEntity.getString("id"));
+                data.setTitle(memberEntity.getString("title"));
+                data.setUsername(memberEntity.getString("username"));
+                data.setBeginningDate(memberEntity.getString("beginningDate"));
+                data.setHours(memberEntity.getString("hours"));
+                data.setLocation(memberEntity.getString("location"));
                 result.add(data);
             }
         }
@@ -296,7 +295,7 @@ public class ProfileResource {
                 LOG.warning("User does not have this event.");
                 return Response.status(Response.Status.BAD_REQUEST).entity("User does not have this event.").build();
             }
-            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.department);
+            Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(data.getDepartment());
             Entity department = txn.get(departmentKey);
             if( department == null ) {
                 txn.rollback();
@@ -304,11 +303,11 @@ public class ProfileResource {
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
             }
             Entity updatedEvent = Entity.newBuilder(event)
-                    .set("title", data.title)
-                    .set("beginningDate", data.beginningDate)
-                    .set("hours", data.hours)
-                    .set("location", data.location)
-                    .set("department", data.department)
+                    .set("title", data.getTitle())
+                    .set("beginningDate", data.getBeginningDate())
+                    .set("hours", data.getHours())
+                    .set("location", data.getLocation())
+                    .set("department", data.getDepartment())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
             txn.update(updatedEvent);

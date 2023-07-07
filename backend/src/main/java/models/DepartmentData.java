@@ -8,16 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 public class DepartmentData {
-
-
-    public String id;  //acronimo do departamento, exemplo MIEI
-    public String email;
-    public String name;
-    public String president;
-    public String phoneNumber;
-    public String location;
-    public String fax;
-
+    private String id;  //acronimo do departamento, exemplo MIEI
+    private String email;
+    private String name;
+    private String president;
+    private String phoneNumber;
+    private String location;
+    private String fax;
 
     public DepartmentData() { }
 
@@ -53,5 +50,33 @@ public class DepartmentData {
             this.location = department.getString("location");
         if(this.fax == null || this.fax.equals(""))
             this.fax = department.getString("fax");
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPresident() {
+        return president;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getFax() {
+        return fax;
     }
 }
