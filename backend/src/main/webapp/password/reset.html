@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reset da Password</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+</head>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    .button {
+  		border: none;
+  		color: white;
+  		padding: 8px 20px;
+  		text-align: center;
+  		text-decoration: none;
+  		display: inline-block;
+  		font-size: 16px;
+  		transition-duration: 0.4s;
+  		cursor: pointer;
+  		background-color: rgb(210,212,211);
+	 	color: black;
+	  	border: 2px solid #0A2558;
+	}
+
+	.button:hover {
+	  	background-color: #0A2558;
+	  	color: rgb(237,233,232);
+	}
+</style>
+<body style="background-color: rgb(230,229,229);">
+    <div class="container">
+        <img src="../img/fullLogo2.png" alt="UNIVERSE logo" width="257" height="65">
+        <br><br><br><br>
+        <label style="color:rgb(34,34,34);" for="password">Password</label>
+        <input type="password" name="password" id="password" placeholder="Introduzir password" style="width: 200px;" required>
+        <i class="far fa-eye" id="togglePassword" style="margin-left: -35px; cursor: pointer;"></i>
+        <br><br>
+        <div style="display: inline-block; width: 500px;">
+            <label style="color:rgb(34,34,34); display: inline-block;">Confirmação </label>
+            <input type="password" name="passwordCon" id="passwordCon" placeholder="Introduzir confirmação" style="display: inline-block; width: 200px;" required>
+            <i class="far fa-eye" id="togglePasswordCon" style="margin-left: -35px; cursor: pointer;"></i>
+        </div>
+        <br><br><br><br>
+        <button class="button"  type="submit" value="Reset" onclick="checkPass(password.value, passwordCon.value)">Reset Password</button>
+    </div>
+</body>
+
+<script>
+      const togglePassword = document.querySelector('#togglePassword');
+      const password = document.querySelector('#password');
+
+      togglePassword.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        // toggle the eye slash icon
+        this.classList.toggle('fa-eye-slash');
+      });
+
+      const togglePasswordCon = document.querySelector('#togglePasswordCon');
+      const passwordCon = document.querySelector('#passwordCon');
+
+      togglePasswordCon.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = passwordCon.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordCon.setAttribute('type', type);
+        // toggle the eye slash icon
+        this.classList.toggle('fa-eye-slash');
+      });
+
+      function hasUppercaseAndNumber(str) {
+            const uppercaseRegex = /[A-Z]/;
+            const numberRegex = /[0-9]/;
+
+            return str.length >= 6 && uppercaseRegex.test(str) && numberRegex.test(str);
+       }
+
+      function checkPass(p1, p2) {
+        if(p1 === p2){
+            if(hasUppercaseAndNumber(p1)){
+
+            }
+            else{
+                alert("A password tem de conter pelo menos uma letra maíscula, um número e tem de ter pelo menos 6 caracteres");
+            }
+        }
+        else
+            alert("A confirmação é diferente da password");
+      }
+
+</script>
+</html>
