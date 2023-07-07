@@ -30,15 +30,19 @@ document.addEventListener("DOMContentLoaded", function() {
             if (decodedToken && decodedToken.role !== "A" && decodedToken.role !== "BO") {
               window.location.href = "/backoffice/index.html";
               alert("Invalid role");
-              sessionStorage.removeItem("capiToken");
-              sessionStorage.removeItem("userLogged");
+              //sessionStorage.removeItem("capiToken");
+              //sessionStorage.removeItem("userLogged");
+              sessionStorage.clear();
+              localStorage.clear();
             } else {
               window.location.href = "/backoffice/mainPage.html";
             }
           })
           .catch(function(error) {
-            sessionStorage.removeItem("capiToken");
-            sessionStorage.removeItem("userLogged");
+            //sessionStorage.removeItem("capiToken");
+            //sessionStorage.removeItem("userLogged");
+            sessionStorage.clear();
+            localStorage.clear();
             console.error(error);
           });
 

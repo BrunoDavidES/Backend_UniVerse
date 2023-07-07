@@ -50,17 +50,21 @@ function loadLoggedUser() {
         // Check if the role is not "A" or "BO" and redirect if necessary
         if (response.role !== "A" && response.role !== "BO") {
             alert(response.role);
-            sessionStorage.removeItem("capiToken");
-            sessionStorage.removeItem("userLogged");
-            sessionStorage.removeItem("miniProfilePic");
+            sessionStorage.clear();
+            //localStorage.clear();
+            //sessionStorage.removeItem("capiToken");
+            //sessionStorage.removeItem("userLogged");
+            //sessionStorage.removeItem("miniProfilePic");
             window.location.href = "/backoffice/index.html";
         }
       }
       else {
         console.error(request.responseText);
-        sessionStorage.removeItem("capiToken");
-        sessionStorage.removeItem("userLogged");
-        sessionStorage.removeItem("miniProfilePic");
+        sessionStorage.clear();
+        //localStorage.clear();
+        //sessionStorage.removeItem("capiToken");
+        //sessionStorage.removeItem("userLogged");
+        //sessionStorage.removeItem("miniProfilePic");
         window.location.href = "/backoffice/index.html";
       }
     }
@@ -130,9 +134,11 @@ function hideRoleOption(){
             }
             else{
                 alert(response.role);
-                sessionStorage.removeItem("capiToken");
-                sessionStorage.removeItem("userLogged");
-                sessionStorage.removeItem("miniProfilePic");
+                sessionStorage.clear();
+                //localStorage.clear();
+                //sessionStorage.removeItem("capiToken");
+                //sessionStorage.removeItem("userLogged");
+                //sessionStorage.removeItem("miniProfilePic");
                 window.location.href = "/backoffice/index.html";
             }
         }
@@ -168,7 +174,15 @@ firebase.initializeApp(firebaseConfig);
 
 
 function uploadEventPic(filename) {
-    var file = document.getElementById("eventPic").files[0];
+    var fileList = document.getElementById("eventPic");
+
+    if (fileList.files.length == 0){
+        console.log("No picture to upload");
+        return;
+    }
+
+    var file = fileList.files[0];
+
     if(file.size > 8500000){
         alert('Ficheiro demasiado pesado (máximo de 8 MB)');
         document.getElementById("eventPic").value = "";
@@ -188,12 +202,20 @@ function uploadEventPic(filename) {
 
 
 function updateEventPicMod(filename) {
-     var file = document.getElementById("eventPicMod").files[0];
-     if(file.size > 8500000){
+    var fileList = document.getElementById("eventPicMod");
+
+    if (fileList.files.length == 0){
+        console.log("No picture to upload");
+        return;
+    }
+
+    var file = fileList.files[0];
+
+    if(file.size > 8500000){
         alert('Ficheiro demasiado pesado (máximo de 8 MB)');
         document.getElementById("eventPicMod").value = "";
-     }
-     else{
+    }
+    else{
         var storageRef = firebase.storage().ref();
         var eventPicRef = storageRef.child("Events/" + filename);
 
@@ -202,7 +224,7 @@ function updateEventPicMod(filename) {
         }).catch(function(error) {
             console.error("Error uploading event picture:", error);
         });
-     }
+    }
 }
 
 
@@ -503,7 +525,15 @@ function validateEvent(){
 
 
 function uploadNewsPic(filename) {
-    var file = document.getElementById("newsPic").files[0];
+    var fileList = document.getElementById("newsPic");
+
+    if (fileList.files.length == 0){
+        console.log("No picture to upload");
+        return;
+    }
+
+    var file = fileList.files[0];
+
     if(file.size > 8500000){
         alert('Ficheiro demasiado pesado (máximo de 8 MB)');
         document.getElementById("newsPic").value = "";
@@ -523,22 +553,28 @@ function uploadNewsPic(filename) {
 
 
 function updateNewsPicMod(filename) {
-     var file = document.getElementById("newsPicMod").files[0];
-     if (file != null){
-         if(file.size > 8500000){
-            alert('Ficheiro demasiado pesado (máximo de 8 MB)');
-            document.getElementById("newsPicMod").value = "";
-         }
-         else{
-            var storageRef = firebase.storage().ref();
-            var eventPicRef = storageRef.child("News/" + filename);
+    var fileList = document.getElementById("newsPicMod");
 
-            eventPicRef.put(file).then(function(snapshot) {
-                console.log("News picture uploaded successfully!");
-            }).catch(function(error) {
-                console.error("Error uploading event picture:", error);
-            });
-        }
+    if (fileList.files.length == 0){
+        console.log("No picture to upload");
+        return;
+    }
+
+    var file = fileList.files[0];
+
+    if(file.size > 8500000){
+         alert('Ficheiro demasiado pesado (máximo de 8 MB)');
+         document.getElementById("newsPicMod").value = "";
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var eventPicRef = storageRef.child("News/" + filename);
+
+        eventPicRef.put(file).then(function(snapshot) {
+            console.log("News picture uploaded successfully!");
+        }).catch(function(error) {
+            console.error("Error uploading event picture:", error);
+        });
     }
 }
 
@@ -679,34 +715,17 @@ function editNews(){
         if ( request.readyState === 4 ){
             if (request.status === 200) {
                 updateNewsPicMod(id);
-                if ( text !== localStorage.getItem(id) ){
+                if ( text !== sessionStorage.getItem(id) && text !== null && text.trim() !== "" ){
                     const file = new Blob([text], {type: 'text/plain;charset=UTF-8'});
                     firebase.storage().ref().child("News/" + id + ".txt").put(file)
                         .then(function() {
                               console.log("News text body uploaded successfully!");
+                              sessionStorage.removeItem(id);
                             })
                             .catch(function(error) {
                               console.error("Error putting text body in storage:", error);
                             });
                     updateNewsPicMod(id);
-
-/*                    var bucketPOSTRequest = new XMLHttpRequest();
-                    bucketPOSTRequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt");
-                    bucketPOSTRequest.setRequestHeader("Content-Type", "text/plain");
-
-                    bucketPOSTRequest.onreadystatechange  = function() {
-                        if (bucketPOSTRequest.readyState == 4){
-                            if (bucketPOSTRequest.status == 200){
-                                console.log("SUCCESS");
-                                localStorage.removeItem(id);
-                            }
-                            else {
-                                console.log("News entity edited but error uploading text body to bucket");
-                                alert("News entity edited but error uploading text body to bucket");
-                            }
-                        }
-                    }
-                    bucketPOSTRequest.send(text); */
                 }
                 else {
                     console.log("SUCCESS");
@@ -736,27 +755,7 @@ function deleteNews(){
         if ( request.readyState === 4 ) {
             if ( request.status === 200 ) {
                 deleteNewsPic(id);
-
-
-
-/*                var bucketDELETERequest = new XMLHttpRequest();
-
-                bucketDELETERequest.open("POST", "/gcs/universe-fct.appspot.com/News-" + id + ".txt", true);
-                bucketDELETERequest.setRequestHeader("Content-Type", "text/plain");
-
-                bucketDELETERequest.onreadystatechange = function() {
-                    if ( bucketDELETERequest.readyState === 4 ) {
-                        if ( bucketDELETERequest.status === 200 ) {
-
-                            console.log("SUCCESS");
-                        }
-                        else{
-                            console.log("Problems erasing News txt file content from bucket");
-                            alert("Problems erasing News txt file content from bucket");
-                        }
-                    }
-                }
-                bucketDELETERequest.send(""); */
+                sessionStorage.removeItem(id);
             } else {
                 console.log("FAIL");
             }
@@ -811,7 +810,7 @@ function getNews() {
                     }
                   })
                   .then(function(fileContent) {
-                    localStorage.setItem(id, fileContent);
+                    sessionStorage.setItem(id, fileContent);
                     document.getElementById("textMod").value = fileContent;
                   })
                   .catch(function(error) {
@@ -1207,7 +1206,6 @@ function getReport() {
                         }
                     })
                     .then(function(fileContent) {
-                        localStorage.setItem(id, fileContent);
                         document.getElementById("textRep").value = fileContent;
                     })
                     .catch(function(error) {
@@ -1988,6 +1986,44 @@ function queryNucleus(){
     }
     request.send();
 }
+
+function getHojeNaFCT(){
+    var storageRef = firebase.storage().ref();
+    var fileRef = storageRef.child("hojenafct.txt");
+
+    fileRef.getDownloadURL()
+      .then(function(url) {
+        return fetch(url);
+      })
+      .then(function(response) {
+        if (response.ok) {
+          return response.text();
+        } else {
+          throw new Error("Error fetching file. Status: " + response.status);
+        }
+      })
+      .then(function(fileContent) {
+        document.getElementById("hojeFCT").value = fileContent;
+      })
+      .catch(function(error) {
+        console.error("Error accessing file:", error);
+      });
+}
+
+
+function updateHojeNaFCT(){
+
+    const file = new Blob([document.getElementById("hojeFCT").value], {type: 'text/plain'});
+
+    firebase.storage().ref().child("hojenafct.txt").put(file)
+        .then(function() {
+            console.log("Hoje na FCT updated successfully!");
+        })
+        .catch(function(error) {
+            console.error("Error putting text body in storage:", error);
+        });
+}
+
 
 function clearList(c1, c2){
     var r1 = document.getElementById(c1);
