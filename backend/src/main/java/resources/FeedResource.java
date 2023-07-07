@@ -11,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.InvalidParameterException;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -96,7 +97,16 @@ public class FeedResource {
                 Entity entry;
                 String id;
                 do {
-                    id = UUID.randomUUID().toString();
+                    if (kind.equals(NEWS))
+                        id = (Long.MAX_VALUE - Instant.now().getEpochSecond())+ UUID.randomUUID().toString();
+                    else {
+                        String[] temp = data.startDate.split("-");
+                        Calendar c = Calendar.getInstance();
+                        c.set(Integer.parseInt(temp[2]), Integer.parseInt(temp[1]), Integer.parseInt(temp[0]));
+                        //Sem o MAX_VALUE, listava primeiro os mais antigos
+                        id = (Long.MAX_VALUE - c.getTimeInMillis()) + UUID.randomUUID().toString();
+                    }
+
                     feedKey = datastore.newKeyFactory().setKind(kind).newKey(id);
                     entry = txn.get(feedKey);
                 } while (entry != null);
@@ -280,6 +290,7 @@ public class FeedResource {
 
         FirebaseToken decodedToken = authenticateToken(token);
 
+        LOG.info("Ponto 1");
         if(kind.equals(EVENT)) {
             if (decodedToken == null) {
                 LOG.info(TOKEN_NOT_FOUND);
@@ -289,10 +300,12 @@ public class FeedResource {
             }
         }
 
+        LOG.info("Ponto 2");
         if( filters == null ){
             filters = new HashMap<>(1);
         }
 
+        LOG.info("Ponto 3");
         if (decodedToken != null){
             String role = getRole(decodedToken);
 
@@ -304,11 +317,16 @@ public class FeedResource {
             filters.put("validated_backoffice", "true");
         }
 
+        EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind(kind);
+
+        LOG.info("Ponto 4");
         QueryResults<Entity> queryResults;
 
-        StructuredQuery.CompositeFilter attributeFilter = null;
+        //StructuredQuery.CompositeFilter attributeFilter = null;
 
-        StructuredQuery.PropertyFilter propFilter;
+        LOG.info("Ponto 6");
+
+        /*StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
 
@@ -316,23 +334,38 @@ public class FeedResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
             else
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
+        } */
+
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            query.setFilter(StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue()));
         }
 
-        EntityQuery.Builder query = Query.newEntityQueryBuilder() //tá feio mas só funciona assim, raios da datastore
+
+        //LOG.info(attributeFilter.toString());
+
+        LOG.info("Ponto 7");
+ /*       EntityQuery.Builder query = Query.newEntityQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
+                .setOrderBy(StructuredQuery.OrderBy.desc("id"))
                 .setLimit(Integer.parseInt(limit));
+                */
+
+        //query.setOrderBy(StructuredQuery.OrderBy.desc("time_creation"));
 
         if ( !cursor.equals("EMPTY") ){
             query.setStartCursor(Cursor.fromUrlSafe(cursor));
         }
 
-        query.setOrderBy(StructuredQuery.OrderBy.desc("time_creation"));
+        LOG.info("Ponto 8");
 
+        LOG.info("Ponto 9");
         queryResults = datastore.run(query.build());
 
+        LOG.info("Ponto 10");
         List<Entity> results = new ArrayList<>();
 
+        LOG.info("Ponto 11");
         queryResults.forEachRemaining(results::add);
 
         LOG.info("Query de " + kind + " pedido");
@@ -360,6 +393,10 @@ public class FeedResource {
             }
         }
 
+        if (filters == null) {
+            filters = new HashMap<>(1);
+        }
+
         if (decodedToken != null){
             String role = getRole(decodedToken);
 
@@ -374,9 +411,7 @@ public class FeedResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-        if (filters == null) {
-            filters = new HashMap<>(1);
-        }
+
         StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
