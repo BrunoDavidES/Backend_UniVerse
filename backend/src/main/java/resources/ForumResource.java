@@ -382,6 +382,7 @@ public class ForumResource {
             } else {
                 return Response.status(Response.Status.NOT_FOUND).entity(USER_DOES_NOT_EXIST).build();
             }
+            LOG.warning(promotedRole);
 
             firebaseDatabase.getReference(FORUMS)
                     .child(forumID)
@@ -407,6 +408,8 @@ public class ForumResource {
             return Response.ok(userRole).build();
         } catch (Exception e) {
             txn.rollback();
+            LOG.warning(e.getMessage());
+            LOG.warning(memberID);
             LOG.info("Error promoting member");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
