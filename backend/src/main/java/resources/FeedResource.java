@@ -289,6 +289,10 @@ public class FeedResource {
             }
         }
 
+        if( filters == null ){
+            filters = new HashMap<>(1);
+        }
+
         if (decodedToken != null){
             String role = getRole(decodedToken);
 
@@ -303,9 +307,7 @@ public class FeedResource {
         QueryResults<Entity> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
-        if( filters == null ){
-            filters = new HashMap<>(1);
-        }
+
         StructuredQuery.PropertyFilter propFilter;
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
