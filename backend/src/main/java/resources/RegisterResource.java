@@ -42,7 +42,7 @@ public class RegisterResource {
         if(response.getStatus() == Response.Status.OK.getStatusCode()) {
 
             // Datastore Register
-            response = datastoreRegister(data.username, data.email, data.name, data.license_plate);
+            response = datastoreRegister(data.username, data.email, data.name);
             if (response.getStatus() != Response.Status.OK.getStatusCode()) {
                 firebaseAuth.deleteUser(data.username);
             }
@@ -75,24 +75,24 @@ public class RegisterResource {
         }
     }
 
-    private Response datastoreRegister(String username, String email, String name, String license_plate) {
+    private Response datastoreRegister(String username, String email, String name) {
         Transaction txn = datastore.newTransaction();
         try {
             Key userKey = datastore.newKeyFactory().setKind("User").newKey(username);
 
-            if(license_plate == null)
-                license_plate = UNREGISTERED;
-
             Entity user = Entity.newBuilder(userKey)
                     .set("email", email)
                     .set("name", name)
-                    .set("license_plate", license_plate)
+                    .set("phone", "")
+                    .set("license_plate", "")
                     .set("status", "ACTIVE")
+                    .set("privacy", "PRIVATE")
                     .set("department", "")
                     .set("department_job", "")
                     .set("nucleus", "")
                     .set("nucleus_job", "")
                     .set("office","")
+                    .set("linkedin", "")
                     .set("time_creation", Timestamp.now())
                     .set("time_lastupdate", Timestamp.now())
                     .build();
