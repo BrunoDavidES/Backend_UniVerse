@@ -11,8 +11,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
+import static resources.NotificationResource.*;
 import static utils.Constants.*;
 import static utils.FirebaseAuth.*;
 
@@ -149,8 +151,6 @@ public class ForumResource {
             while (results.hasNext()) {
                 Entity entity = results.next();
                 txn.delete(entity.getKey());
-                LOG.warning(entity.getKey().getName());
-                LOG.warning(entity.getKey().getNameOrId().toString());
                 firebaseDatabase.getReference(USERS)
                         .child(entity.getKey().getName().replace(".", "-"))
                         .child(FORUMS)
@@ -159,7 +159,7 @@ public class ForumResource {
             }
 
             query = Query.newEntityQueryBuilder()
-                    .setKind(USER_FORUMS)
+                    .setKind(FORUM_POSTS)
                     .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
                     .build();
 
@@ -231,6 +231,24 @@ public class ForumResource {
             txn.commit();
 
             LOG.info("Posted to forum");
+
+            CompletableFuture.runAsync(() -> {
+                Query<Entity> query = Query.newEntityQueryBuilder()
+                        .setKind(USER_FORUMS)
+                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
+                        .build();
+                QueryResults<Entity> results = txn.run(query);
+
+                List<String> members = new ArrayList<>();
+                while (results.hasNext()) {
+                    Entity entity = results.next();
+                    members.add(entity.getKey().getName());
+                }
+                sendNotification(members);
+
+                LOG.info("Members notified");
+            });
+
             return Response.ok(postID).build();
         } catch (Exception e) {
             txn.rollback();
