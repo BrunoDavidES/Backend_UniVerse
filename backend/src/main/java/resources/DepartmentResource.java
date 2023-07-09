@@ -9,6 +9,7 @@ import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.DepartmentData;
+import utils.QueryResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -282,11 +283,13 @@ public class DepartmentResource {
 
         queryResults.forEachRemaining(results::add);
 
+        QueryResponse response = new QueryResponse();
+        response.setResults(results);
+        response.setCursor(queryResults.getCursorAfter().toUrlSafe());
+
         LOG.info("Query de departamentos pedido");
         Gson g = new Gson();
 
-        return Response.ok(g.toJson(results))
-                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
-                .build();
+        return Response.ok(g.toJson(response)).build();
     }
 }

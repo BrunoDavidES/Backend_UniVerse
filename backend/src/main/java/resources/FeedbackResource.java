@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.FeedbackData;
 import models.ReportData;
+import utils.QueryResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -93,14 +94,13 @@ public class FeedbackResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Query<Entity> query = Query.newEntityQueryBuilder()
-                    .setKind("Feedback")
-                    .setOrderBy(StructuredQuery.OrderBy.desc("submitted"))
-                    .setLimit(size)
-                    .setStartCursor(Cursor.fromUrlSafe(cursor))
-                    .build();
+            EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind("Feedback").setLimit(size);
 
-            QueryResults<Entity> results = txn.run(query);
+            if (!cursor.equals("EMPTY") && !cursor.equals("")){
+                query.setStartCursor(Cursor.fromUrlSafe(cursor));
+            }
+
+            QueryResults<Entity> results = txn.run(query.build());
 
             List<Entity> feedbackList = new ArrayList<>();
 
@@ -111,7 +111,13 @@ public class FeedbackResource {
 
             LOG.info( "Feedback fetched");
             txn.commit();
-            return Response.ok(feedbackList).build();
+
+            QueryResponse response = new QueryResponse();
+            response.setResults(feedbackList);
+            response.setCursor(results.getCursorAfter().toUrlSafe());
+
+            Gson g = new Gson();
+            return Response.ok(g.toJson(response)).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();

@@ -413,7 +413,7 @@ function queryEvents(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             const response = JSON.parse(request.responseText);
-            const entities = response.map(function(entity) {
+            const entities = response.results.map(function(entity) {
             return {
                 authorUsername: entity.properties.authorUsername,
                 authorName: entity.properties.authorName,
@@ -470,7 +470,7 @@ function queryEvents(){
                 list.appendChild(listItem);
 
             });
-            queryEventsCursor = request.getResponseHeader("X-Cursor");
+            queryEventsCursor = response.cursor;
         }
     }
 }
@@ -806,7 +806,7 @@ function queryNews(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             const response = JSON.parse(request.responseText);
-            const entities = response.map(function(entity) {
+            const entities = response.results.map(function(entity) {
             return {
                 authorUsername: entity.properties.authorUsername,
                 authorName: entity.properties.authorName,
@@ -847,7 +847,7 @@ function queryNews(){
                 list.appendChild(listItem);
 
             });
-            queryNewsCursor = request.getResponseHeader("X-Cursor");
+            queryNewsCursor = response.cursor;
         }
     }
 }
@@ -942,7 +942,7 @@ function queryUsers(){
             if ( request.status === 200 ) {
                 const response = JSON.parse(request.responseText);
 
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         name: entity.properties.name,
                         username: (entity.properties.email.value).split("@")[0],
@@ -997,7 +997,7 @@ function queryUsers(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUsersCursor = request.getResponseHeader("X-Cursor");
+                queryUsersCursor = response.cursor;
             }
             else {
                 alert("FAIL");
@@ -1198,7 +1198,7 @@ function queryReports(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         reporter: entity.properties.reporter,
@@ -1248,7 +1248,7 @@ function queryReports(){
                     });
                     list.appendChild(listItem);
                 });
-                queryReportsCursor = request.getResponseHeader("X-Cursor");
+                queryReportsCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1285,7 +1285,7 @@ function queryUnresolvedReports(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         reporter: entity.properties.reporter,
@@ -1335,7 +1335,7 @@ function queryUnresolvedReports(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUnresolvedReportsCursor = request.getResponseHeader("X-Cursor");
+                queryUnresolvedReportsCursor = results.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1561,7 +1561,7 @@ function queryDepartments(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         name: entity.properties.name,
                         id: entity.properties.id,
@@ -1609,7 +1609,7 @@ function queryDepartments(){
                     });
                     list.appendChild(listItem);
                 });
-                queryDepartmentsCursor = request.getResponseHeader("X-Cursor");
+                queryDepartmentsCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1838,7 +1838,7 @@ function queryNucleus(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         name: entity.properties.name,
                         id: entity.properties.id,
@@ -1893,7 +1893,7 @@ function queryNucleus(){
                     });
                     list.appendChild(listItem);
                 });
-                queryNucleusCursor = request.getResponseHeader("X-Cursor");
+                queryNucleusCursor = response.cursor;
 
             }
             else {
@@ -1990,7 +1990,7 @@ function queryFAQ(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.submitted.value;
+                    listItem.textContent = entity.title.value + " - " + entity.email.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
@@ -2055,7 +2055,7 @@ function queryUnresFAQ(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         id: entity.key,
                         email: entity.properties.email,
@@ -2068,7 +2068,7 @@ function queryUnresFAQ(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.status.value;
+                    listItem.textContent = entity.title.value + " - " + entity.email.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('unresDetails');
                         details.innerHTML = '';
@@ -2096,7 +2096,7 @@ function queryUnresFAQ(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUnresFAQCursor = request.getResponseHeader("X-Cursor");
+                queryUnresFAQCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);

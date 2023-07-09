@@ -11,6 +11,7 @@ import utils.QueryResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -43,7 +44,7 @@ public class HelpResource {
             Entity entity;
             String id;
             do {
-                id = UUID.randomUUID().toString();
+                id = (Long.MAX_VALUE - Instant.now().getEpochSecond())+ UUID.randomUUID().toString();
                 key = datastore.newKeyFactory().setKind("Help").newKey(id);
                 entity = txn.get(key);
             } while(entity != null);
@@ -142,7 +143,7 @@ public class HelpResource {
         try {
             EntityQuery.Builder query = Query.newEntityQueryBuilder()
                     .setKind("Help")
-                    .setOrderBy(StructuredQuery.OrderBy.desc("submitted"))
+                    //.setOrderBy(StructuredQuery.OrderBy.desc("submitted"))
                     .setLimit(size);
 
             if (!cursor.equals("EMPTY") && !cursor.equals("")){
@@ -197,15 +198,16 @@ public class HelpResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Query<Entity> query = Query.newEntityQueryBuilder()
+            EntityQuery.Builder query = Query.newEntityQueryBuilder()
                     .setKind("Help")
                     .setFilter(StructuredQuery.PropertyFilter.eq("replied", ""))
-                    .setOrderBy(StructuredQuery.OrderBy.desc("submitted"))
-                    .setLimit(size)
-                    .setStartCursor(Cursor.fromUrlSafe(cursor))
-                    .build();
+                    .setLimit(size);
 
-            QueryResults<Entity> results = txn.run(query);
+            if (!cursor.equals("EMPTY") && !cursor.equals("")){
+                query.setStartCursor(Cursor.fromUrlSafe(cursor));
+            }
+
+            QueryResults<Entity> results = txn.run(query.build());
 
             List<Entity> requestList = new ArrayList<>();
 
@@ -214,9 +216,15 @@ public class HelpResource {
                 requestList.add(feedback);
             }
 
+            QueryResponse response = new QueryResponse();
+            response.setResults(requestList);
+            response.setCursor(results.getCursorAfter().toUrlSafe());
+
             LOG.info( "Unanswered help requests fetched");
             txn.commit();
-            return Response.ok(requestList).build();
+
+            Gson g = new Gson();
+            return Response.ok(g.toJson(response)).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();

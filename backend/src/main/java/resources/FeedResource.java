@@ -291,7 +291,6 @@ public class FeedResource {
 
         FirebaseToken decodedToken = authenticateToken(token);
 
-        LOG.info("Ponto 1");
         if(kind.equals(EVENT)) {
             if (decodedToken == null) {
                 LOG.info(TOKEN_NOT_FOUND);
@@ -301,12 +300,10 @@ public class FeedResource {
             }
         }
 
-        LOG.info("Ponto 2");
         if( filters == null ){
             filters = new HashMap<>(1);
         }
 
-        LOG.info("Ponto 3");
         if (decodedToken != null){
             String role = getRole(decodedToken);
 
@@ -320,53 +317,21 @@ public class FeedResource {
 
         EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind(kind).setLimit(Integer.parseInt(limit));
 
-        LOG.info("Ponto 4");
         QueryResults<Entity> queryResults;
-
-        //StructuredQuery.CompositeFilter attributeFilter = null;
-
-        LOG.info("Ponto 6");
-
-        /*StructuredQuery.PropertyFilter propFilter;
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            propFilter = StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue());
-
-            if(attributeFilter == null)
-                attributeFilter = StructuredQuery.CompositeFilter.and(propFilter);
-            else
-                attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
-        } */
 
         for (Map.Entry<String, String> entry : filters.entrySet()) {
             query.setFilter(StructuredQuery.PropertyFilter.eq(entry.getKey(), entry.getValue()));
         }
 
 
-        //LOG.info(attributeFilter.toString());
-
-        LOG.info("Ponto 7");
- /*       EntityQuery.Builder query = Query.newEntityQueryBuilder()
-                .setKind(kind)
-                .setFilter(attributeFilter)
-                .setOrderBy(StructuredQuery.OrderBy.desc("id"))
-                .setLimit(Integer.parseInt(limit));
-                */
-
-        //query.setOrderBy(StructuredQuery.OrderBy.desc("time_creation"));
-
         if ( !cursor.equals("EMPTY") ){
             query.setStartCursor(Cursor.fromUrlSafe(cursor));
         }
 
-        LOG.info("Ponto 8");
-
-        LOG.info("Ponto 9");
         queryResults = datastore.run(query.build());
 
-        LOG.info("Ponto 10");
         List<Entity> results = new ArrayList<>();
 
-        LOG.info("Ponto 11");
         queryResults.forEachRemaining(results::add);
 
         QueryResponse response = new QueryResponse();
@@ -375,9 +340,7 @@ public class FeedResource {
 
         LOG.info("Query de " + kind + " pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(results))
-                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
-                .build();
+        return Response.ok(g.toJson(response)).build();
 
     }
 
