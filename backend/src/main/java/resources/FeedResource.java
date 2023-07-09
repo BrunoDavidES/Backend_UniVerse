@@ -134,7 +134,7 @@ public class FeedResource {
                     //construtor de news
                     // Caso se vá buscar uma notícia de outro site, por parte do backoffice,
                     // e se queira por o author como "Jornal Expresso", por exemplo
-                    if (role.equals(BO) && data.authorNameByBO != null && !data.authorNameByBO.equals("")){
+                    if (data.authorNameByBO != null && !data.authorNameByBO.equals("")){
                         name = data.authorNameByBO;
                     }
                     builder.set("id", id)
