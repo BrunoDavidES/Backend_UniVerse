@@ -2045,7 +2045,7 @@ function queryUnresFAQ(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/help/view/unanswered?size="+limit+"&cursor="+queryFAQCursor, true);
+    request.open("GET", document.location.origin + "/rest/help/view/unanswered?size="+limit+"&cursor="+queryFAQCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
