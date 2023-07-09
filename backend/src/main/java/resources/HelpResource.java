@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.HelpData;
 import models.ReportData;
+import utils.QueryResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -139,14 +140,16 @@ public class HelpResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            Query<Entity> query = Query.newEntityQueryBuilder()
+            EntityQuery.Builder query = Query.newEntityQueryBuilder()
                     .setKind("Help")
                     .setOrderBy(StructuredQuery.OrderBy.desc("submitted"))
-                    .setLimit(size)
-                    .setStartCursor(Cursor.fromUrlSafe(cursor))
-                    .build();
+                    .setLimit(size);
 
-            QueryResults<Entity> results = txn.run(query);
+            if (!cursor.equals("EMPTY") && !cursor.equals("")){
+                query.setStartCursor(Cursor.fromUrlSafe(cursor));
+            }
+
+            QueryResults<Entity> results = txn.run(query.build());
 
             List<Entity> requestList = new ArrayList<>();
 
@@ -155,9 +158,17 @@ public class HelpResource {
                 requestList.add(feedback);
             }
 
+            QueryResponse response = new QueryResponse();
+            response.setResults(requestList);
+            response.setCursor(results.getCursorAfter().toUrlSafe());
+
             LOG.info( "Help requests fetched");
             txn.commit();
-            return Response.ok(requestList).build();
+            Gson g = new Gson();
+            return Response.ok(g.toJson(response))
+                //.header("X-Cursor",results.getCursorAfter().toUrlSafe())
+                .build();
+
         } finally {
             if (txn.isActive()) {
                 txn.rollback();

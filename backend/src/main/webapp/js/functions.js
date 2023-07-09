@@ -1490,13 +1490,7 @@ function editDepartment(){
     var fax = document.getElementById("faxMod").value;
 
     var data = {
-        "id": id,
-        "email": email,
-        "name": name,
-        "president": president,
-        "phoneNumber": phoneNumber,
-        "location": location,
-        "fax": fax
+        "id": id
     };
 
     if (email !== "") {
@@ -1958,10 +1952,8 @@ function clearList(c1, c2){
 }
 
 function clearListFAQ(c1, c2){
-    var r1 = document.getElementById(c1);
-    var r2 = document.getElementById(c2);
-    r1.replaceChildren();
-    r2.replaceChildren();
+    clearList(c1,c2);
+    queryFAQCursor = "EMPTY";
 }
 
 var queryFAQCursor = "EMPTY";
@@ -1975,7 +1967,7 @@ function queryFAQ(){
 
     var request = new XMLHttpRequest();
 
-    request.open("POST", document.location.origin + "/rest/help/view?size="+limit+"&cursor="+queryFAQCursor, true);
+    request.open("GET", document.location.origin + "/rest/help/view?size="+limit+"&cursor="+queryFAQCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
@@ -1985,7 +1977,7 @@ function queryFAQ(){
                 var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         id: entity.key,
                         email: entity.properties.email,
@@ -1998,7 +1990,7 @@ function queryFAQ(){
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.title.value + " - " + entity.status.value;
+                    listItem.textContent = entity.title.value + " - " + entity.submitted.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('details');
                         details.innerHTML = '';
@@ -2026,7 +2018,7 @@ function queryFAQ(){
                     });
                     list.appendChild(listItem);
                 });
-                queryFAQCursor = request.getResponseHeader("X-Cursor");
+                queryFAQCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -2038,10 +2030,8 @@ function queryFAQ(){
 }
 
 function clearListFAQUnres(c1, c2){
-    var r1 = document.getElementById(c1);
-    var r2 = document.getElementById(c2);
-    r1.replaceChildren();
-    r2.replaceChildren();
+    clearList(c1,c2);
+    queryUnresFAQCursor = "EMPTY";
 }
 
 var queryUnresFAQCursor = "EMPTY";
