@@ -507,7 +507,6 @@ function validateEvent(){
 
 //News
 
-
 function uploadNewsPic(filename) {
     var fileList = document.getElementById("newsPic");
 
@@ -1952,9 +1951,186 @@ function updateHojeNaFCT(){
 }
 
 
-function clearList(c1, c2){
+function clearListFAQ(c1, c2){
     var r1 = document.getElementById(c1);
     var r2 = document.getElementById(c2);
     r1.replaceChildren();
     r2.replaceChildren();
+}
+
+var queryFAQCursor = "EMPTY";
+function queryFAQ(){
+    if(queryFAQCursor == null){
+        queryFAQCursor = "EMPTY";
+    }
+
+    var limit = document.getElementById("listLimitId").value;
+    var list = document.getElementById("listOfFAQS");
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/help/view?size="+limit+"&cursor="+queryFAQCursor, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        id: entity.key,
+                        email: entity.properties.email,
+                        title: entity.properties.title,
+                        message: entity.properties.message,
+                        replied: entity.properties.replied,
+                        submitted: entity.properties.submitted
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.title.value + " - " + entity.status.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('details');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = " " + entity.title.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Email de quem mandou: " + entity.email.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Pergunta: " + entity.message.value +
+                                                "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Repondido: " + entity.replied.value;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                queryFAQCursor = request.getResponseHeader("X-Cursor");
+            }
+            else {
+                console.log(request.responseText);
+                alert("FAIL");
+            }
+        }
+    }
+    request.send();
+}
+
+function clearListFAQUnres(c1, c2){
+    var r1 = document.getElementById(c1);
+    var r2 = document.getElementById(c2);
+    r1.replaceChildren();
+    r2.replaceChildren();
+}
+
+var queryUnresFAQCursor = "EMPTY";
+function queryUnresFAQ(){
+    if(queryUnresFAQCursor == null){
+        queryUnresFAQCursor = "EMPTY";
+    }
+
+    var limit = document.getElementById("unResListLimitId").value;
+    var list = document.getElementById("listOfUnresFAQS");
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/help/view/unanswered?size="+limit+"&cursor="+queryFAQCursor, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                var bucketGETRequest = new XMLHttpRequest();
+
+                const response = JSON.parse(request.responseText);
+                const entities = response.map(function(entity) {
+                    return {
+                        id: entity.key,
+                        email: entity.properties.email,
+                        title: entity.properties.title,
+                        message: entity.properties.message,
+                        replied: entity.properties.replied,
+                        submitted: entity.properties.submitted
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.title.value + " - " + entity.status.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('unresDetails');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = " " + entity.title.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        description.innerHTML = "&emsp;Email de quem mandou: " + entity.email.value +
+                                                "<br> &emsp;ID: " + entity.id.value +
+                                                "<br> &emsp;Pergunta: " + entity.message.value +
+                                                "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString() +
+                                                "<br> &emsp;Repondido: " + entity.replied.value;
+
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                queryUnresFAQCursor = request.getResponseHeader("X-Cursor");
+            }
+            else {
+                console.log(request.responseText);
+                alert("FAIL");
+            }
+        }
+    }
+    request.send();
+}
+
+function faqAnswered(){
+    var id = document.getElementById("idFAQStatus").value;
+
+    var request = new XMLHttpRequest();
+
+    request.open("POST", document.location.origin + "/rest/help/" + id + "/answer", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4){
+            if (request.status === 200) {
+                alert("Pergunta marcada como respondida.");
+            }
+            else {
+                console.log(request.responseText);
+                alert("Houve um problema com o pedido, tente mais tarde.");
+            }
+        }
+    };
+
+    request.send();
 }

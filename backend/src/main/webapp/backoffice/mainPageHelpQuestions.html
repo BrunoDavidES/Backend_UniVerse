@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="UTF-8">
-  <title> HOJE na FCT NOVA</title>
+  <title> FAQ FCT NOVA</title>
   <link rel="stylesheet" href="styleMainPage.css">
   <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -10,9 +10,10 @@
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body onload="loadUpperRightInfo();hideRoleOption();">
-<button onclick="queryEvents();" id="moreList">Mais <i class='bx bx-user-plus'></i></button>
-<button onclick="topFunction()" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
+<body onload="loadUpperRightInfo()">
+<button onclick="queryUnresFAQ()" id="moreList">Mais <i class='bx bx-question-mark'></i></button>
+<button onclick="queryFAQ();" id="moreList2">Mais <i class='bx bx-question-mark'></i></button>
+<button onclick="topFunction();" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
 <button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
   <div class="logo-details">
@@ -30,7 +31,7 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageHojeFCT.html'">
-        <a href="#hojeFCT" class="active">
+        <a href="#hojeFCT">
           <i class='bx bx-info-circle'></i>
           <span class="links_name">Hoje na FCT</span>
         </a>
@@ -54,7 +55,7 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageHelpQuestions.html'">
-        <a href="#faq">
+        <a href="#faq" class="active">
           <i class='bx bx-question-mark'></i>
           <span class="links_name">FAQ</span>
         </a>
@@ -78,7 +79,7 @@
     </li>
     <li>
       <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
-        <a href="#reposts">
+        <a href="#reports">
           <i class='bx bx-book-alt' ></i>
           <span class="links_name">Reports</span>
         </a>
@@ -106,7 +107,7 @@
   <nav>
     <div class="sidebar-button">
       <i class='bx bx-menu sidebarBtn'></i>
-      <span class="home">Hoje na FCT</span>
+      <span class="home">FAQ</span>
     </div>
     <h1> Back Office da FCT NOVA</h1>
     <div class="profile-details" id="auxLogged">
@@ -115,32 +116,90 @@
     </div>
   </nav>
 
+
   <div class="home-content">
-    <div id="susUser">
-      <div class="form">
-        <div class="title">Hoje na FCT</div>
-        <div class="input-container2 ic2">
-          <textarea id="hojeFCT" class="input" cols="40" rows="5" maxlength="100"></textarea>
-          <div class="cut cut"></div>
-          <label for="hojeFCT" class="placeholder">Corpo de Hoje na FCT</label>
-        </div>
-        <button type="text" class="submit" onclick="getHojeNaFCT()">Buscar conteúdo de Hoje na FCT</button>
-        <button type="text" class="submit" onclick="updateHojeNaFCT()">Alterar o conteúdo de Hoje na FCT</button>
-      </div> <br>
+    <div class="topnav" id="myTopnav">
+      <button id="resFAQ" onClick="changeWindow('resFAQ', 'unResolved', 'resolved', 'resolve', 'unReport', 'reportAll'); auxListMore(0);" class="active">Pergunta Respondida</button>
+      <button id="unResolved"  onClick="changeWindow('unResolved', 'resFAQ', 'resolved', 'unReport', 'resolve', 'reportAll'); auxListMore(1);">Listar Perguntas por responder</button>
+      <button id="resolved" onClick="changeWindow('resolved', 'resFAQ', 'unResolved', 'reportAll', 'resolve', 'unReport'); auxListMore(2);">Listar todas as Perguntas</button>
     </div>
+    <br><br>
+    <div id="resolve">
+      <div class="form">
+        <div class="title">Resolver Pergunta</div>
+        <div class="subtitle">Marcar a pergunta como resolvida</div>
+        <div class="input-container ic1">
+          <input id="idFAQStatus" class="input" type="text" placeholder=" "/>
+          <div class="cut"></div>
+          <label for="idFAQStatus" class="placeholder">Id da Pergunta</label>
+        </div><br>
+        <button type="text" class="submit" onclick="faqAnswered();">Marcar como visto</button>
+      </div>
+    </div>
+    <div id="unReport" class="list" style="display: none;">
+      <h1 class="title" style="text-align: center;">Listar Perguntas por responder</h1>
+      <br>
+      <h2 class="subtitle" for="unResListLimitId" style="display: inline;">Perguntas por listagem: &emsp;</h2>
+      <select id="unResListLimitId" style="width: 80px; display: inline;">
+        <option value=5>5</option>
+        <option value=10>10</option>
+        <option value=15>15</option>
+        <option value=20>20</option>
+      </select><br>
+      <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListFAQUnres('listOfUnresFAQS', 'unresDetails');">Apagar Lista</button></div>
+
+      <ul id="listOfUnresFAQS"></ul>
+      <hr class="rounded">
+      <br>
+      <div id="unresDetails"></div>
+      <br>
+      <button class="submit" onclick="queryUnresFAQ()">Listar</button>
+    </div>
+    <div id="reportAll" class="list" style="display: none;">
+      <h1 class="title" style="text-align: center;">Listar todas as Perguntas</h1>
+      <br>
+      <h2 class="subtitle" for="listLimitId" style="display: inline;">Perguntas por listagem: &emsp;</h2>
+      <select id="listLimitId" style="width: 80px; display: inline;">
+        <option value=5>5</option>
+        <option value=10>10</option>
+        <option value=15>15</option>
+        <option value=20>20</option>
+      </select><br>
+      <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListFAQ('listOfFAQS', 'details');">Apagar Lista</button></div>
+
+      <ul id="listOfFAQS"></ul>
+      <hr class="rounded">
+      <br>
+      <div id="details"></div>
+      <br>
+      <button class="submit" onclick="queryFAQ()">Listar</button>
+    </div>
+  </div>
   <div class="popup" id="popup" style="">
     <h3>Está prestes a fazer logout</h3>
     <p>Tem a certeza?</p>
     <button type="button" onclick="logout()">Sim</button> &ensp;
     <button type="button" onclick="closePopup()">Não</button>
   </div>
-  </div>
 </section>
-
-
 
 <script src="/js/functions.js"></script>
 <script>
+      function changeWindow(btn, btn1, btn2, div, div1, div2){
+        var appear = document.getElementById(div);
+        var gone = document.getElementById(div1);
+        var gone2 = document.getElementById(div2);
+        var button = document.getElementById(btn);
+        var button2 = document.getElementById(btn1);
+        var button3 = document.getElementById(btn2);
+
+        appear.style.display = 'block';
+        gone.style.display = 'none';
+        gone2.style.display = 'none';
+        button.classList.add("active");
+        button2.classList.remove("active");
+        button3.classList.remove("active");
+      }
 
       let popup = document.getElementById("popup");
 
@@ -164,14 +223,29 @@
 
       let mybutton = document.getElementById("myBtn");
       let mybuttondwn = document.getElementById("myBtnDown");
+      let myList = document.getElementById("moreList");
+      let myList2 = document.getElementById("moreList2");
+      let varAux = 0;
       window.onscroll = function() {scrollFunction()};
+
+      function auxListMore(nr){
+        varAux = nr;
+      }
 
       function scrollFunction() {
         if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
             mybutton.style.display = "block";
             mybuttondwn.style.display = "block";
+            if(varAux == 1){
+                myList.style.display = "block";
+            }
+            else if(varAux == 2){
+                myList2.style.display = "block";
+            }
         } else {
             mybutton.style.display = "none";
+            myList.style.display = "none";
+            myList2.style.display = "none";
             mybuttondwn.style.display = "none";
         }
       }
@@ -185,6 +259,7 @@
         window.scrollTo(0,document.body.scrollHeight);
         topPage.style.display = '';
       }
+
 </script>
 
 
