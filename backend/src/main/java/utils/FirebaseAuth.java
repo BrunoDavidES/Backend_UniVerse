@@ -13,7 +13,7 @@ public class FirebaseAuth {
 
     public static FirebaseToken authenticateToken(String token) {
         try {
-            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token, true);
 
             if( ! firebaseAuth.getUser(decodedToken.getUid()).isEmailVerified()) {
                 return null;
