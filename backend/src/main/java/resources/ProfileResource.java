@@ -79,6 +79,8 @@ public class ProfileResource {
         data.setRole(getRole(firebaseAuth.getUser(username)));
         data.setDepartment(user.getString("department"));
         data.setDepartment_job(user.getString("department_job"));
+        data.setPhone((user.getString("phone")));
+        data.setLinkedIn(user.getString("linkedin"));
 
         if (data.getRole().equals(STUDENT)){
             data.setNucleus(user.getString("nucleus"));

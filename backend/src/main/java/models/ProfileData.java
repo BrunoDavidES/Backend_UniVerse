@@ -14,6 +14,8 @@ public class ProfileData {
     private String nucleus;
     private String nucleus_job;
     private String office;
+    private String phone;
+    private String linkedIn;
 
     public ProfileData(){}
 
@@ -105,5 +107,19 @@ public class ProfileData {
         this.office = office;
     }
 
+    public String getPhone() {
+        return phone;
+    }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getLinkedIn() {
+        return linkedIn;
+    }
+
+    public void setLinkedIn(String linkedIn) {
+        this.linkedIn = linkedIn;
+    }
 }
