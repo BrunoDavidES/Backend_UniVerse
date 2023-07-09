@@ -687,7 +687,7 @@ function editNews(){
                             });
                     updateNewsPicMod(id);
                 }
-                console.log("SUCCESS");
+                alert("SUCCESS");
             }
             else {
                 console.log(request.responseText);
@@ -1020,7 +1020,7 @@ function getUser() {
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
            console.log(request.responseText);
-           console.log("SUCCESS");
+
            const response = JSON.parse(request.responseText);
 
            document.getElementById("usernameInfo").value = response.username;
@@ -1665,7 +1665,7 @@ function getNucleus() {
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
            console.log(request.responseText);
-           console.log("SUCCESS");
+
            const response = JSON.parse(request.responseText);
 
            const entities = response.results.map(function(entity) {
