@@ -257,11 +257,11 @@ function postEvent(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             uploadEventPic(request.responseText);
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
       }
     };
 
@@ -318,11 +318,11 @@ function editEvent(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             updateEventPicMod(id);
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
 }
@@ -340,10 +340,10 @@ function deleteEvent() {
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
             deleteEventPic(id);
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         } else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
 }
@@ -496,11 +496,11 @@ function validateEvent(){
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
 }
@@ -642,11 +642,11 @@ function validateNews(){
     request.send(JSON.stringify(data));
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
 }
@@ -880,11 +880,11 @@ function modifyUserRole(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
     request.send(JSON.stringify(data));
@@ -905,11 +905,11 @@ function deleteUser(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            alert.log("SUCCESS");
+            alert("SUCCESS");
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert.log("FAIL");
+            alert("FAIL");
         }
     };
 
@@ -1057,10 +1057,10 @@ function banAccount(){
     request.onreadystatechange = function() {
         if (request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                 alert.log("SUCCESS");
+                 alert("SUCCESS");
             }
             else{
-                alert.log("FAIL");
+                alert("FAIL");
                 console.log(request.responseText)
             }
         }
@@ -1079,10 +1079,10 @@ function reactivateAccount() {
     request.onreadystatechange = function() {
         if (request.readyState === 4 ) {
             if ( request.status === 200 ) {
-                 alert.log("SUCCESS");
+                 alert("SUCCESS");
             }
             else{
-                alert.log("FAIL");
+                alert("FAIL");
                 console.log(request.responseText);
             }
         }
@@ -1950,6 +1950,12 @@ function updateHojeNaFCT(){
         });
 }
 
+function clearList(c1, c2){
+    var r1 = document.getElementById(c1);
+    var r2 = document.getElementById(c2);
+    r1.replaceChildren();
+    r2.replaceChildren();
+}
 
 function clearListFAQ(c1, c2){
     var r1 = document.getElementById(c1);

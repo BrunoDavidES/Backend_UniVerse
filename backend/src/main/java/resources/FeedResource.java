@@ -375,7 +375,9 @@ public class FeedResource {
 
         LOG.info("Query de " + kind + " pedido");
         Gson g = new Gson();
-        return Response.ok(g.toJson(response)).build();
+        return Response.ok(g.toJson(results))
+                .header("X-Cursor",queryResults.getCursorAfter().toUrlSafe())
+                .build();
 
     }
 
