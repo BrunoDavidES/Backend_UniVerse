@@ -77,6 +77,7 @@ public class ModifyUserResource {
                         .set("privacy", data.getPrivacy())
                         .set("nucleus", data.getNucleus())
                         .set("license_plate", data.getLicense_plate())
+                        .set("office", data.getOffice())
                         .set("linkedin", data.getLinkedin())
                         .set("time_lastupdate", Timestamp.now())
                         .build();

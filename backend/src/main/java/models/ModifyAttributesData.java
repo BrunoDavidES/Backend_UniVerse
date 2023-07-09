@@ -13,6 +13,7 @@ public class ModifyAttributesData {
     private String department_job;
     private String nucleus;
     private String nucleus_job;
+    private String office;
 
     public ModifyAttributesData() {
     }
@@ -38,6 +39,8 @@ public class ModifyAttributesData {
             this.nucleus = targetUser.getString("nucleus");
         if(this.nucleus_job == null)
             this.nucleus_job = targetUser.getString("nucleus_job");
+        if(this.office == null)
+            this.office = targetUser.getString("office");
     }
 
     public String getName() {
@@ -78,6 +81,10 @@ public class ModifyAttributesData {
 
     public String getNucleus_job() {
         return nucleus_job;
+    }
+
+    public String getOffice() {
+        return office;
     }
 
 
