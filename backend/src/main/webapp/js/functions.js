@@ -365,7 +365,7 @@ function getEvent(){
     request.onreadystatechange = function() {
         if (request.readyState === 4 && request.status === 200) {
             const response = JSON.parse(request.responseText);
-            const entities = response.map(function(entity) {
+            const entities = response.results.map(function(entity) {
                 return {
                     title: entity.properties.title,
                     startDate: entity.properties.startDate,
@@ -745,7 +745,7 @@ function getNews() {
         if (request.readyState === 4) {
             if (request.status === 200) {
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         authorName: entity.properties.authorName
@@ -1420,7 +1420,7 @@ function getDepartment() {
         if (request.readyState === 4 && request.status === 200) {
            const response = JSON.parse(request.responseText);
 
-           const entities = response.map(function(entity) {
+           const entities = response.results.map(function(entity) {
                return {
                    location: entity.properties.location,
                    email: entity.properties.email,
@@ -1668,7 +1668,7 @@ function getNucleus() {
            console.log("SUCCESS");
            const response = JSON.parse(request.responseText);
 
-           const entities = response.map(function(entity) {
+           const entities = response.results.map(function(entity) {
                return {
                    name: entity.properties.name,
                    email: entity.properties.email,
