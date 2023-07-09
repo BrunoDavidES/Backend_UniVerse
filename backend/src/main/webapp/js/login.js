@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
   loginForm.addEventListener("submit", function(event) {
     event.preventDefault();
     var username = document.getElementById("username").value;
-    var pass = document.getElementById("password").value;
+    var password = document.getElementById("password").value;
 
     var hashedPassword = CryptoJS.SHA256(password).toString();
 
