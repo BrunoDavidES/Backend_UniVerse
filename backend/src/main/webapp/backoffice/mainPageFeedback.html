@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title> Reports FCT NOVA</title>
+    <title>FEEDBACK FCT NOVA</title>
     <link rel="stylesheet" href="styleMainPage.css">
     <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -11,8 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body onload="loadUpperRightInfo()">
-<button onclick="queryUnresolvedReports();" id="moreList">Mais <i class='bx bx-book-alt' ></i></button>
-<button onclick="queryReports();" id="moreList2">Mais <i class='bx bx-book-alt' ></i></button>
+<button onclick="" id="moreList">Mais <i class='bx bx-happy-alt'></i></button>
 <button onclick="topFunction();" id="myBtn">Topo <i class='bx bx-up-arrow-alt'></i></button>
 <button onclick="bottomFunction();" id="myBtnDown">Baixo <i class='bx bx-down-arrow-alt'></i></button>
 <div class="sidebar">
@@ -79,7 +78,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageReports.html'">
-                <a href="#reports" class="active">
+                <a href="#reports">
                     <i class='bx bx-book-alt' ></i>
                     <span class="links_name">Reports</span>
                 </a>
@@ -87,7 +86,7 @@
         </li>
         <li>
             <button onclick="window.location.href = '/backoffice/mainPageFeedback.html'">
-                <a href="#feedback">
+                <a href="#feedback" class="active">
                     <i class='bx bx-happy-alt'></i>
                     <span class="links_name">FeedBack</span>
                 </a>
@@ -115,7 +114,7 @@
     <nav>
         <div class="sidebar-button">
             <i class='bx bx-menu sidebarBtn'></i>
-            <span class="home">Reports</span>
+            <span class="home">FeedBack</span>
         </div>
         <h1> Back Office da FCT NOVA</h1>
         <div class="profile-details" id="auxLogged">
@@ -127,121 +126,36 @@
 
     <div class="home-content">
         <div class="topnav" id="myTopnav">
-            <button id="getStatus"  onClick="changeWindow('getStatus','unResolved', 'resRep', 'resolved', 'getReport', 'unReport', 'resolve', 'reportAll'); auxListMore(0);" class="active">Obter Report</button>
-            <button id="resRep" onClick="changeWindow('resRep', 'unResolved', 'resolved', 'getStatus', 'resolve', 'unReport', 'reportAll', 'getReport'); auxListMore(0);">Estado do Report</button>
-            <button id="unResolved"  onClick="changeWindow('unResolved', 'resRep', 'resolved', 'getStatus', 'unReport', 'resolve', 'reportAll', 'getReport'); auxListMore(1);">Listar Reports por resolver</button>
-            <button id="resolved" onClick="changeWindow('resolved', 'resRep', 'unResolved', 'getStatus', 'reportAll', 'resolve', 'unReport', 'getReport'); auxListMore(2);">Listar todos os Reports</button>
+            <button id="ovrFeedBtn" onClick="changeWindow('ovrFeedBtn', 'feedListBtn', 'ovrFeed', 'feedList'); auxListMore(0);" class="active">Rating Geral</button>
+            <button id="feedListBtn" onClick="changeWindow('feedListBtn', 'ovrFeedBtn', 'feedList', 'ovrFeed'); auxListMore(1);">Listar FeedBack</button>
         </div>
         <br><br>
-        <div id="getReport">
-            <div class="form">
-                <div class="title">Obter Report</div>
-                <div class="subtitle">Vamos ver os dados de um report!</div>
-                <div class="input-container ic1">
-                    <input id="idReport" class="input" type="text" placeholder=" "/>
-                    <div class="cut"></div>
-                    <label for="idReport" class="placeholder">Id do Report</label>
-                </div>
-                <button type="text" class="submit" onclick="getReport()">Obter Report</button>
-            </div>
-            <br>
-            <div class="form">
-                <div class="title" id="username">Report</div>
-                <div class="input-container ic1">
-                    <input id="repTitle" class="input" readonly="readonly" type="text" placeholder=""/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Título do Report</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="location" class="input" readonly="readonly" type="text" placeholder=""/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Localização</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="statusRep" class="input" readonly="readonly" type="text"/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Status do Report</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="authorRep" class="input" readonly="readonly" type="text"/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Autor do Report</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="creationRep" class="input" readonly="readonly" type="text"/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Criação do Report</label>
-                </div>
-                <div class="input-container ic1">
-                    <input id="lastUpdatedRep" class="input" readonly="readonly" type="text"/>
-                    <div class="cut"></div>
-                    <label class="placeholder">Última atualização do Report</label>
-                </div>
-                <div style="text-align: center;">
-                    <br>
-                    <img id="reportImage" class="eventPhoto" src="" alt="Image of report">
-                </div>
-                <div class="input-container2 ic2">
-                    <textarea id="textRep" class="input" cols="40" rows="5" readonly="readonly"></textarea>
-                    <div class="cut cut"></div>
-                    <label class="placeholder">Corpo do Report</label>
-                </div>
-            </div><br><br>
-        </div>
-        <div id="resolve" style="display: none;">
-            <div class="form">
-                <div class="title">Estado do Report</div>
-                <div class="subtitle">Mudar o estado do Report</div>
-                <div class="input-container ic1">
-                    <input id="idReportStatus" class="input" type="text" placeholder=" "/>
-                    <div class="cut"></div>
-                    <label for="idReportStatus" class="placeholder">Id do Report</label>
-                </div><br>
-                <label class="subtitle" for="newStatus">&emsp;Novo estado &emsp; </label>
-                <select style="height:25px; width: 120px; border-radius: 10px; text-align: center;" id="newStatus">
-                    <option value="SEEN">Seen</option>
-                    <option value="RESOLVED">Resolved</option>
-                </select>
-                <button type="text" class="submit" onclick="reportStatus()">Mudar estado</button>
+        <div id="ovrFeed" style="width:100%;">
+            <div class="form" style="width: 400px; justify-content:center; text-align: center;">
+                <div class="title" style="text-align: center">Rating Geral da UniVerse</div>
+                <div id="ratingOvr" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+                <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">/5</div>
+                <div style="color: yellow; text-align: center; font-size: 55px; display: inline-block;">&nbsp;<i class='bx bxs-star' ></i></div>
             </div>
         </div>
-        <div id="unReport" class="list" style="display: none;">
-            <h1 class="title" style="text-align: center;">Listar os Reports não resolvidos</h1>
+        <div id="feedList" class="list" style="display: none;">
+            <h1 class="title" style="text-align: center;">Listar FeedBack da NOVA FCT</h1>
             <br>
-            <h2 class="subtitle" for="unResListLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
-            <select id="unResListLimitId" style="width: 80px; display: inline;">
-                <option value=5>5</option>
-                <option value=10>10</option>
-                <option value=15>15</option>
-                <option value=20>20</option>
-            </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListUnresReports('listOfUnresReports', 'unresDetails');">Apagar Lista</button></div>
-
-            <ul id="listOfUnresReports"></ul>
-            <hr class="rounded">
-            <br>
-            <div id="unresDetails"></div>
-            <br>
-            <button class="submit" onclick="queryUnresolvedReports()">Listar</button>
-        </div>
-        <div id="reportAll" class="list" style="display: none;">
-            <h1 class="title" style="text-align: center;">Listar todos os Reports</h1>
-            <br>
-            <h2 class="subtitle" for="listLimitId" style="display: inline;">Reports por listagem: &emsp;</h2>
+            <h2 class="subtitle" for="listLimitId" style="display: inline;">FeedBack por listagem: &emsp;</h2>
             <select id="listLimitId" style="width: 80px; display: inline;">
                 <option value=5>5</option>
                 <option value=10>10</option>
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListReports('listOfReports', 'details');">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListFAQUnres('listOfUnresFAQS', 'unresDetails');">Apagar Lista</button></div>
 
-            <ul id="listOfReports"></ul>
+            <ul id="listOf"></ul>
             <hr class="rounded">
             <br>
-            <div id="details"></div>
+            <div id="unresDetails"></div>
             <br>
-            <button class="submit" onclick="queryReports()">Listar</button>
+            <button class="submit" onclick="">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">
@@ -254,24 +168,16 @@
 
 <script src="/js/functions.js"></script>
 <script>
-      function changeWindow(btn, btn1, btn2, btn3, div, div1, div2, div3){
+      function changeWindow(btn, btn1, div, div1){
         var appear = document.getElementById(div);
         var gone = document.getElementById(div1);
-        var gone2 = document.getElementById(div2);
-        var gone3 = document.getElementById(div3);
         var button = document.getElementById(btn);
         var button2 = document.getElementById(btn1);
-        var button3 = document.getElementById(btn2);
-        var button4 = document.getElementById(btn3);
 
         appear.style.display = 'block';
         gone.style.display = 'none';
-        gone2.style.display = 'none';
-        gone3.style.display = 'none';
         button.classList.add("active");
         button2.classList.remove("active");
-        button3.classList.remove("active");
-        button4.classList.remove("active");
       }
 
       let popup = document.getElementById("popup");
@@ -297,7 +203,6 @@
       let mybutton = document.getElementById("myBtn");
       let mybuttondwn = document.getElementById("myBtnDown");
       let myList = document.getElementById("moreList");
-      let myList2 = document.getElementById("moreList2");
       let varAux = 0;
       window.onscroll = function() {scrollFunction()};
 
@@ -311,9 +216,6 @@
             mybuttondwn.style.display = "block";
             if(varAux == 1){
                 myList.style.display = "block";
-            }
-            else if(varAux == 2){
-                myList2.style.display = "block";
             }
         } else {
             mybutton.style.display = "none";
