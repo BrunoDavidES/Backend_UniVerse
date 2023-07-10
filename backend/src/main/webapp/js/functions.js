@@ -549,7 +549,8 @@ function queryEvents(){
                 list.appendChild(listItem);
 
             });
-            queryEventsCursor = response.cursor;
+            if (response.results.length !== 0)
+                queryEventsCursor = response.cursor;
         }
         else if (request.readyState === 4){
             console.log(request.responseText);
@@ -701,9 +702,11 @@ function postNews(){
                 firebase.storage().ref().child("News/" + id + ".txt").put(file)
                     .then(function() {
                           console.log("News text body uploaded successfully!");
+                          alert("SUCCESS");
                         })
                         .catch(function(error) {
                           console.error("Error putting text body in storage:", error);
+                          alert("Erro ao gurdar fotografia do Evento.\nEvento criado sem fotografia.")
                         });
             }
             else {
@@ -822,12 +825,14 @@ function deleteNews(){
                 sessionStorage.removeItem(id);
                 alert("SUCCESS")
             } else {
-                console.log("FAIL");
+                console.log(request.responseText);
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400 || request.status === 403)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
             }
-        }
-        else {
-            console.log(request.responseText);
-            alert("FAIL");
         }
     }
     request.send();
@@ -953,7 +958,8 @@ function queryNews(){
                 list.appendChild(listItem);
 
             });
-            queryNewsCursor = response.cursor;
+            if (response.results.length !== 0)
+                queryNewsCursor = response.cursor;
         }
         else if (request.readyState === 4){
             console.log(request.responseText);
@@ -1120,7 +1126,8 @@ function queryUsers(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUsersCursor = response.cursor;
+                if (response.results.length !== 0)
+                    queryUsersCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1404,7 +1411,8 @@ function queryReports(){
                     });
                     list.appendChild(listItem);
                 });
-                queryReportsCursor = response.cursor;
+                if (response.results.length !== 0)
+                    queryReportsCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1498,7 +1506,8 @@ function queryUnresolvedReports(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUnresolvedReportsCursor = results.cursor;
+                if (response.results.length !== 0)
+                    queryUnresolvedReportsCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -1813,7 +1822,8 @@ function queryDepartments(){
                     });
                     list.appendChild(listItem);
                 });
-                queryDepartmentsCursor = response.cursor;
+                if (response.results.length !== 0)
+                    queryDepartmentsCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -2128,8 +2138,8 @@ function queryNucleus(){
                     });
                     list.appendChild(listItem);
                 });
-                queryNucleusCursor = response.cursor;
-
+                if (response.results.length !== 0)
+                    queryNucleusCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -2258,7 +2268,8 @@ function queryFAQ(){
                     });
                     list.appendChild(listItem);
                 });
-                queryFAQCursor = response.cursor;
+                if (response.results.length !== 0)
+                    queryFAQCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
@@ -2341,7 +2352,8 @@ function queryUnresFAQ(){
                     });
                     list.appendChild(listItem);
                 });
-                queryUnresFAQCursor = response.cursor;
+                if (response.results.length !== 0)
+                    queryUnresFAQCursor = response.cursor;
             }
             else {
                 console.log(request.responseText);
