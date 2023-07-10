@@ -62,6 +62,39 @@ public class FeedResource {
                 return Response.status(Response.Status.FORBIDDEN).entity("No permission to create an event.").build();
             }
 
+            if (kind.equals(EVENT)) {
+                try {
+
+                    String[] temp1 = data.getStartDate().split("-");
+                    Date today = Calendar.getInstance().getTime();
+                    Calendar c1 = Calendar.getInstance();
+                    c1.set(Integer.parseInt(temp1[2]), Integer.parseInt(temp1[1]) -1, Integer.parseInt(temp1[0]));
+
+                    Date startDate = c1.getTime();
+
+                    if (today.after(startDate)) {
+                        LOG.warning("Start date is older than today's date");
+                        return Response.status(Response.Status.BAD_REQUEST).entity("Start date is older than today's date.").build();
+                    }
+
+                    if (!data.getEndDate().equals(("").trim())) {
+                        String[] temp2 = data.getEndDate().split("-");
+                        Calendar c2 = Calendar.getInstance();
+                        c2.set(Integer.parseInt(temp2[2]), Integer.parseInt(temp2[1]) -1, Integer.parseInt(temp2[0]));
+
+                        Date endDate = c2.getTime();
+
+                        if (startDate.after(endDate)) {
+                            LOG.warning("Start date is older than event's end date");
+                            return Response.status(Response.Status.BAD_REQUEST).entity("Start date is older than event's end date.").build();
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.warning("Invalid format for Date");
+                    return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Date. Try using the format dd-mm-yyyy with a valid Date." +
+                            "\nValid Dates are today's date and all the following.").build();
+                }
+            }
 
             Transaction txn = datastore.newTransaction();
             try {
@@ -103,7 +136,7 @@ public class FeedResource {
                     else {
                         String[] temp = data.getStartDate().split("-");
                         Calendar c = Calendar.getInstance();
-                        c.set(Integer.parseInt(temp[2]), Integer.parseInt(temp[1]), Integer.parseInt(temp[0]));
+                        c.set(Integer.parseInt(temp[2]), Integer.parseInt(temp[1]) -1, Integer.parseInt(temp[0]));
                         //Sem o MAX_VALUE, listava primeiro os mais antigos
                         id = (Long.MAX_VALUE - c.getTimeInMillis()) + UUID.randomUUID().toString();
                     }
