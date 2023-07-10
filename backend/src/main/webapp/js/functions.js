@@ -31,7 +31,7 @@ function loadLoggedUser() {
         var pic = document.getElementById("profilePic");
 
         if (sessionStorage.getItem("miniProfilePic") !== null){
-            pic.src = sessionStorage.getItem("minProfilePic");
+            pic.src = sessionStorage.getItem("miniProfilePic");
             miniPic.src = sessionStorage.getItem("miniProfilePic");
         }
         else{

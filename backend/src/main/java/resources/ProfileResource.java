@@ -2,9 +2,7 @@ package resources;
 
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.auth.*;
 import com.google.gson.Gson;
 import models.PersonalEventsData;
 import models.ProfileData;
@@ -19,6 +17,7 @@ import java.util.logging.Logger;
 import static utils.Constants.*;
 import static utils.FirebaseAuth.authenticateToken;
 import static utils.FirebaseAuth.getRole;
+
 
 @Path("/profile")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -517,5 +516,48 @@ public class ProfileResource {
 
         return Response.ok(jsonResponse).build();
     }
+
+
+    @GET
+    @Path("/loggedinuserscount")
+    public Response getLoggedInUsersCount(@HeaderParam("Authorization") String token) {
+        LOG.fine("Attempt to count the number of logged in users");
+
+        // Verificar, caso for evento privado, se o token é valido
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+        String role = getRole(decodedToken);
+        if(!role.equals(BO) && !role.equals(ADMIN)){  //SE CALHAR PODE SE POR ROLE MINIMO COMO PROFESSOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+        }
+
+        try {
+            long currentTimeMillis = System.currentTimeMillis();
+            int loggedInUsersCount = 0;
+            ListUsersPage page = firebaseAuth.listUsers(null);
+            for (UserRecord userRecord : page.iterateAll()) {
+                long lastSignInTimeMillis = userRecord.getUserMetadata().getLastSignInTimestamp();
+                if (lastSignInTimeMillis > 0) {
+                    // Set the time threshold as needed (e.g., consider users logged in within the last 30 minutes)
+                    long timeThresholdMillis = 30 * 60 * 1000; // 5 minutes
+
+                    if (currentTimeMillis - lastSignInTimeMillis <= timeThresholdMillis) {
+                        loggedInUsersCount++;
+                    }
+                }
+            }
+
+            return Response.ok(loggedInUsersCount).build();
+        } catch (FirebaseAuthException e) {
+            LOG.severe("Error retrieving logged-in users count: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
 }

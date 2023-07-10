@@ -1,3 +1,30 @@
+
+function numOfLoggedUsers(){
+    var request = new XMLHttpRequest();
+
+    request.open("GET", document.location.origin + "/rest/profile/loggedinuserscount" , true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4){
+            if (request.status === 200) {
+                 console.log(request.responseText);
+                 document.getElementById("usersLoggedIn").innerHTML = request.responseText;
+            }
+            else {
+                console.log(request.responseText);
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+            }
+        }
+    };
+
+    request.send();
+}
+
 function registeredUsers(){
     var xmlhttp = new XMLHttpRequest();
 

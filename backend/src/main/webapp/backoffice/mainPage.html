@@ -13,7 +13,7 @@
   <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve(); newsToSolve(); eventsToSolve();">
+<body onload="verifyLogin(); loadLoggedUser(); registeredUsers(); repToSolve(); newsToSolve(); eventsToSolve(); numOfLoggedUsers();">
 <div class="cardResize">
   <div class="card" style="width: 250px;">
     <img alt="User Photo" id="profilePic" style="width:100%">
@@ -139,8 +139,8 @@
 
   <div class="home-content">
     <div class="form" style="width: 400px; margin-left: 5%; text-align: center; display:inline-block">
-      <div class="title" style="text-align: center">Users na Aplicação</div>
-      <div style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
+      <div class="title" style="text-align: center">Logins efetuados</div>
+      <div id="usersLoggedIn" style="color: #eee; text-align: center; font-size: 60px; display: inline-block">0</div>
       <div style="color: #0f0; text-align: center; font-size: 40px; display: inline-block">&nbsp;<i class='bx bx-user'></i></div>
     </div>
 
