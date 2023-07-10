@@ -82,7 +82,7 @@ public class ProfileResource {
         data.setPhone((user.getString("phone")));
         data.setLinkedIn(user.getString("linkedin"));
         data.setPrivacy(user.getString("privacy"));
-        data.setTimeCreation(user.getString("time_creation"));
+        data.setTimeCreation(user.getTimestamp("time_creation").toString());
 
         if (data.getRole().equals(STUDENT)){
             data.setNucleus(user.getString("nucleus"));
