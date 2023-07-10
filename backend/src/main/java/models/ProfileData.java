@@ -16,6 +16,8 @@ public class ProfileData {
     private String office;
     private String phone;
     private String linkedIn;
+    private String privacy;
+    private String timeCreation;
 
     public ProfileData(){}
 
@@ -122,4 +124,22 @@ public class ProfileData {
     public void setLinkedIn(String linkedIn) {
         this.linkedIn = linkedIn;
     }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
+
+    public String getTimeCreation() {
+        return timeCreation;
+    }
+
+    public void setTimeCreation(String timeCreation) {
+        this.timeCreation = timeCreation;
+    }
+
+
 }
