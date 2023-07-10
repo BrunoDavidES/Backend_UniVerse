@@ -383,6 +383,11 @@ public class FeedResource {
     public Response queryEntriesNum(@HeaderParam("Authorization") String token, @PathParam("kind") String kind, Map<String, String> filters) {
         LOG.fine("Attempt to count the query feed " + kind);
 
+        if (!kind.equals(EVENT) && !kind.equals(NEWS)){
+            LOG.warning("Kind " + kind + " is not valid.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Kind " + kind + " não é válido.").build();
+        }
+
         FirebaseToken decodedToken = authenticateToken(token);
 
         if (kind.equals(EVENT)) {

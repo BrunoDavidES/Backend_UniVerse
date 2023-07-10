@@ -148,14 +148,14 @@
                 <option value=15>15</option>
                 <option value=20>20</option>
             </select><br>
-            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListFAQUnres('listOfUnresFAQS', 'unresDetails');">Apagar Lista</button></div>
+            <div style="text-align: right;"> <button class="submit" style="background-color: #303245; width: 200px; color: #eee; margin-top: 10px; height: 35px;" onclick="clearListFeedBack('listOfFeedbacks', 'feedBackDetails');">Apagar Lista</button></div>
 
-            <ul id="listOf"></ul>
+            <ul id="listOfFeedbacks"></ul>
             <hr class="rounded">
             <br>
-            <div id="unresDetails"></div>
+            <div id="feedBackDetails"></div>
             <br>
-            <button class="submit" onclick="">Listar</button>
+            <button class="submit" onclick="queryFeedBack()">Listar</button>
         </div>
     </div>
     <div class="popup" id="popup" style="">

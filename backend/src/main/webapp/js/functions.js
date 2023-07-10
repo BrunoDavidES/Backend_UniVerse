@@ -1358,7 +1358,7 @@ function queryReports(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -1453,7 +1453,7 @@ function queryUnresolvedReports(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -1771,7 +1771,7 @@ function queryDepartments(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -2080,7 +2080,7 @@ function queryNucleus(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -2182,7 +2182,7 @@ function getHojeNaFCT(){
 
 function updateHojeNaFCT(){
 
-    const file = new Blob([document.getElementById("hojeFCT").value], {type: 'text/plain'});
+    const file = new Blob([document.getElementById("hojeFCT").value], {type: 'text/plain;charset=UTF-8'});
 
     firebase.storage().ref().child("hojenafct.txt").put(file)
         .then(function() {
@@ -2224,7 +2224,7 @@ function queryFAQ(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -2308,7 +2308,7 @@ function queryUnresFAQ(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 ) {
             if (request.status === 200) {
-                var bucketGETRequest = new XMLHttpRequest();
+                //var bucketGETRequest = new XMLHttpRequest();
 
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
@@ -2394,5 +2394,107 @@ function faqAnswered(){
         }
     };
 
+    request.send();
+}
+
+function clearListFeedBack(c1, c2){
+    clearList(c1,c2);
+    queryFeedBackCursor = "EMPTY";
+}
+
+var queryFeedBackCursor = "EMPTY";
+function queryFeedBack(){
+    if (queryFeedBackCursor === null){
+        queryFeedBackCursor = "EMPTY";
+    }
+
+    var limit = document.getElementById("listLimitId").value;
+    var list = document.getElementById("listOfFeedbacks");
+
+    var request = new XMLHttpRequest();
+
+    request.open(document.location.origin + "/rest/feedback/view?size=" + limit + "&cursor=" + queryFeedBackCursor, true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                const response = JSON.parse(request.responseText);
+                const entities = response.results.map(function(entity) {
+                    return {
+                        id: entity.key,
+                        author: entity.properties.author,
+                        message: entity.properties.message,
+                        submitted: entity.properties.submitted
+                    };
+                });
+
+                entities.forEach(function(entity) {
+                    var listItem = document.createElement("li");
+                    listItem.textContent = entity.author.value + " - " + entity.submitted.value;
+                    listItem.addEventListener('click', function() {
+                        var details = document.getElementById('feedBackDetails');
+                        details.innerHTML = '';
+
+                        var title = document.createElement('h2');
+                        title.textContent = " " + entity.id.value;
+                        details.appendChild(title);
+
+                        var description = document.createElement('p');
+                        var descriptionTXT = "&emsp;Autor da mensagem de feedback: " + entity.email.value +
+                                             "<br> &emsp;ID: " + entity.id.value +
+                                             "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString();
+
+                        var storageRef = firebase.storage().ref();
+                        var fileRef = storageRef.child('Feedback/' + id + ".txt");
+
+                        fileRef.getDownloadURL()
+                          .then(function(url) {
+                            return fetch(url);
+                          })
+                          .then(function(response) {
+                            if (response.ok) {
+                              return response.text();
+                            } else {
+                              throw new Error("Error fetching file. Status: " + response.status);
+                            }
+                          })
+                          .then(function(fileContent) {
+                            descriptionTXT += "<br> &emsp;Conteúdo do Feedback: " + fileContent;
+                          })
+                          .catch(function(error) {
+                            console.error("Error accessing file:", error);
+                          });
+
+                        description.innerHTML = descriptionTXT;
+                        details.appendChild(description);
+
+                        var siblings = Array.from(listItem.parentNode.children);
+                        var currentIndex = siblings.indexOf(listItem);
+                        siblings.slice(currentIndex + 1).forEach(function(sibling) {
+                            sibling.classList.toggle('closed');
+                        });
+
+                        bottomFunction();
+                    });
+                    list.appendChild(listItem);
+                });
+                if (response.results.length !== 0)
+                    queryFeedBackCursor = response.cursor;
+            }
+            else {
+                console.log(request.responseText);
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 403)
+                    alert("ERRO " + request.status + "\nNão tem permissão para listar FeedBacks.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
+            }
+        }
+    }
     request.send();
 }
