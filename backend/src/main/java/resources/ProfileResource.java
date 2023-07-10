@@ -425,6 +425,46 @@ public class ProfileResource {
     }
 
     @POST
+    @Path("/query/public")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response queryPublicUsers(@HeaderParam("Authorization") String token,
+                                     @QueryParam("limit") String limit,
+                                     @QueryParam("offset") String cursor) {
+        LOG.fine("Attempt to query public users.");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if (decodedToken == null) {
+            LOG.warning(TOKEN_NOT_FOUND + " token: " + token);
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        QueryResults<Entity> queryResults;
+
+        EntityQuery.Builder query = Query.newEntityQueryBuilder()
+                .setKind(USER)
+                .setFilter(StructuredQuery.PropertyFilter.eq("privacy", "PUBLIC"))
+                .setLimit(Integer.parseInt(limit));
+
+        if (!cursor.equals("EMPTY")) {
+            query.setStartCursor(Cursor.fromUrlSafe(cursor));
+        }
+
+        queryResults = datastore.run(query.build());
+
+        List<Entity> results = new ArrayList<>();
+
+        queryResults.forEachRemaining(results::add);
+
+        QueryResponse response = new QueryResponse();
+        response.setResults(results);
+        response.setCursor(queryResults.getCursorAfter().toUrlSafe());
+
+        LOG.info("Query de public users pedido");
+        Gson g = new Gson();
+        return Response.ok(g.toJson(response)).build();
+    }
+
+    @POST
     @Path("/numberOfUsers")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response queryUsersNum(@HeaderParam("Authorization") String token, Map<String, String> filters) {
