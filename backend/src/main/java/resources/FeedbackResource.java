@@ -37,10 +37,10 @@ public class FeedbackResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
-        /*if(!data.validate()) {
+        if(!data.validate()) {
             LOG.warning(MISSING_OR_WRONG_PARAMETER);
             return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }*/
+        }
 
         Transaction txn = datastore.newTransaction();
 
@@ -57,7 +57,7 @@ public class FeedbackResource {
             Entity.Builder builder = Entity.newBuilder(key);
 
             builder.set("author", decodedToken.getUid())
-                    .set("message", data.getMessage())
+                    .set("rating", data.getRating())
                     .set("submitted", Timestamp.now());
 
             entity = builder.build();
@@ -87,8 +87,10 @@ public class FeedbackResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
-        if(getRole(decodedToken) == "EXAMPLE") {
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+        String role = getRole(decodedToken);
+        if(! (role.equals(BO) || role.equals(ADMIN)) ){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
         }
 
         Transaction txn = datastore.newTransaction();
@@ -118,6 +120,48 @@ public class FeedbackResource {
 
             Gson g = new Gson();
             return Response.ok(g.toJson(response)).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
+
+    @GET
+    @Path("/stats")
+    public Response statsFeedback(@HeaderParam("Authorization") String token) {
+        LOG.fine("Attempt to fetch feedback");
+
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        Transaction txn = datastore.newTransaction();
+
+        try {
+            EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind("Feedback");
+
+            QueryResults<Entity> results = txn.run(query.build());
+
+            List<Entity> feedbackList = new ArrayList<>();
+
+            float ratingSum = 0;
+            float numFeedback = 0;
+            while (results.hasNext()) {
+                Entity feedback = results.next();
+                feedbackList.add(feedback);
+                ratingSum += Integer.parseInt(feedback.getString("rating"));
+                numFeedback++;
+            }
+
+            float[] stats = {ratingSum/numFeedback, numFeedback};
+
+            LOG.info( "Feedback stats fetched");
+            txn.commit();
+
+            return Response.ok(stats).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
