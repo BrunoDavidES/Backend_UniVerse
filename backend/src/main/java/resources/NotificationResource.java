@@ -47,8 +47,15 @@ public class NotificationResource {
             txn.add(user);
             txn.commit();
 
+            List<String> fcmTokens = new ArrayList<>();
+            fcmTokens.add(data.getFcmToken());
+            FirebaseMessaging.getInstance().subscribeToTopic(fcmTokens, "Alerts");
+
             LOG.info("Device registered in datastore " + data.getFcmToken());
             return Response.ok(user).build();
+        } catch (FirebaseMessagingException e) {
+            LOG.info("Subscribe failed");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
