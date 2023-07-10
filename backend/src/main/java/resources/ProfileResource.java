@@ -373,7 +373,7 @@ public class ProfileResource {
         FirebaseToken decodedToken = authenticateToken(token);
         if(decodedToken == null) {
             LOG.warning(TOKEN_NOT_FOUND + " token: " + token);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
         String role = getRole(decodedToken);

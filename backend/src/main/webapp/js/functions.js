@@ -222,6 +222,7 @@ function updateEventPicMod(filename) {
 function deleteEventPic(filename) {
   var storageRef = firebase.storage().ref();
   var eventPicRef = storageRef.child("Events/" + filename);
+  var eventTxt = storageRef.child("Events/" + filename + ".txt");
 
   eventPicRef
     .delete()
@@ -230,6 +231,15 @@ function deleteEventPic(filename) {
     })
     .catch(function(error) {
       console.error("Error deleting event picture:", error);
+    });
+
+  eventTxt
+    .delete()
+    .then(function() {
+      console.log("Event text deleted successfully!");
+    })
+    .catch(function(error) {
+      console.error("Error deleting event description text:", error);
     });
 }
 
@@ -256,13 +266,32 @@ function postEvent(){
 
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
-            uploadEventPic(request.responseText);
-            alert("SUCCESS");
+            var id = request.responseText;
+            uploadEventPic(id);
+
+            const file = new Blob([document.getElementById("text").value], {type: 'text/plain;charset=UTF-8'});
+
+            firebase.storage().ref().child("Events/" + id + ".txt").put(file)
+                .then(function() {
+                    console.log("Event text body uploaded successfully!");
+                    alert("SUCCESS");
+                })
+                .catch(function(error) {
+                    alert("Erro ao guardar a descrição.\nEvento criado sem descrição.")
+                    console.error("Error putting text body in storage:", error);
+                });
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
-      }
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVerifique se preencheu os campos todos.\nCaso o tenha feito, volte a tentar dentro de alguns minutos.");
+
+        }
     };
 
     request.send(JSON.stringify(data));
@@ -318,11 +347,28 @@ function editEvent(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4 && request.status === 200) {
             updateEventPicMod(id);
-            alert("SUCCESS");
+
+            const file = new Blob([document.getElementById("textMod").value], {type: 'text/plain;charset=UTF-8'});
+
+            firebase.storage().ref().child("Events/" + id + ".txt").put(file)
+                .then(function() {
+                    console.log("Event text body uploaded successfully!");
+                    alert("SUCCESS");
+                })
+                .catch(function(error) {
+                    alert("Erro ao guardar a descrição.\nEvento atualizado sem descrição.")
+                    console.error("Error putting text body in storage:", error);
+                });
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
         }
     };
 }
@@ -341,9 +387,15 @@ function deleteEvent() {
         if (request.readyState === 4 && request.status === 200) {
             deleteEventPic(id);
             alert("SUCCESS");
-        } else if (request.readyState === 4) {
+        }
+        else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVerifique se preencheu os campos todos.\nCaso o tenha feito, volte a tentar dentro de alguns minutos.");
         }
     };
 }
@@ -388,7 +440,34 @@ function getEvent(){
                 document.getElementById("isPublicLbl").innerHTML = "Evento público: " + entity.isPublic.value;
                 document.getElementById("isItPaidLbl").innerHTML = "Evento a pagar: " + entity.isItPaid.value;
             });
-        };
+
+            var storageRef = firebase.storage().ref();
+            var fileRef = storageRef.child('Events/' + id + ".txt");
+
+            fileRef.getDownloadURL()
+              .then(function(url) {
+                return fetch(url);
+              })
+              .then(function(response) {
+                if (response.ok) {
+                  return response.text();
+                } else {
+                  throw new Error("Error fetching file. Status: " + response.status);
+                }
+              })
+              .then(function(fileContent) {
+                sessionStorage.setItem(id, fileContent);
+                document.getElementById("textMod").value = fileContent;
+              })
+              .catch(function(error) {
+                console.error("Error accessing file:", error);
+              });
+
+        }
+        else if ( request.readyState === 4 ){
+            console.log(request.responseText);
+            alert("Erro " + request.status + "\n" + request.responseText);
+        }
     }
 
     request.send(JSON.stringify(idData));
@@ -472,6 +551,10 @@ function queryEvents(){
             });
             queryEventsCursor = response.cursor;
         }
+        else if (request.readyState === 4){
+            console.log(request.responseText);
+            alert("Erro" + request.status + "\n" + request.responseText);
+        }
     }
 }
 
@@ -500,7 +583,13 @@ function validateEvent(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
         }
     };
 }
@@ -619,7 +708,13 @@ function postNews(){
             }
             else {
                 alert(request.responseText);
-                console.log("FAIL");
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400 || request.status === 403)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVerifique se preencheu os campos todos.\nCaso o tenha feito, volte a tentar dentro de alguns minutos.");
+
             }
         }
     };
@@ -646,7 +741,12 @@ function validateNews(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
         }
     };
 }
@@ -691,7 +791,13 @@ function editNews(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400 || request.status === 403)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     };
@@ -780,7 +886,7 @@ function getNews() {
                   });
             } else {
                 console.log(request.responseText);
-                alert("FAIL");
+                alert("Erro" + request.status + "\n" + request.responseText);
             }
         }
     };
@@ -849,6 +955,10 @@ function queryNews(){
             });
             queryNewsCursor = response.cursor;
         }
+        else if (request.readyState === 4){
+            console.log(request.responseText);
+            alert("Erro" + request.status + "\n" + request.responseText);
+        }
     }
 }
 
@@ -884,7 +994,13 @@ function modifyUserRole(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVerifique se preencheu os campos todos.\nCaso o tenha feito, volte a tentar dentro de alguns minutos.");
         }
     };
     request.send(JSON.stringify(data));
@@ -909,7 +1025,14 @@ function deleteUser(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1000,8 +1123,14 @@ function queryUsers(){
                 queryUsersCursor = response.cursor;
             }
             else {
-                alert("FAIL");
                 console.log(request.responseText);
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
             }
         }
     }
@@ -1038,7 +1167,14 @@ function getUser() {
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1060,8 +1196,15 @@ function banAccount(){
                  alert("SUCCESS");
             }
             else{
-                alert("FAIL");
-                console.log(request.responseText)
+                console.log(request.responseText);
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1082,8 +1225,14 @@ function reactivateAccount() {
                  alert("SUCCESS");
             }
             else{
-                alert("FAIL");
                 console.log(request.responseText);
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1164,7 +1313,14 @@ function getReport() {
                     });
             } else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1252,7 +1408,14 @@ function queryReports(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1339,7 +1502,14 @@ function queryUnresolvedReports(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1364,7 +1534,14 @@ function reportStatus(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else if (request.status === 400)
+                    alert("ERRO " + request.status + "\n" + request.responseText);
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     };
@@ -1396,7 +1573,14 @@ function deleteDepartment(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1442,7 +1626,12 @@ function getDepartment() {
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1470,9 +1659,17 @@ function postDepartment(){
       if (request.readyState === 4 && request.status === 200) {
           console.log(request.responseText);
           alert("SUCCESS");
-      } else if (request.readyState === 4) {
+      }
+      else if (request.readyState === 4) {
           console.log(request.responseText);
-          alert("FAIL");
+
+          if (request.status === 401)
+              alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+          else if (request.status === 400)
+              alert("ERRO " + request.status + "\n" + request.responseText);
+          else
+              alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
       }
     };
 
@@ -1528,7 +1725,14 @@ function editDepartment(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1613,7 +1817,12 @@ function queryDepartments(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1642,7 +1851,14 @@ var data = {
         }
         else if (request.readyState === 4) {
           console.log(request.responseText);
-          alert("FAIL");
+
+        if (request.status === 401)
+            alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+        else if (request.status === 400 || request.status === 403)
+            alert("ERRO " + request.status + "\n" + request.responseText);
+        else
+            alert("ERRO " + request.status +"\nVerifique se preencheu os campos todos.\nCaso o tenha feito, volte a tentar dentro de alguns minutos.");
+
       }
     };
 
@@ -1700,7 +1916,12 @@ function getNucleus() {
 
         } else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1782,7 +2003,14 @@ function editNucleus(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+            if (request.status === 401)
+                alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+            else if (request.status === 400 || request.status === 403)
+                alert("ERRO " + request.status + "\n" + request.responseText);
+            else
+                alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1805,7 +2033,14 @@ function deleteNucleus(){
         }
         else if (request.readyState === 4) {
             console.log(request.responseText);
-            alert("FAIL");
+
+           if (request.status === 401)
+               alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+           else if (request.status === 400)
+               alert("ERRO " + request.status + "\n" + request.responseText);
+           else
+               alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
         }
     };
 
@@ -1898,7 +2133,12 @@ function queryNucleus(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -1925,7 +2165,7 @@ function getHojeNaFCT(){
       })
       .catch(function(error) {
         console.error("Error accessing file:", error);
-        alert("FAIL");
+        alert("Erro a aceder ao ficheiro.");
       });
 }
 
@@ -1940,7 +2180,7 @@ function updateHojeNaFCT(){
         })
         .catch(function(error) {
             console.error("Error putting text body in storage:", error);
-            alert("FAIL");
+            alert("Erro a guardar o ficheiro.\nTente novamente dentro de alguns minutos.");
         });
 }
 
@@ -2022,7 +2262,12 @@ function queryFAQ(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -2100,7 +2345,12 @@ function queryUnresFAQ(){
             }
             else {
                 console.log(request.responseText);
-                alert("FAIL");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
             }
         }
     }
@@ -2123,7 +2373,11 @@ function faqAnswered(){
             }
             else {
                 console.log(request.responseText);
-                alert("Houve um problema com o pedido, tente mais tarde.");
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
             }
         }
     };
