@@ -94,7 +94,7 @@ public class FeedbackResource {
         Transaction txn = datastore.newTransaction();
 
         try {
-            EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind("Feedback").setLimit(size);
+            EntityQuery.Builder query = Query.newEntityQueryBuilder().setKind("Feedback").setOrderBy(StructuredQuery.OrderBy.desc("submitted")).setLimit(size);
 
             if (!cursor.equals("EMPTY") && !cursor.equals("")){
                 query.setStartCursor(Cursor.fromUrlSafe(cursor));
