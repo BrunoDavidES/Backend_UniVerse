@@ -1109,7 +1109,7 @@ function getReport() {
         if (request.readyState === 4) {
             if (request.status === 200) {
                 const response = JSON.parse(request.responseText);
-                const entities = response.map(function(entity) {
+                const entities = response.results.map(function(entity) {
                     return {
                         title: entity.properties.title,
                         reporter: entity.properties.reporter,
