@@ -2512,6 +2512,7 @@ function statsFeedBack(){
             if (request.status === 200) {
                 const response = JSON.parse(request.responseText);
                 document.getElementById("ratingOvr").innerHTML = response[0];
+                document.getElementById("submissions").innerHTML = response[1];
                 console.log(request.responseText);
             }
             else {
