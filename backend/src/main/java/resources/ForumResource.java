@@ -496,19 +496,23 @@ public class ForumResource {
                     .setKind(FORUM_POSTS)
                     .addAncestors(PathElement.of(FORUM, forumID))
                     .newKey(postID);
+            String forumName = txn.get(key).getString("name");
 
             Entity post = Entity.newBuilder(key)
                     .set("author", userID)
                     .build();
             txn.add(post);
-            txn.commit();
 
             LOG.info("Posted to forum");
 
             CompletableFuture.runAsync(() -> {
+                Key fkey = datastore.newKeyFactory()
+                        .setKind(FORUM)
+                        .newKey(forumID);
+
                 Query<Entity> query = Query.newEntityQueryBuilder()
                         .setKind(USER_FORUMS)
-                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
+                        .setFilter(StructuredQuery.PropertyFilter.hasAncestor(fkey))
                         .build();
                 QueryResults<Entity> results = txn.run(query);
 
@@ -517,10 +521,11 @@ public class ForumResource {
                     Entity entity = results.next();
                     members.add(entity.getKey().getName());
                 }
-                sendNotification(members);
+                sendNotification(members, forumName);
 
-                LOG.info("Members notified");
+                LOG.warning("Members notified");
             });
+            txn.commit();
 
             return Response.ok(postID).build();
         } catch (Exception e) {

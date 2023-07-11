@@ -3,7 +3,9 @@ package resources;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.*;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.messaging.*;
+import models.ForumData;
 import models.NotificationData;
 
 import javax.ws.rs.*;
@@ -53,7 +55,8 @@ public class NotificationResource {
      *
      * @param targets The list of target users.
      */
-    public static void sendNotification(List<String> targets) {
+    public static void sendNotification(List<String> targets, String forum) {
+        LOG.warning("Attempt to send notification");
         List<String> targetDevices = new ArrayList<>();
 
         Transaction txn = datastore.newTransaction();
@@ -62,23 +65,22 @@ public class NotificationResource {
             Entity entity;
             Query<Entity> query;
             QueryResults<Entity> results;
-            for(String target: targets) {
+            for (String target : targets) {
                 key = datastore.newKeyFactory()
-                        .setKind("Device")
-                        .addAncestors(PathElement.of("User", target))
+                        .setKind("User")
                         .newKey(target);
 
-                 query = Query.newEntityQueryBuilder()
+                query = Query.newEntityQueryBuilder()
                         .setKind("Device")
                         .setFilter(StructuredQuery.PropertyFilter.hasAncestor(key))
                         .build();
-                 results = txn.run(query);
+                results = txn.run(query);
 
                 while (results.hasNext()) {
                     entity = results.next();
+                    LOG.warning(entity.getKey().getName());
                     targetDevices.add(entity.getKey().getName());
                 }
-
             }
             txn.commit();
         } finally {
@@ -90,7 +92,7 @@ public class NotificationResource {
         try {
             Notification notification = Notification.builder()
                     .setTitle("UniVerse")
-                    .setBody("This is a test notification")
+                    .setBody("You have a new message in: " + forum)
                     .build();
 
             Message message;
@@ -104,9 +106,11 @@ public class NotificationResource {
                 FirebaseMessaging.getInstance().send(message);
             }
 
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOG.warning("Failed to send notification" + e.getMessage());
         }
 
+        LOG.warning("Members notified");
     }
 
     private Response registerdevice(FirebaseToken decodedToken, NotificationData data){
