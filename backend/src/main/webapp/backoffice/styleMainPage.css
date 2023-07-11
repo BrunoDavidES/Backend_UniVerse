@@ -312,6 +312,14 @@
       width: 50%;
     }
 
+    .form2 {
+          background-color: #0A2558;
+          border-radius: 20px;
+          box-sizing: border-box;
+          padding: 20px;
+          width: 50%;
+        }
+
     .title {
       color: #eee;
       font-size: 30px;
