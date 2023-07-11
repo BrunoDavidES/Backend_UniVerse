@@ -26,6 +26,11 @@ public class FeedData {
     public boolean validate(String kind) {
         if (title == null)
             return false;
+        if (nucleus == null)
+            nucleus = "";
+
+        if (department == null)
+            department = "";
 
         if(kind.equals("Event")) {
             return isPublic != null && isItPaid != null && startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;

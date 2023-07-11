@@ -424,7 +424,7 @@ public class FeedResource {
                     }
 
                 } else if (role.equals(BO) || role.equals(ADMIN)) {
-                    String departmentID = data.getDepartment()!= null ? data.getDepartment() : user.getString("department");
+                    String departmentID = !data.getDepartment().equals("") ? data.getDepartment() : user.getString("department");
 
                     Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(departmentID);
                     Entity department = txn.get(departmentKey);
