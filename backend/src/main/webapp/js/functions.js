@@ -893,7 +893,6 @@ function editNews(){
     if (title !== "") {
         data["title"] = title;
     }
-    alert(title);
 
     var request = new XMLHttpRequest();
     request.open("PATCH", document.location.origin + "/rest/feed/edit/News/" + id, true);
@@ -2428,7 +2427,7 @@ function queryUnresFAQ(){
 
     var request = new XMLHttpRequest();
 
-    request.open("GET", document.location.origin + "/rest/help/view/unanswered?size="+limit+"&cursor="+queryFAQCursor, true);
+    request.open("GET", document.location.origin + "/rest/help/view/unanswered?size="+limit+"&cursor="+queryUnresFAQCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
@@ -2506,7 +2505,7 @@ function faqAnswered(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4){
             if (request.status === 200) {
-                alert("Pergunta marcada como respondida.");
+                alert("SUCCESS");
             }
             else {
                 console.log(request.responseText);

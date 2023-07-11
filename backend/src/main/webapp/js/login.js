@@ -49,8 +49,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (request.status === 200) {
                       var response = JSON.parse(request.responseText);
 
-                      console.log(response);
-
                       sessionStorage.setItem("name", response.name);
                       sessionStorage.setItem("displayRole", response.role);
                       sessionStorage.setItem("departmentTitle", response.department);
