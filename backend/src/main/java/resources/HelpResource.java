@@ -19,30 +19,31 @@ import static utils.Constants.*;
 import static utils.FirebaseAuth.authenticateToken;
 import static utils.FirebaseAuth.getRole;
 
+/**
+ * Resource class for managing help requests.
+ */
 @Path("/help")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class HelpResource {
     private static final Logger LOG = Logger.getLogger(HelpResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
+
+    /**
+     * Creates a new help request.
+     *
+     * @param data The help request data.
+     * @return Response indicating the status of the help request.
+     */
     @POST
     @Path("/request")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response requestHelp(@HeaderParam("Authorization") String token,
-                                HelpData data) {
+    public Response requestHelp(HelpData data){
         LOG.fine("Attempt to request help.");
-
-        /*if(!data.validate()) {
-            LOG.warning(MISSING_OR_WRONG_PARAMETER);
-            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }*/
-
         Transaction txn = datastore.newTransaction();
 
         try {
-            Key key;
-            Entity entity;
-            String id;
+            Key key; Entity entity; String id;
             do {
                 id = (Long.MAX_VALUE - Instant.now().getEpochSecond())+ UUID.randomUUID().toString();
                 key = datastore.newKeyFactory().setKind("Help").newKey(id);
@@ -70,6 +71,15 @@ public class HelpResource {
         }
     }
 
+
+    /**
+     * Answers a help request.
+     *
+     * @param token     The authorization token.
+     * @param requestID The ID of the help request to answer.
+     * @param data      The help request data.
+     * @return Response indicating the status of the help request answer.
+     */
     @POST
     @Path("/{requestID}/answer")
     public Response answerHelp(@HeaderParam("Authorization") String token,
@@ -82,20 +92,7 @@ public class HelpResource {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
-
-        // TODO
-        /*if(!getRole(decodedToken).equals("EXAMPLE")) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
-
-        /*if(!data.validate()) {
-            LOG.warning(MISSING_OR_WRONG_PARAMETER);
-            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }*/
-
         Transaction txn = datastore.newTransaction();
-
         try {
             Key key = datastore.newKeyFactory().setKind("Help").newKey(requestID);
             Entity entity = txn.get(key);
@@ -119,7 +116,14 @@ public class HelpResource {
         }
     }
 
-    // TODO check pagination
+    /**
+     * Fetches all help requests.
+     *
+     * @param token  The authorization token.
+     * @param size   The number of requests to fetch.
+     * @param cursor The cursor for pagination.
+     * @return Response containing the fetched help requests.
+     */
     @GET
     @Path("/view")
     public Response viewRequests(@HeaderParam("Authorization") String token,
@@ -132,12 +136,41 @@ public class HelpResource {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
+        return queryRequests(cursor, size);
+    }
 
-        // TODO
-        /*if(!getRole(decodedToken).equals("EXAMPLE")) {
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
+    /**
+     * Fetches unanswered help requests.
+     *
+     * @param token  The authorization token.
+     * @param size   The number of requests to fetch.
+     * @param cursor The cursor for pagination.
+     * @return Response containing the fetched unanswered help requests.
+     */
+    @GET
+    @Path("/view/unanswered")
+    public Response viewUnansweredRequests(@HeaderParam("Authorization") String token,
+                                           @QueryParam("size") int size,
+                                           @QueryParam("cursor") String cursor) {
+        LOG.fine("Attempt to fetch user help requests");
 
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+        return queryUnanswered(cursor, size);
+    }
+
+
+    /**
+     * Queries help requests from the datastore.
+     *
+     * @param cursor The cursor for pagination.
+     * @param size   The number of requests to fetch.
+     * @return Response containing the queried help requests.
+     */
+    private Response queryRequests(String cursor, int size){
         Transaction txn = datastore.newTransaction();
 
         try {
@@ -167,8 +200,8 @@ public class HelpResource {
             txn.commit();
             Gson g = new Gson();
             return Response.ok(g.toJson(response))
-                //.header("X-Cursor",results.getCursorAfter().toUrlSafe())
-                .build();
+                    //.header("X-Cursor",results.getCursorAfter().toUrlSafe())
+                    .build();
 
         } finally {
             if (txn.isActive()) {
@@ -177,24 +210,15 @@ public class HelpResource {
         }
     }
 
-    @GET
-    @Path("/view/unanswered")
-    public Response viewUnansweredRequests(@HeaderParam("Authorization") String token,
-                                           @QueryParam("size") int size,
-                                           @QueryParam("cursor") String cursor) {
-        LOG.fine("Attempt to fetch user help requests");
 
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        // TODO
-        /*if(!getRole(decodedToken).equals("EXAMPLE")) {
-            return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
-        }*/
-
+    /**
+     * Queries unanswered help requests from the datastore.
+     *
+     * @param cursor The cursor for pagination.
+     * @param size   The number of requests to fetch.
+     * @return Response containing the queried unanswered help requests.
+     */
+    private Response queryUnanswered(String cursor, int size){
         Transaction txn = datastore.newTransaction();
 
         try {

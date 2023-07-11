@@ -17,13 +17,23 @@ import static utils.Constants.*;
 import static utils.Constants.TOKEN_NOT_FOUND;
 import static utils.FirebaseAuth.authenticateToken;
 
-
+/**
+ * Resource class for handling notifications.
+ */
 @Path("/notification")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class NotificationResource {
     private static final Logger LOG = Logger.getLogger(NotificationResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
 
+
+    /**
+     * Registers a device for receiving notifications.
+     *
+     * @param token The authorization token.
+     * @param data  The notification data.
+     * @return The response indicating the success or failure of the registration.
+     */
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -35,34 +45,14 @@ public class NotificationResource {
             LOG.warning(TOKEN_NOT_FOUND);
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
-
-        Transaction txn = datastore.newTransaction();
-        try {
-            Key userKey = datastore.newKeyFactory()
-                    .setKind("Device")
-                    .addAncestors(PathElement.of("User", decodedToken.getUid()))
-                    .newKey(data.getFcmToken());
-
-            Entity user = Entity.newBuilder(userKey).build();
-            txn.add(user);
-            txn.commit();
-
-            List<String> fcmTokens = new ArrayList<>();
-            fcmTokens.add(data.getFcmToken());
-            FirebaseMessaging.getInstance().subscribeToTopic(fcmTokens, "Alerts");
-
-            LOG.info("Device registered in datastore " + data.getFcmToken());
-            return Response.ok(user).build();
-        } catch (FirebaseMessagingException e) {
-            LOG.info("Subscribe failed");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        } finally {
-            if (txn.isActive()) {
-                txn.rollback();
-            }
-        }
+        return registerdevice(decodedToken, data);
     }
 
+    /**
+     * Sends a notification to the specified targets.
+     *
+     * @param targets The list of target users.
+     */
     public static void sendNotification(List<String> targets) {
         List<String> targetDevices = new ArrayList<>();
 
@@ -119,5 +109,32 @@ public class NotificationResource {
 
     }
 
+    private Response registerdevice(FirebaseToken decodedToken, NotificationData data){
+        Transaction txn = datastore.newTransaction();
+        try {
+            Key userKey = datastore.newKeyFactory()
+                    .setKind("Device")
+                    .addAncestors(PathElement.of("User", decodedToken.getUid()))
+                    .newKey(data.getFcmToken());
+
+            Entity user = Entity.newBuilder(userKey).build();
+            txn.add(user);
+            txn.commit();
+
+            List<String> fcmTokens = new ArrayList<>();
+            fcmTokens.add(data.getFcmToken());
+            FirebaseMessaging.getInstance().subscribeToTopic(fcmTokens, "Alerts");
+
+            LOG.info("Device registered in datastore " + data.getFcmToken());
+            return Response.ok(user).build();
+        } catch (FirebaseMessagingException e) {
+            LOG.info("Subscribe failed");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        } finally {
+            if (txn.isActive()) {
+                txn.rollback();
+            }
+        }
+    }
 
 }

@@ -55,7 +55,7 @@ public class Constants {
     public static final String WRONG_PRESIDENT = "President doesn't exists.";
     public static final String DEPARTMENT_ALREADY_EXISTS = "Department already exists.";
     public static final String WRONG_DEPARTMENT = "Department does not exist.";
-
+    public static final String WRONG_PERSONAL_EVENT = "User does not have this event.";
     public static final String ROLE = "role";
     public static final String LAST_UPDATE = "time_lastupdate";
     public static final String USER = "User";

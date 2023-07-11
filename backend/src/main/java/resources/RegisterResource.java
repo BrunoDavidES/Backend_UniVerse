@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 
 import static utils.Constants.*;
 
+/**
+ * Resource class for user registration.
+ */
 @Path("/register")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class RegisterResource {
@@ -24,8 +27,19 @@ public class RegisterResource {
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
     private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
+    /**
+     * Default constructor.
+     */
     public RegisterResource() {}
 
+    /**
+     * Endpoint for user registration.
+     *
+     * @param data The user data for registration.
+     * @return Response indicating the status of the registration.
+     * @throws Exception If an error occurs during registration.
+     * It will return 400 error if there are missing or wrong parameters.
+     */
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -51,6 +65,12 @@ public class RegisterResource {
         return response;
     }
 
+    /**
+     * Registers the user in Firebase.
+     *
+     * @param data The user data for registration.
+     * @return Response indicating the status of the registration.
+     */
     private Response firebaseRegister(UserData data) {
         try {
             UserRecord userRecord = firebaseAuth.createUser( new CreateRequest()
@@ -75,6 +95,12 @@ public class RegisterResource {
         }
     }
 
+    /**
+     * Registers the user in Datastore.
+     *
+     * @param data The user data for registration.
+     * @return Response indicating the status of the registration.
+     */
     private Response datastoreRegister(UserData data) {
         Transaction txn = datastore.newTransaction();
         try {

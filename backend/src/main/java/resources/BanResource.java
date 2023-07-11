@@ -14,11 +14,25 @@ import static utils.Constants.*;
 import static utils.FirebaseAuth.authenticateToken;
 import static utils.FirebaseAuth.getRole;
 
+
+/**
+ * Resource class for handling user banning and unbanning.
+ */
 @Path("/{username}")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class BanResource {
     private static final Logger LOG = Logger.getLogger(BanResource.class.getName());
 
+
+    /**
+     * Bans a user.
+     *
+     * @param token    The authorization token.
+     * @param username The username of the user to ban.
+     * @return The response indicating the success or failure of the operation.
+     * It will return 401 if the token is doesn't exist or 400 if the
+     * user role is not backoffice or admin.
+     */
     @POST
     @Path("/ban")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -26,22 +40,9 @@ public class BanResource {
                             @PathParam("username") String username) {
         LOG.fine("Attempt to ban user.");
 
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        String role = getRole(decodedToken);
-        if(!role.equals(BO) && !role.equals(ADMIN)){
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
-
-        /*if(!data.validate()) {
-            LOG.warning(MISSING_OR_WRONG_PARAMETER);
-            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }*/
+        var validation = validateTokenPermissions(token);
+        if(validation != null)
+            return validation;
 
         try {
             UserRecord userRecord = FirebaseAuth.getInstance().getUser(username);
@@ -58,6 +59,16 @@ public class BanResource {
         }
     }
 
+
+    /**
+     * Unbans a user.
+     *
+     * @param token    The authorization token.
+     * @param username The username of the user to unban.
+     * @return The response indicating the success or failure of the operation.
+     * It will return 401 if the token is doesn't exist or 400 if the
+     * user role is not backoffice or admin.
+     */
     @POST
     @Path("/unban")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -65,22 +76,9 @@ public class BanResource {
                               @PathParam("username") String username) {
         LOG.fine("Attempt to unban user.");
 
-        FirebaseToken decodedToken = authenticateToken(token);
-        if(decodedToken == null) {
-            LOG.warning(TOKEN_NOT_FOUND);
-            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
-        }
-
-        String role = getRole(decodedToken);
-        if(!role.equals(BO) && !role.equals(ADMIN)){
-            LOG.warning(NICE_TRY);
-            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
-        }
-
-        /*if(!data.validate()) {
-            LOG.warning(MISSING_OR_WRONG_PARAMETER);
-            return Response.status(Response.Status.BAD_REQUEST).entity(MISSING_OR_WRONG_PARAMETER).build();
-        }*/
+        var validation = validateTokenPermissions(token);
+        if(validation != null)
+            return validation;
 
         try {
             UserRecord userRecord = FirebaseAuth.getInstance().getUser(username);
@@ -95,6 +93,28 @@ public class BanResource {
         } catch (FirebaseAuthException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Failed to unban user: " + e.getMessage()).build();
         }
+    }
+
+
+    /**
+     * Validates the authorization token.
+     *
+     * @param token The authorization token.
+     * @return The response indicating the success or failure of the validation.
+     */
+    private Response validateTokenPermissions(String token){
+        FirebaseToken decodedToken = authenticateToken(token);
+        if(decodedToken == null) {
+            LOG.warning(TOKEN_NOT_FOUND);
+            return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
+        }
+
+        String role = getRole(decodedToken);
+        if(!role.equals(BO) && !role.equals(ADMIN)){
+            LOG.warning(NICE_TRY);
+            return Response.status(Response.Status.BAD_REQUEST).entity(CAPI).build();
+        }
+        return null;
     }
 
 }

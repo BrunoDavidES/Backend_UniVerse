@@ -16,6 +16,9 @@ import static utils.Constants.*;
 import static utils.FirebaseAuth.authenticateToken;
 import static utils.FirebaseAuth.getRole;
 
+/**
+ * Default constructor for the EntityResource class.
+ */
 @Path("/entity")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class EntityResource {
@@ -24,6 +27,15 @@ public class EntityResource {
 
     public EntityResource() { }
 
+    /**
+     * Creates a new entity.
+     *
+     * @param token      the authorization token
+     * @param kind       the kind of the entity
+     * @param keyName    the name of the key for the entity
+     * @param attributes the attributes of the entity
+     * @return the response indicating the success or failure of the operation
+     */
     @POST
     @Path("/new/{kind}/{key}")
     @Consumes(MediaType.APPLICATION_JSON)
