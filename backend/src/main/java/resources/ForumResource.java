@@ -486,7 +486,7 @@ public class ForumResource {
             String date = getCurrentDate();
 
             DatabaseReference forumRef = firebaseDatabase.getReference(FORUMS).child(forumID).child("feed");
-            String postID = date + forumRef.push().getKey();
+            String postID = date.replace("/", "-") + forumRef.push().getKey();
             forumRef.child(postID).child("author").child("username").setValueAsync(decodedToken.getUid());
             forumRef.child(postID).child("author").child("name").setValueAsync(decodedToken.getName());
             forumRef.child(postID).child("message").setValueAsync(data.getMessage());
