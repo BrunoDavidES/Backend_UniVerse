@@ -6,6 +6,8 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import models.NucleusData;
@@ -33,6 +35,8 @@ import static utils.FirebaseAuth.getRole;
 public class NucleusResource {
     private static final Logger LOG = Logger.getLogger(NucleusResource.class.getName());
     private static final Datastore datastore = DatastoreOptions.getDefaultInstance().getService();
+    private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
 
     public NucleusResource() { }
 
@@ -52,7 +56,7 @@ public class NucleusResource {
     @POST
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response register(@HeaderParam("Authorization") String token, NucleusData data) {
+    public Response register(@HeaderParam("Authorization") String token, NucleusData data) throws FirebaseAuthException {
         LOG.fine("Attempt to create a nucleus by: " + data.getPresident());
 
         FirebaseToken decodedToken = authenticateToken(token);
@@ -195,16 +199,22 @@ public class NucleusResource {
      * @param data         The nucleus data.
      * @return The response indicating the success or failure of the registration.
      */
-    private Response registerNucleusValidation(FirebaseToken decodedToken,  NucleusData data){
+    private Response registerNucleusValidation(FirebaseToken decodedToken,  NucleusData data) throws FirebaseAuthException {
         Transaction txn = datastore.newTransaction();
         try {
             Key presidentKey = datastore.newKeyFactory().setKind(USER).newKey(data.getPresident());
             Entity president = txn.get(presidentKey);
+            String presRole = getRole(firebaseAuth.getUser(data.getPresident()));
 
             if (president == null){
                 txn.rollback();
                 LOG.warning(WRONG_PRESIDENT);
                 return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_PRESIDENT).build();
+            }
+            if(!presRole.equals(STUDENT)){
+                txn.rollback();
+                LOG.warning(NOT_A_STUDENT);
+                return Response.status(Response.Status.BAD_REQUEST).entity(NOT_A_STUDENT).build();
             }
 
             String role = getRole(decodedToken);

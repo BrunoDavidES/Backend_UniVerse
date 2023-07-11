@@ -49,6 +49,8 @@ public class Constants {
     public static final String USER_OR_PASSWORD_INCORRECT = "User or password incorrect.";
     public static final String NUCLEUS_DOES_NOT_EXISTS = "Nucleus does not exist.";
     public static final String NUCLEUS_ALREADY_EXISTS = "Nucleus already exists.";
+    public static final String NOT_A_STUDENT = "This user is not a student";
+
     public static final String NICE_TRY = "Nice try but your not a capi person.";
     public static final String PERMISSION_DENIED = "Permission denied.";
     public static final String REPORT_DOES_NOT_EXIST = "Report does not exist.";
