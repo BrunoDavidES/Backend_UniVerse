@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
             sessionStorage.clear();
             localStorage.clear();
             console.error(error);
+            alert("Login invalido!!!");
           });
 
       });
