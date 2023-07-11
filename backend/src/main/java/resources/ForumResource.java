@@ -471,10 +471,10 @@ public class ForumResource {
             }
 
             String demotedRole;
-            if(memberRole.equals("ASSISTANT")) {
+            if(memberRole.equals(ASSISTANT)) {
                 demotedRole = "MEMBER";
-            } else if(memberRole.equals("ADMIN")) {
-                demotedRole = "ASSISTANT";
+            } else if(memberRole.equals(ADMIN)) {
+                demotedRole = ASSISTANT;
             } else {
                 return Response.status(Response.Status.FORBIDDEN).entity(TOKEN_NOT_FOUND).build();
             }
