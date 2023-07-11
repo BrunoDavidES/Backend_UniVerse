@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
             sessionStorage.clear();
             localStorage.clear();
             console.error(error);
+            alert("Login invalido!!!");
           });
 
       });
@@ -86,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function() {
           sessionStorage.setItem("capiToken", token);
         }).catch(function(error) {
           console.error(error);
+          alert("Login invalido!!!");
         });
       }
     });
