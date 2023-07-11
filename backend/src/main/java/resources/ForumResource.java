@@ -496,7 +496,6 @@ public class ForumResource {
                     .setKind(FORUM_POSTS)
                     .addAncestors(PathElement.of(FORUM, forumID))
                     .newKey(postID);
-            String forumName = txn.get(key).getString("name");
 
             Entity post = Entity.newBuilder(key)
                     .set("author", userID)
@@ -509,6 +508,7 @@ public class ForumResource {
                 Key fkey = datastore.newKeyFactory()
                         .setKind(FORUM)
                         .newKey(forumID);
+                String forumName = txn.get(fkey).getString("name");
 
                 Query<Entity> query = Query.newEntityQueryBuilder()
                         .setKind(USER_FORUMS)
