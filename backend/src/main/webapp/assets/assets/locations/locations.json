@@ -6,6 +6,350 @@
       "lat": 38.660992,
       "lng": -9.205782,
       "name": "FCT NOVA"
+    },
+    {
+      "address": "Campus da Faculdade de Ciências e Tecnologia, 2829-516 Caparica",
+      "id": "via-copia",
+      "lat": 38.661671,
+      "lng": -9.204574,
+      "name": "Via Cópia"
+    },
+    {
+      "address": "Campus da Faculdade de Ciências e Tecnologia, 2825-149 Caparica",
+      "id": "mininova",
+      "lat": 38.661386,
+      "lng": -9.205384,
+      "name": "Mininova"
+    },
+    {
+      "id":"esp-solucao",
+      "address":"Campus da Faculdade Ciências e Tecnologia, Edifício da Cantina, 2829-516 Caparica",
+      "lat":38.661422,
+      "lng":-9.205096,
+      "name":"Espaço Solução"
+    },
+    {
+      "id":"pap-solucao",
+      "address":"Campus da Faculdade Ciências e Tecnologia, Edifício da Cantina, 2829-516 Caparica",
+      "lat": 38.661413,
+      "lng": -9.205157,
+      "name":"Papelaria Solução"
+    },
+    {
+      "id":"div-academica",
+      "address":"Campus da Faculdade Ciências e Tecnologia, Edifício da Cantina, 2829-516 Caparica",
+      "lat": 38.661135,
+      "lng": -9.205263,
+      "name":"Divisão Académica"
+    },
+    {
+      "id":"div-parcerias",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.662292,
+      "lng": -9.206031,
+      "name":"Divisão de Acompanhamento de Parcerias"
+    },
+    {
+      "id":"div-formacao",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.661147,
+      "lng": -9.205373,
+      "name":"Divisão de Apoio à Formação Avançada"
+    },
+    {
+      "id":"div-geral",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.663195,
+      "lng": -9.207188,
+      "name": "Divisão de Apoio Geral"
+    },
+    {
+      "id":"div-tecnico",
+      "address": "Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.662292,
+      "lng": -9.206031,
+      "name": "Divisão de Apoio Técnico"
+    },
+    {
+      "id":"div-comunicacao",
+      "address": "Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.662292,
+      "lng": -9.206031,
+      "name": "Divisão de Comunicação e Relações Exteriores"
+    },
+    {
+      "id":"div-documentacao",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.662565,
+      "lng": -9.205361,
+      "name": "Divisão de Documentação e Cultura"
+    },
+    {
+      "id":"div-eventos",
+      "address": "Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.662292,
+      "lng": -9.206031,
+      "name": "Divisão de Eventos e Apoio ao Estudante Diplomado"
+    },
+    {
+      "id":"div-informatica",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.663213,
+      "lng": -9.207048,
+      "name": "Divisão de Infraestruturas Informáticas"
+    },
+    {
+      "id":"div-qualidade",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.663200,
+      "lng": -9.263200,
+      "name": "Divisão de Planeamento e Gestão da Qualidade"
+    },
+    {
+      "id":"div-financeiros",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.661135,
+      "lng": -9.205263,
+      "name": "Divisão de Recursos Financeiros"
+    },
+    {
+      "id":"div-humanos",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.661135,
+      "lng": -9.205263,
+      "name": "Divisão de Recursos Humanos"
+    },
+    {
+      "id":"div-internacionais",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.661135,
+      "lng": -9.205263,
+      "name":"Divisão de Relações Internacionais"
+    },
+    {
+      "id":"div-direcao",
+      "address":"Campus da Faculdade Ciências e Tecnologia, 2829-516 Caparica",
+      "lat": 38.661135,
+      "lng": -9.205263,
+      "name": "Divisão de Apoio à Direção"
+    },
+    {
+      "id": "dep-ambiente",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.662014,
+      "lng": -9.207847,
+      "name": "Departamento de Ciências e Engenharia do Ambiente"
+    },
+    {
+      "id": "dep-materiais",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660803,
+      "lng": -9.203480,
+      "name": "Departamento de Ciência dos Materiais"
+    },
+    {
+      "id": "dep-restauro",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.662014,
+      "lng": -9.207847,
+      "name": "Departamento de Conservação e Restauro"
+    },
+    {
+      "id": "dep-sociais",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660696,
+      "lng": -9.205775,
+      "name": "Departamento de Ciências Sociais Aplicadas"
+    },
+    {
+      "id": "dep-terra",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660330,
+      "lng": -9.207096,
+      "name": "Departamento de Ciências da Terra"
+    },
+    {
+      "id": "dep-vida",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.662014,
+      "lng": -9.207847,
+      "name": "Departamento de Ciências da Vida"
+    },
+    {
+      "id": "dep-civil",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660330,
+      "lng": -9.207096,
+      "name": "Departamento de Engenharia Civil"
+    },
+    {
+      "id": "dep-eletrotecnia",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660443,
+      "lng": -9.204875,
+      "name": "Departamento de Engenharia Eletrotécnica e de Computadores"
+    },
+    {
+      "id": "dep-industrial",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660357,
+      "lng": -9.206627,
+      "name": "Departamento de Engenharia Mecânica e Industrial"
+    },
+    {
+      "id": "dep-fisica",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661258,
+      "lng": -9.205544,
+      "name": "Departamento de Física"
+    },
+    {
+      "id": "dep-informatica",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660803,
+      "lng": -9.203480,
+      "name": "Departamento de Informática"
+    },
+    {
+      "id": "dep-matematica",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660696,
+      "lng": -9.205775,
+      "name": "Departamento de Matemática"
+    },
+    {
+      "id": "div-quimica",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.662014,
+      "lng": -9.207847,
+      "name": "Divisão de Química"
+    },
+    {
+      "id":"ed-1",
+      "address":"Largo da Torre, 2829-516 Caparica",
+      "lat": 38.661186,
+      "lng": -9.205351,
+      "name": "Edifício I"
+    },
+    {
+      "id":"ed-2",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660764,
+      "lng": -9.203575,
+      "name": "Edifício II"
+    },
+    {
+      "id":"ed-3",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.663185,
+      "lng": -9.207236,
+      "name": "Edifício III"
+    },
+    {
+      "id":"ed-4",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662921,
+      "lng": -9.207239,
+      "name": "Edifício IV"
+    },
+    {
+      "id":"ed-5",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662921,
+      "lng": -9.207239,
+      "name": "Edifício V - Auditório Caixa Geral de Depósitos"
+    },
+    {
+      "id":"ed-dep",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662607,
+      "lng": -9.207484,
+      "name": "Edifício Departamental"
+    },
+    {
+      "id":"ed-7",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660774,
+      "lng": -9.205857,
+      "name": "Edifício VII"
+    },
+    {
+      "id":"ed-8",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660378,
+      "lng": -9.206747,
+      "name": "Edifício VIII"
+    },
+    {
+      "id":"ed-9",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660264,
+      "lng": -9.206980,
+      "name": "Edifício IX"
+    },
+    {
+      "id":"ed-10",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660783,
+      "lng": -9.204902,
+      "name": "Edifício X"
+    },
+    {
+      "id":"cenimat",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.659537,
+      "lng": -9.203493,
+      "name": "Cenimat"
+    },
+    {
+      "id":"hangar",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662164,
+      "lng": -9.207046,
+      "name": "Hangares"
+    },
+    {
+      "id":"can",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.661622,
+      "lng": -9.204953,
+      "name": "Cantina"
+    },
+    {
+      "id":"por",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660080,
+      "lng": -9.203205,
+      "name": "Portaria"
+    },
+    {
+      "id":"uninova",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.659635,
+      "lng": -9.203515,
+      "name": "Uninova"
+    },
+    {
+      "id":"cea",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662171,
+      "lng": -9.205983,
+      "name": "Centro de Excelência do Ambiente"
+    },
+    {
+      "id":"ed-11",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662933,
+      "lng": -9.206665,
+      "name": "Edifício XI - Laboratório de e-Learning"
+    },
+    {
+      "id":"biblioteca",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662933,
+      "lng": -9.206665,
+      "name": "Biblioteca"
     }
+
   ]
 }
