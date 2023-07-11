@@ -4,9 +4,102 @@ function verifyLogin() {
       window.location.href = "/backoffice/index.html";
     }
   });
+
+  var request = new XMLHttpRequest();
+  var token = sessionStorage.getItem("capiToken");
+
+  request.open("GET", document.location.origin + "/rest/profile/verifyBOToken", true);
+  request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  request.setRequestHeader("Authorization", token);
+  request.send();
+
+  request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+          if (request.status === 200) {
+              var response = request.responseText;
+
+              if (response === "false"){
+                  alert("ERRO\nA sua sessão expirou ou não é válida.");
+                  sessionStorage.clear();
+
+                  window.location.href = "/backoffice/index.html";
+              }
+          }
+          else {
+              console.error(request.responseText);
+              sessionStorage.clear();
+
+              window.location.href = "/backoffice/index.html";
+          }
+      }
+  }
 }
 
 function loadLoggedUser() {
+
+    document.getElementById("name").innerHTML = sessionStorage.getItem("name");
+    document.getElementById("username").innerHTML = sessionStorage.getItem("userLogged");
+    document.getElementById("role").innerHTML = sessionStorage.getItem("displayRole");
+    document.getElementById("departmentTitle").innerHTML = sessionStorage.getItem("departmentTitle");
+    document.getElementById("departmentJobTitle").innerHTML = sessionStorage.getItem("departmentJobTitle");
+
+    /*
+    var request = new XMLHttpRequest();
+    var token = sessionStorage.getItem("capiToken");
+
+    request.open("GET", document.location.origin + "/rest/profile/verifyBOToken", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", token);
+    request.send();
+
+    request.onreadystatechange = function() {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                var response = request.responseText;
+
+                if (response === false){
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
+                    sessionStorage.clear();
+
+                    window.location.href = "/backoffice/index.html";
+                }
+            }
+            else {
+                console.error(request.responseText);
+                sessionStorage.clear();
+
+                window.location.href = "/backoffice/index.html";
+            }
+        }
+    }*/
+
+
+    var miniPic = document.getElementById("miniProfilePic");
+    var pic = document.getElementById("profilePic");
+
+    if (sessionStorage.getItem("miniProfilePic") !== null){
+        pic.src = sessionStorage.getItem("miniProfilePic");
+        miniPic.src = sessionStorage.getItem("miniProfilePic");
+    }
+    else{
+        var storageRef = firebase.storage().ref();
+        var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
+
+        imgRef.getDownloadURL()
+          .then(function(url) {
+            pic.src = url;
+            miniPic.src = url;
+            sessionStorage.setItem("miniProfilePic", url);
+          })
+          .catch(function(error) {
+            console.error("Error retrieving image:", error);
+            miniPic.src = "../img/logo.png";
+            pic.src = "../img/logo.png";
+          });
+    }
+
+
+ /*
   var request = new XMLHttpRequest();
   var token = sessionStorage.getItem("capiToken");
 
@@ -20,7 +113,7 @@ function loadLoggedUser() {
         var response = JSON.parse(request.responseText);
 
         document.getElementById("name").innerHTML = response.name;
-        document.getElementById("usernameMail").innerHTML = response.email.split("@")[0];
+        document.getElementById("username").innerHTML = response.email.split("@")[0];
         document.getElementById("role").innerHTML = response.role;
         document.getElementById("departmentTitle").innerHTML = response.department;
         document.getElementById("departmentJobTitle").innerHTML = response.department_job;
@@ -64,19 +157,36 @@ function loadLoggedUser() {
     }
   };
 
-  request.send();
+  request.send(); */
 }
 
 function loadUpperRightInfo(){
+
+    document.getElementById("name").innerHTML = sessionStorage.getItem("userLogged");
+
     var cachePic = sessionStorage.getItem("miniProfilePic");
     var miniPic = document.getElementById("miniProfilePic");
     if (cachePic === null){
-        miniPic.src = "../img/logo.png";
+        var storageRef = firebase.storage().ref();
+        var imgRef = storageRef.child("Users/" + sessionStorage.getItem("userLogged"));
+
+        imgRef.getDownloadURL()
+          .then(function(url) {
+            miniPic.src = url;
+            sessionStorage.setItem("miniProfilePic", url);
+          })
+          .catch(function(error) {
+            console.error("Error retrieving image:", error);
+            miniPic.src = "../img/logo.png";
+          });
     }
     else{
         miniPic.src = cachePic;
     }
 
+
+
+    /*
     var request = new XMLHttpRequest();
     request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -91,26 +201,43 @@ function loadUpperRightInfo(){
 
                 if (response.role !== "A" && response.role !== "BO") {
                     alert("User not allowed!");
-                    sessionStorage.removeItem("capiToken");
-                    sessionStorage.removeItem("userLogged");
-                    sessionStorage.removeItem("miniProfilePic");
+                    sessionStorage.clear();
+                    //sessionStorage.removeItem("capiToken");
+                    //sessionStorage.removeItem("userLogged");
+                    //sessionStorage.removeItem("miniProfilePic");
                     window.location.href = "/backoffice/index.html";
                 }
             }
             else {
                 console.log(request.responseText);
-                sessionStorage.removeItem("capiToken");
-                sessionStorage.removeItem("userLogged");
-                sessionStorage.removeItem("miniProfilePic");
+                sessionStorage.clear();
+                //sessionStorage.removeItem("capiToken");
+                //sessionStorage.removeItem("userLogged");
+                //sessionStorage.removeItem("miniProfilePic");
                 window.location.href = "/backoffice/index.html";
             }
         }
     }
 
-    request.send();
+    request.send(); */
 }
 
 function hideRoleOption(){
+    var token = sessionStorage.getItem("capiToken");
+
+    try {
+        var payload = token.split('.')[1];
+        var decodedPayload = JSON.parse(atob(payload));
+
+        if (decodedPayload.role === "BO"){
+            document.getElementById("BO").style.display = "none";
+        }
+
+    } catch (error) {
+        console.error("Failed to decode token:", error);
+        return null;
+    }
+/*
     var request = new XMLHttpRequest();
 
     request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
@@ -135,13 +262,13 @@ function hideRoleOption(){
         }
     }
     request.send();
+    */
 }
 
 
 function logout() {
   firebase.auth().signOut().then(function() {
-    sessionStorage.removeItem("userLogged");
-    sessionStorage.removeItem("capiToken");
+    sessionStorage.clear();
     window.location.href = "/backoffice/index.html";
   }).catch(function(error) {
     console.error(error);
@@ -2513,7 +2640,6 @@ function statsFeedBack(){
                 const response = JSON.parse(request.responseText);
                 document.getElementById("ratingOvr").innerHTML = response[0];
                 document.getElementById("submissions").innerHTML = response[1];
-                console.log(request.responseText);
             }
             else {
                 console.log(request.responseText);

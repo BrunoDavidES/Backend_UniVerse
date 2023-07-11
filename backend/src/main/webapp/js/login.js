@@ -35,9 +35,37 @@ document.addEventListener("DOMContentLoaded", function() {
               //sessionStorage.removeItem("capiToken");
               //sessionStorage.removeItem("userLogged");
               sessionStorage.clear();
-              localStorage.clear();
+              //localStorage.clear();
             } else {
-              window.location.href = "/backoffice/mainPage.html";
+              var request = new XMLHttpRequest();
+
+              request.open("GET", document.location.origin + "/rest/profile/" + sessionStorage.getItem("userLogged"), true);
+              request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+              request.setRequestHeader("Authorization", token);
+              request.send();
+
+               request.onreadystatechange = function() {
+                  if (request.readyState === 4) {
+                    if (request.status === 200) {
+                      var response = JSON.parse(request.responseText);
+
+                      console.log(response);
+
+                      sessionStorage.setItem("name", response.name);
+                      sessionStorage.setItem("displayRole", response.role);
+                      sessionStorage.setItem("departmentTitle", response.department);
+                      sessionStorage.setItem("departmentJobTitle", response.department_job);
+
+                      window.location.href = "/backoffice/mainPage.html";
+                    }
+                    else {
+                        alert("Erro " + request.status + "\nNão será possível proceder com o login.\nTente novamente mais tarde.");
+                        sessionStorage.clear();
+
+                        window.location.href = "/backoffice/index.html";
+                    }
+                  }
+                }
             }
           })
           .catch(function(error) {

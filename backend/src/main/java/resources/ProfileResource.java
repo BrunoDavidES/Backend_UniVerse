@@ -561,5 +561,20 @@ public class ProfileResource {
         }
     }
 
+    @GET
+    @Path("/verifyBOToken")
+    public Response verifyBOToken(@HeaderParam("Authorization") String token){
+        FirebaseToken decodedToken = authenticateToken(token);
+
+        if (decodedToken == null){
+            return Response.ok("false").build();
+        }
+        else if (!getRole(decodedToken).equals(BO) && !getRole(decodedToken).equals(ADMIN)){
+                return Response.ok("false").build();
+        }
+
+        return Response.ok("true").build();
+    }
+
 
 }

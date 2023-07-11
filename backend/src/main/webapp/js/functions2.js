@@ -9,7 +9,6 @@ function numOfLoggedUsers(){
     request.onreadystatechange  = function() {
         if (request.readyState === 4){
             if (request.status === 200) {
-                 console.log(request.responseText);
                  document.getElementById("usersLoggedIn").innerHTML = request.responseText;
             }
             else {
