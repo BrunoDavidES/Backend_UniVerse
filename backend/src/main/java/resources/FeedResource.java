@@ -411,13 +411,16 @@ public class FeedResource {
             if (kind.equals(EVENT)) {
 
                 if (role.equals(TEACHER)) {
+                    String departmentID = user.getString("department");
 
-                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(user.getString("department"));
+                    Key departmentKey = datastore.newKeyFactory().setKind(DEPARTMENT).newKey(departmentID);
                     Entity department = txn.get(departmentKey);
                     if( department == null ) {
                         txn.rollback();
                         LOG.warning("User with role Teacher is not in a department.");
                         return Response.status(Response.Status.FORBIDDEN).entity("User with role Teacher is not in a department.").build();
+                    } else {
+                        data.setDepartment(departmentID);
                     }
 
                 } else if (role.equals(BO) || role.equals(ADMIN)) {
@@ -430,16 +433,22 @@ public class FeedResource {
                         LOG.warning(WRONG_DEPARTMENT);
                         return Response.status(Response.Status.BAD_REQUEST).entity(WRONG_DEPARTMENT).build();
                     }
+                    else{
+                        data.setDepartment(departmentID);
+                    }
 
                 } else{
-
-                    Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(user.getString("nucleus"));
+                    String nucleusID = user.getString("nucleus");
+                    Key nucleusKey = datastore.newKeyFactory().setKind(NUCLEUS).newKey(nucleusID);
                     Entity nucleus = txn.get(nucleusKey);
 
                     if (nucleus == null || !nucleus.getString("president").equals(username)) {
                         txn.rollback();
                         LOG.warning("No permission to post an Event in that nucleus");
                         return Response.status(Response.Status.FORBIDDEN).entity("No permission to post an Event in that nucleus").build();
+                    }
+                    else{
+                        data.setNucleus(nucleusID);
                     }
                 }
             }

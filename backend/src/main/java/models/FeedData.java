@@ -126,8 +126,12 @@ public class FeedData {
         return validated_backoffice;
     }
 
-    public String getAuthorNameByBO() {
-        return authorNameByBO;
+    public void setDepartment(String newDepartment){
+        this.department = newDepartment;
+    }
+
+    public void setNucleus(String newNucleus){
+        this.nucleus = newNucleus;
     }
 
 
