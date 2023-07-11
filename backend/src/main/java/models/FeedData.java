@@ -27,15 +27,7 @@ public class FeedData {
         if (title == null)
             return false;
 
-
-
         if(kind.equals("Event")) {
-            if (department != null && nucleus == null)
-                nucleus = "";
-            else if (department == null && nucleus != null)
-                department = "";
-            else
-                return false;
             return isPublic != null && isItPaid != null && startDate != null && endDate != null && location != null && Integer.parseInt(capacity) > 1;
         }
 
