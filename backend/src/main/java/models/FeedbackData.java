@@ -6,7 +6,7 @@ public class FeedbackData {
     public FeedbackData() {}
 
     public boolean validate() {
-        return rating > 1 && rating < 5;
+        return rating >= 1 && rating <= 5;
     }
 
     public int getRating() {

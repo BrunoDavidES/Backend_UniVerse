@@ -317,12 +317,13 @@ public class ReportsResource {
 
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        //Query<Entity> query = Query.newEntityQueryBuilder()
+        Query<Key> query = Query.newKeyQueryBuilder()
                 .setKind(REPORT)
                 .setFilter(StructuredQuery.PropertyFilter.neq("status", STATUS_RESOLVED))
                 .build();
 
-        QueryResults<Entity> queryResults = datastore.run(query);
+        QueryResults<Key> queryResults = datastore.run(query);
 
         int counter = 0;
 

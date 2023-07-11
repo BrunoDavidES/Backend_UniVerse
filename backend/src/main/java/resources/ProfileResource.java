@@ -479,7 +479,8 @@ public class ProfileResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity(TOKEN_NOT_FOUND).build();
         }
 
-        QueryResults<Entity> queryResults;
+        //QueryResults<Entity> queryResults;
+        QueryResults<Key> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
         if (filters == null) {
@@ -495,7 +496,8 @@ public class ProfileResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        //Query<Entity> query = Query.newEntityQueryBuilder()
+        Query<Key> query = Query.newKeyQueryBuilder()
                 .setKind(USER)
                 .setFilter(attributeFilter)
                 .build();

@@ -414,7 +414,8 @@ public class FeedResource {
             filters.put("validated_backoffice", "true");
         }
 
-        QueryResults<Entity> queryResults;
+        //QueryResults<Entity> queryResults;
+        QueryResults<Key> queryResults;
 
         StructuredQuery.CompositeFilter attributeFilter = null;
 
@@ -428,7 +429,8 @@ public class FeedResource {
                 attributeFilter = StructuredQuery.CompositeFilter.and(attributeFilter, propFilter);
         }
 
-        Query<Entity> query = Query.newEntityQueryBuilder()
+        //Query<Entity> query = Query.newEntityQueryBuilder()
+        Query<Key> query = Query.newKeyQueryBuilder()
                 .setKind(kind)
                 .setFilter(attributeFilter)
                 .build();

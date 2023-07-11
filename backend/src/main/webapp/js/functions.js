@@ -2229,7 +2229,7 @@ function queryFAQ(){
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
                     return {
-                        id: entity.key,
+                        id: entity.key.path[0],
                         email: entity.properties.email,
                         title: entity.properties.title,
                         message: entity.properties.message,
@@ -2251,10 +2251,10 @@ function queryFAQ(){
 
                         var description = document.createElement('p');
                         description.innerHTML = "&emsp;Email de quem mandou: " + entity.email.value +
-                                                "<br> &emsp;ID: " + entity.id.value +
-                                                "<br> &emsp;Pergunta: " + entity.message.value +
+                                                "<br> &emsp;ID: " + entity.id.name +
                                                 "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString() +
-                                                "<br> &emsp;Repondido: " + entity.replied.value;
+                                                "<br> &emsp;Repondido: " + (entity.replied.value !== "" ? new Date(entity.replied.value.seconds * 1000).toString() : "" ) +
+                                                "<br> &emsp;Pergunta: " + entity.message.value;
 
                         details.appendChild(description);
 
@@ -2313,11 +2313,10 @@ function queryUnresFAQ(){
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
                     return {
-                        id: entity.key,
+                        id: entity.key.path[0],
                         email: entity.properties.email,
                         title: entity.properties.title,
                         message: entity.properties.message,
-                        replied: entity.properties.replied,
                         submitted: entity.properties.submitted
                     };
                 });
@@ -2335,10 +2334,9 @@ function queryUnresFAQ(){
 
                         var description = document.createElement('p');
                         description.innerHTML = "&emsp;Email de quem mandou: " + entity.email.value +
-                                                "<br> &emsp;ID: " + entity.id.value +
-                                                "<br> &emsp;Pergunta: " + entity.message.value +
+                                                "<br> &emsp;ID: " + entity.id.name +
                                                 "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString() +
-                                                "<br> &emsp;Repondido: " + entity.replied.value;
+                                                "<br> &emsp;Pergunta: " + entity.message.value;
 
                         details.appendChild(description);
 
@@ -2413,7 +2411,7 @@ function queryFeedBack(){
 
     var request = new XMLHttpRequest();
 
-    request.open(document.location.origin + "/rest/feedback/view?size=" + limit + "&cursor=" + queryFeedBackCursor, true);
+    request.open("GET", document.location.origin + "/rest/feedback/view?size=" + limit + "&cursor=" + queryFeedBackCursor, true);
     request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
 
@@ -2423,31 +2421,34 @@ function queryFeedBack(){
                 const response = JSON.parse(request.responseText);
                 const entities = response.results.map(function(entity) {
                     return {
-                        id: entity.key,
+                        id: entity.key.path[0],
                         author: entity.properties.author,
                         message: entity.properties.message,
-                        submitted: entity.properties.submitted
+                        submitted: entity.properties.submitted,
+                        rating: entity.properties.rating
                     };
                 });
 
                 entities.forEach(function(entity) {
                     var listItem = document.createElement("li");
-                    listItem.textContent = entity.author.value + " - " + entity.submitted.value;
+                    listItem.textContent = entity.author.value;
                     listItem.addEventListener('click', function() {
                         var details = document.getElementById('feedBackDetails');
                         details.innerHTML = '';
 
                         var title = document.createElement('h2');
-                        title.textContent = " " + entity.id.value;
+                        title.textContent = " " + entity.id.name;
                         details.appendChild(title);
 
                         var description = document.createElement('p');
-                        var descriptionTXT = "&emsp;Autor da mensagem de feedback: " + entity.email.value +
-                                             "<br> &emsp;ID: " + entity.id.value +
-                                             "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString();
+                        var descriptionTXT = "&emsp;Autor da mensagem de feedback: " + entity.author.value +
+                                             "<br> &emsp;ID: " + entity.id.name +
+                                             "<br> &emsp;Enviado em: " + new Date(entity.submitted.value.seconds * 1000).toString() +
+                                             "<br> &emsp;Classificação: " + entity.rating.value +
+                                             "<br> &emsp;Conteúdo do Feedback: ";
 
                         var storageRef = firebase.storage().ref();
-                        var fileRef = storageRef.child('Feedback/' + id + ".txt");
+                        var fileRef = storageRef.child('Feedback/' + entity.id.name + ".txt");
 
                         fileRef.getDownloadURL()
                           .then(function(url) {
@@ -2461,13 +2462,13 @@ function queryFeedBack(){
                             }
                           })
                           .then(function(fileContent) {
-                            descriptionTXT += "<br> &emsp;Conteúdo do Feedback: " + fileContent;
+                             description.innerHTML = descriptionTXT + fileContent;
                           })
                           .catch(function(error) {
                             console.error("Error accessing file:", error);
+                            description.innerHTML = descriptionTXT;
                           });
 
-                        description.innerHTML = descriptionTXT;
                         details.appendChild(description);
 
                         var siblings = Array.from(listItem.parentNode.children);
@@ -2490,6 +2491,34 @@ function queryFeedBack(){
                     alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
                 else if (request.status === 403)
                     alert("ERRO " + request.status + "\nNão tem permissão para listar FeedBacks.");
+                else
+                    alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
+
+            }
+        }
+    }
+    request.send();
+}
+
+function statsFeedBack(){
+    var request = new XMLHttpRequest();
+
+    request.open("GET", document.location.origin + "/rest/feedback/stats", true);
+    request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    request.setRequestHeader("Authorization", sessionStorage.getItem("capiToken"));
+
+    request.onreadystatechange  = function() {
+        if (request.readyState === 4 ) {
+            if (request.status === 200) {
+                const response = JSON.parse(request.responseText);
+                document.getElementById("ratingOvr").innerHTML = response[0];
+                console.log(request.responseText);
+            }
+            else {
+                console.log(request.responseText);
+
+                if (request.status === 401)
+                    alert("ERRO " + request.status +"\nA sua sessão expirou ou não é válida.");
                 else
                     alert("ERRO " + request.status +"\nVolte a tentar dentro de alguns minutos.");
 

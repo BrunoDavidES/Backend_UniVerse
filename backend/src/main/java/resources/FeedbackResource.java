@@ -11,6 +11,7 @@ import utils.QueryResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -152,16 +153,21 @@ public class FeedbackResource {
             while (results.hasNext()) {
                 Entity feedback = results.next();
                 feedbackList.add(feedback);
-                ratingSum += Integer.parseInt(feedback.getString("rating"));
+                ratingSum += feedback.getLong("rating");
                 numFeedback++;
             }
 
-            float[] stats = {ratingSum/numFeedback, numFeedback};
+            DecimalFormat df = new DecimalFormat("#.##");
+            df.setMaximumFractionDigits(2);
+
+            float[] stats = { Float.parseFloat( df.format(ratingSum/numFeedback) ), numFeedback};
 
             LOG.info( "Feedback stats fetched");
             txn.commit();
 
-            return Response.ok(stats).build();
+            Gson g = new Gson();
+
+            return Response.ok(g.toJson(stats)).build();
         } finally {
             if (txn.isActive()) {
                 txn.rollback();
