@@ -3,31 +3,31 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "assets/AssetManifest.json": "69a0f2b40b79eb5feee1c7e5d9bd5b7e",
+  "assets/AssetManifest.json": "3fc9b9e98b1e5dfe520b78aa43d1f1b0",
 "assets/assets/app/logo_full_background.png": "aadbbedcedd03fb18856eeb3c93af6fd",
 "assets/assets/app/logo_nova_horiz.png": "0588a7e44c9bdbd1e8b31057f20ed18d",
 "assets/assets/app/logo_no_reference_no_white.png": "469c945d67a8fa36f1b54ec484971d03",
 "assets/assets/app/profile_title.png": "73ba25f513aec0fad292000c4c4d202d",
 "assets/assets/bill.jpg": "d5bd0a1db4d0a949858b546ea10e1463",
-"assets/assets/capi.png": "05b34efb1be19c4e2c3774e268aa6cf4",
 "assets/assets/images/404.png": "a3e5a1e4439f486d8ec5ed37dd3e5673",
 "assets/assets/images/bigger_dot.png": "8c4a86da175b741fd6fdca7a8e189653",
 "assets/assets/images/capi_logo.png": "7dbdc77f478443d7cd080957e97cded6",
 "assets/assets/images/dot.png": "8a678b8eeefdea68708d975fba40915f",
 "assets/assets/images/icon_no_white.png": "a7e8d8b8d2d895aec766ac3812658b0b",
+"assets/assets/images/person.png": "586f828fe3d2dbab7557793c045b650a",
 "assets/assets/images/photo_1.jpg": "36780691fc752b3219d3c849bb67460f",
 "assets/assets/images/photo_2.jpg": "b6180403fd17f1079f7ba2fed93384a9",
 "assets/assets/images/photo_3.jpg": "aee698f87109f2509b5c0d8507ea380a",
 "assets/assets/images/photo_4.jpg": "5afe2bd48925b308313061117d7f9b78",
-"assets/assets/images/photo_5.jpg": "3747f9e0b830bbe44ebc9a58aa784c9a",
-"assets/assets/images/photo_6.jpg": "061017fe8f2b520d8ea0e87917a31bde",
+"assets/assets/images/photo_5.jpg": "ffc4e35215eaf2d5ab9626dfe0a8f995",
+"assets/assets/images/photo_6.jpg": "48263c6e47a1d02bcba482a6c2951416",
 "assets/assets/images/photo_7.jpg": "1c4dd773d1485b93d8aaef2e54a28247",
 "assets/assets/images/photo_8.jpg": "852436ee763d71931d9baaaadd454fe3",
 "assets/assets/images/ufo.png": "c803e9c011bd9c165a266b46a11ad455",
 "assets/assets/images/welcome_photo.jpg": "ec9c1879c03cd148cdde502df6de1b72",
 "assets/assets/img.png": "6c1af842fdcd1608312518995b616fb1",
-"assets/assets/locations/locations.json": "16e8046208203ffc6f34d00497a024d7",
-"assets/assets/man.png": "7081f9bfac95cd1ae4a62d9e002bd449",
+"assets/assets/locations/locations.json": "2e46c9d5fb99df398e02692a13129a6e",
+"assets/assets/locations/locations_simple.json": "636997fc2449175a3c1bd033949ac9d0",
 "assets/assets/titles/about_us.png": "7aa62483568dccadde5d4fcc2246429a",
 "assets/assets/titles/agencies.png": "e5593020bea0e19e92d751d8f57d3d53",
 "assets/assets/titles/area.png": "89e51ccc9201d5dec2a540c7d5fb1a06",
@@ -62,7 +62,7 @@ const RESOURCES = {
 "assets/assets/web/logo.png": "d9ad91466b5fdc7487c1b5b265961310",
 "assets/assets/web/logoNova.png": "e50cc5e52f9a8b1ebb170d98f51d0f39",
 "assets/assets/web/profile-title.png": "85629040d64370e33482eb8becfe0204",
-"assets/assets/web/qr.png": "fcd30886010af37052858c0121e79b47",
+"assets/assets/web/qr.png": "a2402092dbf84b15e81ad99af6803937",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "e7069dfd19b331be16bed984668fe080",
 "assets/NOTICES": "566e1295124f9bd52c6be76f628e9e2a",
@@ -75,10 +75,10 @@ const RESOURCES = {
 "flutter.js": "a85fcf6324d3c4d3ae3be1ae4931e9c5",
 "icons/icon-192x192.png": "6b6f9c80f67e5213d5fcfb073c3b3c5c",
 "icons/icon-512x512.png": "b1569551a0d662073476a37fd540eb02",
-"index.html": "c7681be186498306fd84bb6c92014a1b",
-"/": "c7681be186498306fd84bb6c92014a1b",
+"index.html": "70ea12a209945dbe305228e09023424e",
+"/": "70ea12a209945dbe305228e09023424e",
 "logo.png": "a7e8d8b8d2d895aec766ac3812658b0b",
-"main.dart.js": "f3b4612342dec7368921f67315940947",
+"main.dart.js": "8230cd8e79a3cc3b9604bb0d5ddfad43",
 "manifest.json": "67b0a8905cb2aef94551c387ce8f46a0",
 "version.json": "b5c7ecde8d08ddcb76521c6253147174"
 };
@@ -253,4 +253,3 @@ function onlineFirst(event) {
     })
   );
 }
-
