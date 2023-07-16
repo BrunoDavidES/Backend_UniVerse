@@ -1,0 +1,172 @@
+{
+  "places": [
+    {
+      "address": "Largo da Torre, 2829-516 Caparica",
+      "id": "main",
+      "lat": 38.660992,
+      "lng": -9.205782,
+      "name": "FCT NOVA"
+    },
+    {
+      "id":"ed-1",
+      "address":"Largo da Torre, 2829-516 Caparica",
+      "lat": 38.661186,
+      "lng": -9.205351,
+      "name": "Edifício I"
+    },
+    {
+      "id":"ed-2",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660764,
+      "lng": -9.203575,
+      "name": "Edifício II"
+    },
+    {
+      "id":"ed-3",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.663185,
+      "lng": -9.207236,
+      "name": "Edifício III"
+    },
+    {
+      "id":"ed-4",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662921,
+      "lng": -9.207239,
+      "name": "Edifício IV"
+    },
+    {
+      "id":"ed-5",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662921,
+      "lng": -9.207239,
+      "name": "Edifício V - Auditório Caixa Geral de Depósitos"
+    },
+    {
+      "id":"ed-dep",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662607,
+      "lng": -9.207484,
+      "name": "Edifício Departamental"
+    },
+    {
+      "id":"ed-7",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660774,
+      "lng": -9.205857,
+      "name": "Edifício VII"
+    },
+    {
+      "id":"ed-8",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660378,
+      "lng": -9.206747,
+      "name": "Edifício VIII"
+    },
+    {
+      "id":"ed-9",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660264,
+      "lng": -9.206980,
+      "name": "Edifício IX"
+    },
+    {
+      "id":"ed-10",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.660783,
+      "lng": -9.204902,
+      "name": "Edifício X"
+    },
+    {
+      "id":"hangar",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662164,
+      "lng": -9.207046,
+      "name": "Hangares"
+    },
+    {
+      "id":"can",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.661622,
+      "lng": -9.204953,
+      "name": "Cantina"
+    },
+    {
+      "id":"uninova",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.659635,
+      "lng": -9.203515,
+      "name": "Uninova"
+    },
+    {
+      "id":"ed-11",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662933,
+      "lng": -9.206665,
+      "name": "Edifício XI - Laboratório de e-Learning"
+    },
+    {
+      "id":"biblioteca",
+      "address":"Largo da Torre, 2825-516 Caparica",
+      "lat": 38.662933,
+      "lng": -9.206665,
+      "name": "Biblioteca"
+    },
+    {
+      "id": "casa-pessoal",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661758,
+      "lng": -9.205445,
+      "name":"Casa do Pessoal"
+    },
+    {
+      "id": "tanto-faz",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661577,
+      "lng": -9.206804,
+      "name": "Tanto Faz"
+    },
+    {
+      "id": "tia",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661374,
+      "lng": -9.204845,
+      "name": "A tia"
+    },
+    {
+      "id": "campus.come",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661732,
+      "lng": -9.205101,
+      "name": "C@ampus.come"
+    },
+    {
+      "id": "ed-biblioteca",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.662663,
+      "lng": -9.205244,
+      "name": "C@ampus - Ed.Biblioteca"
+    },
+    {
+      "id": "alquimia",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.661944,
+      "lng": -9.207859,
+      "name": "Nova Alquímia"
+    },
+    {
+      "id": "my-spot",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.660498,
+      "lng": -9.205622,
+      "name": "My Spot Bar"
+    },
+    {
+      "id": "sport",
+      "address": "Campus de Faculdade de Ciências e Tecnologias , 2829-516 Caparica",
+      "lat": 38.658762,
+      "lng": -9.203999,
+      "name": "SportBar"
+    }
+  ]
+}
